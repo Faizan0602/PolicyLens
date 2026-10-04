@@ -31,6 +31,15 @@ class Settings(BaseSettings):
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
     debug: bool = False
 
+    # Model and Provider Settings
+    llm_provider: str = "mock"
+    llm_model: str = "gemini-2.5-flash"
+    embedding_model: str = "BAAI/bge-small-en-v1.5"
+
+    # Sensitive API Credentials (masked in safe_dump/safe_repr)
+    openai_api_key: SecretStr | None = None
+    gemini_api_key: SecretStr | None = None
+
     def safe_dump(self) -> dict[str, Any]:
         """Return a dictionary representation with sensitive values masked."""
         data: dict[str, Any] = {}

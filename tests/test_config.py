@@ -38,9 +38,20 @@ def test_environment_variable_override():
 def test_safe_dump_masks_sensitive_keys():
     """Verify safe_dump masks any field whose name contains sensitive keywords."""
     settings = Settings()
+    from pydantic import SecretStr
+
+    settings = Settings(
+        openai_api_key=SecretStr("super-secret-key-123"),
+        gemini_api_key=SecretStr("gemini-secret-token-456"),
+    )
     safe = settings.safe_dump()
     assert "app_name" in safe
     assert safe["app_name"] == "PolicyLens"
     # Ensure safe_repr is valid JSON
+    assert safe["openai_api_key"] == "**********"
+    assert safe["gemini_api_key"] == "**********"
+    # Ensure safe_repr is valid JSON and does not expose the secrets
     repr_str = settings.safe_repr()
     assert '"app_name": "PolicyLens"' in repr_str
+    assert "super-secret-key-123" not in repr_str
+    assert "gemini-secret-token-456" not in repr_str
