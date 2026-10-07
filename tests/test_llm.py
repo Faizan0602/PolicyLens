@@ -34,12 +34,16 @@ def test_get_llm_mock_provider():
 
 def test_get_llm_provider_switching():
     """Verify get_llm dynamically switches provider based on settings."""
+    from policylens.config import get_settings
+
+    get_settings.cache_clear()
     with patch.dict(
         os.environ, {"POLICYLENS_LLM_PROVIDER": "mock", "POLICYLENS_LLM_MODEL": "custom-mock"}
     ):
         llm = get_llm()
         assert isinstance(llm, MockLLM)
         assert llm.model == "custom-mock"
+    get_settings.cache_clear()
 
 
 def test_get_llm_unsupported_provider():

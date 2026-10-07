@@ -40,6 +40,16 @@ class Settings(BaseSettings):
     openai_api_key: SecretStr | None = None
     gemini_api_key: SecretStr | None = None
 
+    # Chunking Settings
+    chunk_size: int = 1000
+    chunk_overlap: int = 150
+
+    # Qdrant Vector Store Settings
+    qdrant_url: str = "http://localhost:6333"
+    qdrant_api_key: SecretStr | None = None
+    qdrant_collection: str = "policylens_chunks"
+    embedding_batch_size: int = 32
+
     def safe_dump(self) -> dict[str, Any]:
         """Return a dictionary representation with sensitive values masked."""
         data: dict[str, Any] = {}
