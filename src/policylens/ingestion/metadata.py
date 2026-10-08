@@ -46,6 +46,16 @@ def compute_content_hash(text: str) -> str:
     return hashlib.sha256(text.strip().encode("utf-8")).hexdigest()
 
 
+def compute_file_hash(file_path: str | Path) -> str:
+    """Generate deterministic SHA-256 hash of a file's binary contents."""
+    path = Path(file_path)
+    sha256 = hashlib.sha256()
+    with open(path, "rb") as f:
+        while chunk := f.read(65536):
+            sha256.update(chunk)
+    return sha256.hexdigest()
+
+
 def generate_doc_id(source_file: str, regulator: str = "", circular_no: str = "") -> str:
     """Generate a deterministic document ID using SHA-256."""
     norm_file = Path(source_file).name.strip().lower()

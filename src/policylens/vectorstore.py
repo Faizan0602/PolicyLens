@@ -127,6 +127,7 @@ def upsert_chunks(
         point_id = generate_point_id(doc_id=meta["doc_id"], chunk_index=meta["chunk_index"])
         payload: dict[str, Any] = {
             "text": chunk.text,
+            "source_file": chunk.metadata.get("source_file"),
             **meta,
         }
         points.append(
@@ -165,3 +166,33 @@ def search_chunks(
         limit=limit,
     )
     return res.points
+
+
+def delete_document_chunks(
+    source_file: str,
+    doc_id: str | None = None,
+    client: QdrantClient | None = None,
+    collection_name: str | None = None,
+) -> None:
+    """Delete all indexed chunks for a given document from the Qdrant collection."""
+    settings = get_settings()
+    q_client = client or get_qdrant_client()
+    c_name = collection_name or settings.qdrant_collection
+
+    if not q_client.collection_exists(c_name):
+        return
+
+    filter_conditions = []
+    if doc_id:
+        filter_conditions.append(
+            models.FieldCondition(key="doc_id", match=models.MatchValue(value=doc_id))
+        )
+    else:
+        filter_conditions.append(
+            models.FieldCondition(key="source_file", match=models.MatchValue(value=source_file))
+        )
+
+    q_client.delete(
+        collection_name=c_name,
+        points_selector=models.FilterSelector(filter=models.Filter(must=filter_conditions)),
+    )

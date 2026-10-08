@@ -62,8 +62,9 @@ Thumbs.db
 *.log
 logs/
 
-# Qdrant Storage
+# Storage
 qdrant_storage/
+postgres_data/
 
 data/raw/
 !data/raw/.gitkeep

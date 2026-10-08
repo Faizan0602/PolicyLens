@@ -44,6 +44,9 @@ class Settings(BaseSettings):
     chunk_size: int = 1000
     chunk_overlap: int = 150
 
+    # Database Settings
+    database_url: str = "postgresql://localhost:5432/policylens"
+
     # Qdrant Vector Store Settings
     qdrant_url: str = "http://localhost:6333"
     qdrant_api_key: SecretStr | None = None
