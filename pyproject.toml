@@ -17,6 +17,7 @@ dependencies = [
     "sentence-transformers>=2.2.0",
     "numpy>=1.24.0",
     "pymupdf>=1.23.0",
+    "langchain-core>=1.4.7,<2.0.0",
     "langchain-text-splitters>=0.2.0",
     "qdrant-client>=1.9.0",
     "sqlalchemy>=2.0.0,<3.0.0",
@@ -25,6 +26,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+gemini = ["google-genai>=2.29.0,<3.0.0"]
+groq = ["groq>=1.7.0,<2.0.0"]
+
 dev = [
     "ruff>=0.6.0",
     "pre-commit>=3.5.0",

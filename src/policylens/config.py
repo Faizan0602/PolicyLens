@@ -35,10 +35,12 @@ class Settings(BaseSettings):
     llm_provider: str = "mock"
     llm_model: str = "gemini-2.5-flash"
     embedding_model: str = "BAAI/bge-small-en-v1.5"
+    gemini_force_ipv4: bool = False
 
     # Sensitive API Credentials (masked in safe_dump/safe_repr)
-    openai_api_key: SecretStr | None = None
+
     gemini_api_key: SecretStr | None = None
+    groq_api_key: SecretStr | None = None
 
     # Chunking Settings
     chunk_size: int = 1000

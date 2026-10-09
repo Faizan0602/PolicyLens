@@ -3,7 +3,48 @@
 import os
 from unittest.mock import patch
 
+import pytest
+from pydantic import SecretStr
+
 from policylens.config import Settings, get_settings
+
+
+def test_groq_credentials_default_to_none():
+    with patch.dict(os.environ, {}, clear=True):
+        assert Settings(_env_file=None).groq_api_key is None
+
+
+def test_groq_settings_load_synthetic_environment_and_mask_secret():
+    test_key = "synthetic-groq-test-key"
+    with patch.dict(
+        os.environ,
+        {
+            "POLICYLENS_LLM_PROVIDER": "groq",
+            "POLICYLENS_LLM_MODEL": "configured-groq-model",
+            "POLICYLENS_GROQ_API_KEY": test_key,
+        },
+        clear=True,
+    ):
+        settings = Settings(_env_file=None)
+    assert settings.llm_provider == "groq"
+    assert settings.llm_model == "configured-groq-model"
+    assert isinstance(settings.groq_api_key, SecretStr)
+    assert settings.groq_api_key.get_secret_value() == test_key
+    assert settings.safe_dump()["groq_api_key"] == "**********"
+    assert test_key not in settings.safe_repr()
+    assert test_key not in repr(settings)
+
+
+def test_gemini_ipv4_default():
+    """The workaround is opt-in and independent of the developer's .env."""
+    with patch.dict(os.environ, {}, clear=True):
+        assert Settings(_env_file=None).gemini_force_ipv4 is False
+
+
+@pytest.mark.parametrize("value, expected", [("true", True), ("false", False)])
+def test_gemini_ipv4_environment_override(value, expected):
+    with patch.dict(os.environ, {"POLICYLENS_GEMINI_FORCE_IPV4": value}, clear=True):
+        assert Settings(_env_file=None).gemini_force_ipv4 is expected
 
 
 def test_default_settings():

@@ -1,13 +1,15 @@
 """Unit tests for PolicyLens LLM and embedding factories."""
 
 import os
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import numpy as np
 import pytest
 
 from policylens.config import Settings
 from policylens.llm import (
+    GeminiLLM,
+    GroqLLM,
     MockLLM,
     compute_cosine_similarity,
     demonstrate_embedding_similarity,
@@ -46,11 +48,180 @@ def test_get_llm_provider_switching():
     get_settings.cache_clear()
 
 
-def test_get_llm_unsupported_provider():
+@pytest.mark.parametrize("provider", ["unsupported_provider_xyz", "openai", "groqcloud"])
+def test_get_llm_unsupported_provider(provider):
     """Verify get_llm raises ValueError for unsupported provider."""
-    settings = Settings(llm_provider="unsupported_provider_xyz")
-    with pytest.raises(ValueError, match="Unsupported LLM provider"):
+    settings = Settings(_env_file=None, llm_provider=provider)
+    with pytest.raises(ValueError, match="Unsupported LLM provider") as caught:
         get_llm(settings)
+    assert "'groq'" in str(caught.value)
+
+
+@pytest.mark.parametrize("api_key", [None, "test-key"])
+def test_gemini_default_transport_and_timeout(api_key):
+    """Use SDK defaults for address selection, with a finite SDK request timeout."""
+    genai = pytest.importorskip("google.genai")
+    with patch.object(genai, "Client") as client_factory:
+        GeminiLLM(api_key=api_key)
+    kwargs = client_factory.call_args.kwargs
+    assert kwargs["http_options"].timeout == 60_000
+    assert kwargs["http_options"].client_args is None
+    if api_key:
+        assert kwargs["api_key"] == api_key
+    else:
+        assert "api_key" not in kwargs
+
+
+def test_gemini_ipv4_transport_and_timeout():
+    genai = pytest.importorskip("google.genai")
+    with (
+        patch.object(genai, "Client") as client_factory,
+        patch("httpx.HTTPTransport") as transport_factory,
+    ):
+        GeminiLLM(api_key="test-key", force_ipv4=True)
+    transport_factory.assert_called_once_with(local_address="0.0.0.0")
+    options = client_factory.call_args.kwargs["http_options"]
+    assert options.client_args == {"transport": transport_factory.return_value}
+    assert options.timeout == 60_000
+    assert options.retry_options is None
+
+
+@pytest.mark.parametrize("provider", ["gemini", "google"])
+@pytest.mark.parametrize("force_ipv4", [False, True])
+def test_gemini_factory_preserves_model_and_passes_ipv4(provider, force_ipv4):
+    settings = Settings(
+        _env_file=None,
+        llm_provider=provider,
+        llm_model="configured-gemini-model",
+        gemini_api_key="test-key",
+        gemini_force_ipv4=force_ipv4,
+    )
+    with patch("policylens.llm.GeminiLLM") as gemini_factory:
+        assert get_llm(settings) is gemini_factory.return_value
+    gemini_factory.assert_called_once_with(
+        model="configured-gemini-model", api_key="test-key", force_ipv4=force_ipv4
+    )
+
+
+def test_gemini_generate_sdk_request_timeout_without_network():
+    """Verify the SDK applies the timeout to real request construction, without network I/O."""
+    pytest.importorskip("google.genai")
+    import httpx
+
+    def respond(request):
+        assert request.extensions["timeout"] == {
+            "connect": 60.0,
+            "read": 60.0,
+            "write": 60.0,
+            "pool": 60.0,
+        }
+        return httpx.Response(
+            200,
+            json={"candidates": [{"content": {"parts": [{"text": "Mock response"}]}}]},
+        )
+
+    with patch("httpx.HTTPTransport", return_value=httpx.MockTransport(respond)):
+        llm = GeminiLLM(api_key="test-key", force_ipv4=True)
+    try:
+        assert llm.generate("test prompt") == "Mock response"
+    finally:
+        llm.client.close()
+
+
+@pytest.fixture
+def groq_sdk():
+    groq = pytest.importorskip("groq")
+    with patch.object(groq, "Groq") as client_factory:
+        yield client_factory
+
+
+def test_groq_initialization_and_generate(groq_sdk):
+    llm = GroqLLM(model="configured-model", api_key="test-groq-key")
+    assert llm.model == "configured-model"
+    assert llm.client is groq_sdk.return_value
+    groq_sdk.assert_called_once_with(api_key="test-groq-key", timeout=60.0, max_retries=0)
+    create = llm.client.chat.completions.create
+    text = "  Supported answer [Source 1].\n"
+    create.return_value.choices = [Mock(message=Mock(content=text))]
+    prompt = "Question and evidence containing {literal braces}"
+
+    assert llm.generate(prompt, temperature=0.2, max_completion_tokens=64) == text
+
+    create.assert_called_once_with(
+        model="configured-model",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.2,
+        max_completion_tokens=64,
+    )
+
+
+@pytest.mark.parametrize("provider", ["groq", " GROQ "])
+def test_groq_factory_uses_configured_model_and_secret(provider):
+    settings = Settings(
+        _env_file=None,
+        llm_provider=provider,
+        llm_model="configured-groq-model",
+        groq_api_key="test-groq-key",
+    )
+    with patch("policylens.llm.GroqLLM") as client_factory:
+        assert get_llm(settings) is client_factory.return_value
+    client_factory.assert_called_once_with(model="configured-groq-model", api_key="test-groq-key")
+
+
+@pytest.mark.parametrize("api_key", [None, "", " \n\t "])
+def test_groq_missing_credentials_rejected_without_sdk_environment_fallback(api_key):
+    # Synthetic keys only; neither .env nor local credentials are read.
+    settings = Settings(
+        _env_file=None, llm_provider="groq", llm_model="configured-model", groq_api_key=api_key
+    )
+    with (
+        patch.dict(os.environ, {"GROQ_API_KEY": "unrelated-test-key"}),
+        pytest.raises(ValueError, match="set POLICYLENS_GROQ_API_KEY"),
+    ):
+        get_llm(settings)
+
+
+@pytest.mark.parametrize("model", ["", " \n "])
+def test_groq_missing_model_rejected(model):
+    with pytest.raises(ValueError, match="set POLICYLENS_LLM_MODEL"):
+        GroqLLM(model=model, api_key="test-groq-key")
+
+
+@pytest.mark.parametrize(
+    "choices",
+    [
+        [],
+        None,
+        [Mock(message=None)],
+        [Mock(message=Mock(content=None))],
+        [Mock(message=Mock(content=""))],
+        [Mock(message=Mock(content=" \n\t "))],
+        [Mock(message=Mock(content=123))],
+    ],
+)
+def test_groq_generate_unusable_response_raises(groq_sdk, choices):
+    llm = GroqLLM(model="configured-model", api_key="test-groq-key")
+    llm.client.chat.completions.create.return_value.choices = choices
+    with pytest.raises(RuntimeError, match="Groq returned no"):
+        llm.generate("Question")
+
+
+def test_groq_generate_sdk_errors_propagate_without_retry(groq_sdk):
+    llm = GroqLLM(model="configured-model", api_key="test-groq-key")
+    failure = RuntimeError("Service unavailable")
+    create = llm.client.chat.completions.create
+    create.side_effect = failure
+    with pytest.raises(RuntimeError, match="Service unavailable") as caught:
+        llm.generate("Question")
+    assert caught.value is failure
+    create.assert_called_once()
+
+
+def test_groq_generate_rejects_streaming_without_request(groq_sdk):
+    llm = GroqLLM(model="configured-model", api_key="test-groq-key")
+    with pytest.raises(ValueError, match="does not support streaming"):
+        llm.generate("Question", stream=True)
+    llm.client.chat.completions.create.assert_not_called()
 
 
 def test_manual_cosine_similarity_math():

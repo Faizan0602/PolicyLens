@@ -41,11 +41,30 @@ class MockLLM:
 class GeminiLLM:
     """Gemini LLM wrapper using google-genai SDK."""
 
-    def __init__(self, model: str = "gemini-2.5-flash", api_key: str | None = None) -> None:
+    def __init__(
+        self,
+        model: str = "gemini-3.8-flash",
+        api_key: str | None = None,
+        *,
+        force_ipv4: bool = False,
+    ) -> None:
         from google import genai
+        from google.genai import types
+
+        client_args = None
+        if force_ipv4:
+            import httpx
+
+            # Scope IPv4 source binding to this client's synchronous requests.
+            client_args = {"transport": httpx.HTTPTransport(local_address="0.0.0.0")}
+        http_options = types.HttpOptions(timeout=60_000, client_args=client_args)
 
         self.model = model
-        self.client = genai.Client(api_key=api_key) if api_key else genai.Client()
+        self.client = (
+            genai.Client(api_key=api_key, http_options=http_options)
+            if api_key
+            else genai.Client(http_options=http_options)
+        )
 
     def generate(self, prompt: str, **kwargs: Any) -> str:
         """Generate completion using Gemini API."""
@@ -57,30 +76,42 @@ class GeminiLLM:
         return str(response.text)
 
 
-class OpenAILLM:
-    """OpenAI LLM wrapper using official openai SDK."""
+class GroqLLM:
+    """GroqCloud completion wrapper with a configured model and no automatic retries."""
 
-    def __init__(self, model: str = "gpt-4o-mini", api_key: str | None = None) -> None:
-        from openai import OpenAI
+    def __init__(self, model: str, api_key: str | None = None) -> None:
+        if not api_key or not api_key.strip():
+            raise ValueError("Groq API key is required; set POLICYLENS_GROQ_API_KEY.")
+        if not model or not model.strip():
+            raise ValueError("Groq model is required; set POLICYLENS_LLM_MODEL.")
+
+        from groq import Groq
 
         self.model = model
-        self.client = OpenAI(api_key=api_key) if api_key else OpenAI()
+        self.client = Groq(api_key=api_key, timeout=60.0, max_retries=0)
 
     def generate(self, prompt: str, **kwargs: Any) -> str:
-        """Generate completion using OpenAI API."""
+        """Return the first completion's text, rejecting missing or empty responses."""
+        if kwargs.get("stream"):
+            raise ValueError("GroqLLM.generate() does not support streaming.")
         response = self.client.chat.completions.create(
             model=self.model,
             messages=[{"role": "user", "content": prompt}],
             **kwargs,
         )
-        choice = response.choices[0]
-        return str(choice.message.content or "")
+        if not response.choices:
+            raise RuntimeError("Groq returned no completion choices.")
+        message = response.choices[0].message
+        text = message.content if message is not None else None
+        if not isinstance(text, str) or not text.strip():
+            raise RuntimeError("Groq returned no usable response text.")
+        return text
 
 
 def get_llm(settings: Settings | None = None) -> LLMClient:
     """Instantiate an LLM client driven entirely by configuration and environment.
 
-    Supported providers: 'mock', 'gemini' (or 'google'), 'openai'.
+    Supported providers: 'mock', 'gemini' (or 'google'), 'groq'.
     """
     cfg = settings or get_settings()
     provider = cfg.llm_provider.strip().lower()
@@ -89,14 +120,18 @@ def get_llm(settings: Settings | None = None) -> LLMClient:
         return MockLLM(model=cfg.llm_model)
     elif provider in ("gemini", "google"):
         api_key = cfg.gemini_api_key.get_secret_value() if cfg.gemini_api_key else None
-        return GeminiLLM(model=cfg.llm_model, api_key=api_key)
-    elif provider == "openai":
-        api_key = cfg.openai_api_key.get_secret_value() if cfg.openai_api_key else None
-        return OpenAILLM(model=cfg.llm_model, api_key=api_key)
+        return GeminiLLM(
+            model=cfg.llm_model,
+            api_key=api_key,
+            force_ipv4=cfg.gemini_force_ipv4,
+        )
+    elif provider == "groq":
+        api_key = cfg.groq_api_key.get_secret_value() if cfg.groq_api_key else None
+        return GroqLLM(model=cfg.llm_model, api_key=api_key)
     else:
         raise ValueError(
             f"Unsupported LLM provider: '{cfg.llm_provider}'. "
-            "Supported providers: 'mock', 'gemini', 'openai'."
+            "Supported providers: 'mock', 'gemini' (or 'google'), 'groq'."
         )
 
 
