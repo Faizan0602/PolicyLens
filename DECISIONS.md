@@ -126,3 +126,49 @@ A chunk of text is useless if we don't know where it came from, who issued it, o
 - **Decision:** Designed a strict 14-field Pydantic schema (`ChunkMetadata`) applied to every chunk, containing exactly: `doc_id`, `title`, `regulator`, `circular_no`, `issue_date`, `effective_date`, `status`, `supersedes`, `section`, `page`, `access_level`, `source_url`, `content_hash`, and `chunk_index`.
 - **Reasoning:** Regulatory queries are highly specific. By structuring these properties up front, we allow the vector database (Qdrant) to perform exact "pre-filtering" (e.g., `regulator == "RBI"` AND `issue_date == "2024-01-01"`) before running the semantic vector search. The metadata itself provides essential traceability back to the source document and regulatory context.
 - **Trade-offs and Limitations:** Storing 14 fields on every chunk increases the payload size per point in the database. Furthermore, the pipeline is highly dependent on the upstream manifest or parser correctly providing this information; missing upstream data will result in `None` values that cannot be filtered. Note that metadata fields alone do not make ingestion idempotent; the pipeline relies separately on a PostgreSQL registry for file change detection and deterministic UUIDv5 Qdrant point IDs (derived from `doc_id` and `chunk_index`) to ensure safe re-runs.
+
+---
+
+## Decision 007: Frozen Retrieval Baseline and Failure Analysis (Phase 2, Step 2.6)
+
+### Status
+Accepted
+
+### Context
+The Step 2.5 dense-retrieval baseline is frozen before retrieval improvements. Twelve development questions were investigated against original PDFs and read-only indexed chunks; hold-out questions were excluded.
+
+### Decisions Made
+
+1. **Frozen baseline and comparison rule**
+   - Source: [committed baseline JSON](eval/results/retrieval_20261012T191839173509Z_af6558ebe4a5bce1f853b19340b8acdfe77ea87db78f6dd033f4fb3c73a9c58f.json), timestamp `20261012T191839173509Z`.
+   - Dense retrieval, `k=5`, embedding model `BAAI/bge-small-en-v1.5`, Qdrant collection `policylens_chunks`. Of 60 golden questions, 12 frozen hold-out questions were excluded; 48 development questions remained, with 41 answerable questions evaluated and 7 unanswerable questions excluded.
+   - Configuration SHA-256: `af6558ebe4a5bce1f853b19340b8acdfe77ea87db78f6dd033f4fb3c73a9c58f`. Two saved runs have the same hash and identical full-precision aggregate metrics. This hash identifies recorded settings, **not** the Qdrant index snapshot or embedding artifacts.
+
+   | Experiment/configuration | Hit@5 | Recall@5 | MRR | Notes |
+   | --- | ---: | ---: | ---: | --- |
+   | Baseline: dense BGE, `k=5`, `policylens_chunks` | 0.9268 | 0.8561 | 0.8862 | 41 answerable development questions; 12 hold-out excluded |
+
+   Future retrieval experiments must use the same evaluation split and metric definitions for comparison. No improvement results have been recorded.
+
+2. **Failure taxonomy and investigated cases**
+   - Parsing/extraction: confirmed for G035. Chunking/context fragmentation: observed in G028 and G036; incomplete answer-bearing chunk coverage in G050 and G052. Embedding/ranking misses: observed as absent or lower-ranked gold pages, without proving an embedding-model defect. Exact-identifier miss: likely for G042. Ambiguous questions and wrong filters were **not established** as causes in these cases.
+
+   | ID | Confirmed observation | Likely explanation or limit |
+   | --- | --- | --- |
+   | G003 | Complete miss; the Payments Banks page is indexed, while Commercial Banks and Small Finance Banks passages rank higher. | Related-regulation ranking competition (medium confidence). |
+   | G035 | Complete miss; the Digital Accessibility PDF is visually readable but yields zero extracted text and zero indexed chunks. | Parsing/extraction failure (confirmed, high confidence). |
+   | G042 | Complete miss; the sanctions table and exact `5080(E)` mapping are indexed but absent from top five. | Exact-identifier retrieval miss (medium confidence). |
+   | G007 | Partial recall: page 8 retrieved; indexed page 9 missing. | Ranking/coverage issue (medium confidence). |
+   | G008 | Partial recall: pages 2, 7, 8 retrieved; indexed pages 5, 6 missing. Duplicate page-8 chunks and page 14 occupy top-five positions. | Crowding confirmed; underlying ranking cause untested. |
+   | G012 | Partial recall: ETF extension page retrieved; indexed original page missing. The extension itself states both dates. | Version/provenance ranking miss (medium confidence). |
+   | G017 | Partial recall: answer-bearing AIFI page 2 retrieved; contextual page 1 missing. Near-identical RBI valuation amendments occupy other ranks. | Near-duplicate ranking competition (medium confidence). |
+   | G028 | Partial recall: OTC novation page 1 retrieved; indexed page 2 missing. Issue date and applicability rule span the pages. | Context split confirmed; effect on ranking is untested. |
+   | G036 | Partial recall: delisting page 3 retrieved; indexed page 2 missing. The bank-route sentence crosses the page boundary. | Context split confirmed; likely ranking issue (medium confidence). |
+   | G021 | Hit@5 and Recall@5 succeed; the first gold page is rank 2, after the same circular's introduction. | Minor ranking weakness, not an established substantive miss. |
+   | G050 | Page-level Hit@5 and Recall@5 succeed; the returned gold-page chunk has the 60-day rule, but the separately indexed 90-day rule is absent. | Chunk-level answer-evidence gap confirmed; ranking cause undetermined. |
+   | G052 | Page-level Hit@5 and Recall@5 succeed; a related IFSCA circular ranks first, while returned gold-page chunks omit separately indexed LRS and overseas-labelling text. | Related-document competition and chunk-level evidence gap confirmed. |
+
+   Page-level Hit@k and Recall@k can equal 1 even when returned chunks omit part of the required answer, as G050 and G052 show. Similarity scores alone do not establish relevance or a root cause.
+
+3. **Future improvement hypotheses, not implemented**
+   - Test extraction support for image-only/non-extractable PDFs; stronger exact-identifier matching; diversity against near-duplicate chunks; neighboring-chunk/page context for multi-section questions; and chunk-level answer-evidence coverage checks. These are untested hypotheses, not measured gains. No tuning was performed.
