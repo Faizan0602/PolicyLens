@@ -1,0 +1,197 @@
+"""Evaluate dense retrieval on verified development questions only."""
+
+import argparse
+import hashlib
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+from policylens.config import get_settings
+from policylens.retrieval import retrieve
+
+if __package__:
+    from .metrics import hit_at_k, recall_at_k, reciprocal_rank
+else:
+    from metrics import hit_at_k, recall_at_k, reciprocal_rank
+
+ROOT = Path(__file__).resolve().parents[1]
+GOLDEN_PATH = ROOT / "data" / "eval" / "golden.jsonl"
+HOLDOUT_PATH = ROOT / "data" / "eval" / "holdout_ids.txt"
+RESULTS_DIR = ROOT / "eval" / "results"
+REQUIRED_FIELDS = {
+    "id",
+    "question",
+    "type",
+    "gold_sources",
+    "reference_answer",
+    "answerable",
+    "verified",
+}
+
+
+def load_golden() -> list[dict[str, Any]]:
+    """Read and validate the golden JSONL before any retrieval calls."""
+    if not GOLDEN_PATH.is_file():
+        raise FileNotFoundError(f"Golden dataset not found: {GOLDEN_PATH}")
+
+    records = []
+    seen_ids = set()
+    for line_number, line in enumerate(GOLDEN_PATH.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            raise ValueError(f"Blank golden record at line {line_number}")
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"Invalid golden JSON at line {line_number}: {exc.msg}") from exc
+        if not isinstance(record, dict) or set(record) != REQUIRED_FIELDS:
+            raise ValueError(f"Invalid golden fields at line {line_number}")
+        if not isinstance(record["id"], str) or not record["id"].strip():
+            raise ValueError(f"Invalid golden ID at line {line_number}")
+        if record["id"] in seen_ids:
+            raise ValueError(f"Duplicate golden ID: {record['id']}")
+        if not isinstance(record["question"], str) or not record["question"].strip():
+            raise ValueError(f"Invalid question for {record['id']}")
+        if not isinstance(record["type"], str) or not isinstance(record["reference_answer"], str):
+            raise ValueError(f"Invalid type or reference answer for {record['id']}")
+        if type(record["answerable"]) is not bool or type(record["verified"]) is not bool:
+            raise ValueError(f"Invalid answerable or verified flag for {record['id']}")
+        sources = record["gold_sources"]
+        if not isinstance(sources, list) or record["answerable"] != bool(sources):
+            raise ValueError(f"Invalid gold_sources for {record['id']}")
+        for source in sources:
+            if (
+                not isinstance(source, dict)
+                or set(source) != {"doc_id", "page"}
+                or not isinstance(source["doc_id"], str)
+                or not source["doc_id"].strip()
+                or type(source["page"]) is not int
+                or source["page"] < 1
+            ):
+                raise ValueError(f"Invalid gold source for {record['id']}")
+        seen_ids.add(record["id"])
+        records.append(record)
+
+    if not records:
+        raise ValueError("Golden dataset is empty")
+    return records
+
+
+def load_holdout(golden_ids: set[str]) -> set[str]:
+    """Validate the frozen twelve-question hold-out split."""
+    if not HOLDOUT_PATH.is_file():
+        raise FileNotFoundError(f"Hold-out IDs not found: {HOLDOUT_PATH}")
+    ids = HOLDOUT_PATH.read_text(encoding="utf-8").splitlines()
+    if len(ids) != 12 or any(not item or item != item.strip() for item in ids):
+        raise ValueError("Hold-out file must contain exactly 12 nonblank IDs, one per line")
+    if len(set(ids)) != len(ids):
+        raise ValueError("Hold-out IDs must be unique")
+    unknown = set(ids) - golden_ids
+    if unknown:
+        raise ValueError(f"Hold-out IDs missing from golden dataset: {', '.join(sorted(unknown))}")
+    return set(ids)
+
+
+def evaluate(k: int) -> dict[str, Any]:
+    """Run one ordered development-only retrieval evaluation."""
+    if type(k) is not int or k < 1:
+        raise ValueError("k must be a positive integer")
+    golden = load_golden()
+    holdout_ids = load_holdout({record["id"] for record in golden})
+    development = [record for record in golden if record["id"] not in holdout_ids]
+    eligible = [record for record in development if record["answerable"]]
+    if not eligible:
+        raise ValueError("No answerable development questions to evaluate")
+    if any(record["verified"] is not True for record in eligible):
+        raise ValueError("All evaluated questions must have verified=true")
+
+    settings = get_settings()
+    configuration = {
+        "k": k,
+        "embedding_model": settings.embedding_model,
+        "qdrant_collection": settings.qdrant_collection,
+    }
+    canonical = json.dumps(configuration, sort_keys=True, separators=(",", ":"))
+    configuration_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+    per_question = []
+    for record in eligible:
+        results = retrieve(record["question"], k=k)
+        sources = record["gold_sources"]
+        per_question.append(
+            {
+                "id": record["id"],
+                "hit_at_k": hit_at_k(results, sources, k),
+                "recall_at_k": recall_at_k(results, sources, k),
+                "reciprocal_rank": reciprocal_rank(results, sources, k),
+            }
+        )
+
+    count = len(per_question)
+    now = datetime.now(timezone.utc)
+    return {
+        "timestamp_utc": now.isoformat(timespec="microseconds").replace("+00:00", "Z"),
+        "configuration_hash": configuration_hash,
+        "configuration": configuration,
+        "counts": {
+            "golden_questions": len(golden),
+            "holdout_questions": len(holdout_ids),
+            "development_questions": len(development),
+            "answerable_evaluated": count,
+            "unanswerable_excluded": len(development) - count,
+        },
+        "metrics": {
+            "hit_at_k": sum(row["hit_at_k"] for row in per_question) / count,
+            "recall_at_k": sum(row["recall_at_k"] for row in per_question) / count,
+            "mrr": sum(row["reciprocal_rank"] for row in per_question) / count,
+        },
+        "per_question": per_question,
+    }
+
+
+def save_results(report: dict[str, Any]) -> Path:
+    """Create the results directory only after evaluation has completed."""
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    timestamp = report["timestamp_utc"].replace("-", "").replace(":", "").replace(".", "")
+    path = RESULTS_DIR / f"retrieval_{timestamp}_{report['configuration_hash']}.json"
+    with path.open("x", encoding="utf-8") as output:
+        json.dump(report, output, indent=2, ensure_ascii=False)
+        output.write("\n")
+    return path
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Evaluate dense retrieval on development questions"
+    )
+    parser.add_argument("--k", type=int, default=5, help="Number of retrieved chunks (default: 5)")
+    args = parser.parse_args()
+    if args.k < 1:
+        parser.error("--k must be a positive integer")
+
+    report = evaluate(args.k)
+    output_path = save_results(report)
+    config = report["configuration"]
+    counts = report["counts"]
+    metrics = report["metrics"]
+    rows = [
+        (
+            "Configuration",
+            f"k={config['k']}, embedding_model={config['embedding_model']}, "
+            f"qdrant_collection={config['qdrant_collection']}",
+        ),
+        ("Development questions", counts["development_questions"]),
+        ("Answerable evaluated", counts["answerable_evaluated"]),
+        ("Unanswerable excluded", counts["unanswerable_excluded"]),
+        (f"Hit@{args.k}", f"{metrics['hit_at_k']:.4f}"),
+        (f"Recall@{args.k}", f"{metrics['recall_at_k']:.4f}"),
+        ("MRR", f"{metrics['mrr']:.4f}"),
+    ]
+    print(f"{'Retrieval evaluation':<24} Value")
+    for label, value in rows:
+        print(f"{label:<24} {value}")
+    print(f"Saved: {output_path}")
+
+
+if __name__ == "__main__":
+    main()
