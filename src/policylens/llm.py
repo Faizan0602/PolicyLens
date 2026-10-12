@@ -68,6 +68,12 @@ class GeminiLLM:
 
     def generate(self, prompt: str, **kwargs: Any) -> str:
         """Generate completion using Gemini API."""
+        if "temperature" in kwargs:
+            from google.genai import types
+
+            # Translate only an explicit request option; leave other calls unchanged.
+            config = types.GenerateContentConfig.model_validate(kwargs.get("config") or {})
+            kwargs["config"] = config.model_copy(update={"temperature": kwargs.pop("temperature")})
         response = self.client.models.generate_content(
             model=self.model,
             contents=prompt,

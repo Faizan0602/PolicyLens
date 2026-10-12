@@ -1,5 +1,6 @@
 """Unit tests for PolicyLens LLM and embedding factories."""
 
+import json
 import os
 from unittest.mock import Mock, patch
 
@@ -103,7 +104,8 @@ def test_gemini_factory_preserves_model_and_passes_ipv4(provider, force_ipv4):
     )
 
 
-def test_gemini_generate_sdk_request_timeout_without_network():
+@pytest.mark.parametrize("temperature", [None, 0])
+def test_gemini_generate_sdk_request_timeout_without_network(temperature):
     """Verify the SDK applies the timeout to real request construction, without network I/O."""
     pytest.importorskip("google.genai")
     import httpx
@@ -115,6 +117,11 @@ def test_gemini_generate_sdk_request_timeout_without_network():
             "write": 60.0,
             "pool": 60.0,
         }
+        generation_config = json.loads(request.content).get("generationConfig", {})
+        if temperature is None:
+            assert "temperature" not in generation_config
+        else:
+            assert generation_config["temperature"] == 0
         return httpx.Response(
             200,
             json={"candidates": [{"content": {"parts": [{"text": "Mock response"}]}}]},
@@ -123,9 +130,34 @@ def test_gemini_generate_sdk_request_timeout_without_network():
     with patch("httpx.HTTPTransport", return_value=httpx.MockTransport(respond)):
         llm = GeminiLLM(api_key="test-key", force_ipv4=True)
     try:
-        assert llm.generate("test prompt") == "Mock response"
+        kwargs = {} if temperature is None else {"temperature": temperature}
+        assert llm.generate("test prompt", **kwargs) == "Mock response"
     finally:
         llm.client.close()
+
+
+@pytest.mark.parametrize("as_model", [False, True])
+def test_gemini_explicit_temperature_preserves_existing_config(as_model):
+    genai = pytest.importorskip("google.genai")
+    from google.genai import types
+
+    original = {"temperature": 0.8, "max_output_tokens": 64}
+    config = types.GenerateContentConfig(**original) if as_model else original.copy()
+    with patch.object(genai, "Client") as client_factory:
+        llm = GeminiLLM(api_key="test-key")
+    generate = client_factory.return_value.models.generate_content
+    generate.return_value.text = "OK"
+
+    assert llm.generate("Question", temperature=0, config=config) == "OK"
+
+    generate.assert_called_once()
+    request = generate.call_args.kwargs
+    assert (
+        "temperature" not in request
+    )  # Gemini accepts it inside config, not as a top-level option.
+    assert request["config"].temperature == 0
+    assert request["config"].max_output_tokens == 64
+    assert (config.model_dump(exclude_none=True) if as_model else config) == original
 
 
 @pytest.fixture
@@ -135,9 +167,10 @@ def groq_sdk():
         yield client_factory
 
 
-def test_groq_initialization_and_generate(groq_sdk):
-    llm = GroqLLM(model="configured-model", api_key="test-groq-key")
-    assert llm.model == "configured-model"
+@pytest.mark.parametrize("model, temperature", [("configured-model", 0.2), ("qwen/qwen3.8-27b", 0)])
+def test_groq_initialization_and_generate(groq_sdk, model, temperature):
+    llm = GroqLLM(model=model, api_key="test-groq-key")
+    assert llm.model == model
     assert llm.client is groq_sdk.return_value
     groq_sdk.assert_called_once_with(api_key="test-groq-key", timeout=60.0, max_retries=0)
     create = llm.client.chat.completions.create
@@ -145,12 +178,12 @@ def test_groq_initialization_and_generate(groq_sdk):
     create.return_value.choices = [Mock(message=Mock(content=text))]
     prompt = "Question and evidence containing {literal braces}"
 
-    assert llm.generate(prompt, temperature=0.2, max_completion_tokens=64) == text
+    assert llm.generate(prompt, temperature=temperature, max_completion_tokens=64) == text
 
     create.assert_called_once_with(
-        model="configured-model",
+        model=model,
         messages=[{"role": "user", "content": prompt}],
-        temperature=0.2,
+        temperature=temperature,
         max_completion_tokens=64,
     )
 
