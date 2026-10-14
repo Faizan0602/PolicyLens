@@ -133,3 +133,49 @@ Top-1: FAIL. Top-3: FAIL. Top-5: FAIL.
 Highest result: Rank 1, score 0.711499, source NOTI27401102026AA16BFEFF59341BF97FD2930B1A4A63C.PDF, page 18.
 Returned results: Rank 1 currency-management circular withdrawals (0.711499); Rank 2 ATM cassette swaps (0.704964); Rank 3 Commercial Banks investment directions (0.702993); Rank 4 Payments Banks investment directions (0.701479); Rank 5 Local Area Banks investment directions (0.699667).
 Failure reason: No retrieved passage supports a policy repo-rate announcement. The corpus appears not to contain the requested evidence. Do not infer a repo-rate figure.
+
+# Step 3.1: Dense vs Sparse BM25 Retrieval Evaluation
+
+Status: Completed. Objective: compare sparse BM25 with the frozen dense baseline on the same answerable development questions, without using the hold-out.
+
+## Configuration
+
+- Dense: `BAAI/bge-small-en-v1.5` in `policylens_chunks`.
+- Sparse: `qdrant/bm25` in `policylens_bm25`, named vector `bm25` with IDF modifier.
+- Both collections contain 669 chunks with identical point IDs and complete payloads; retrieval depth was `k=5`.
+- Of 48 development questions, 41 answerable questions were evaluated and 7 unanswerable questions were excluded. The 12 frozen hold-out questions were excluded.
+
+## Results
+
+| Method | Hit@5 | Recall@5 | MRR |
+| --- | ---: | ---: | ---: |
+| Dense | 0.9268 | 0.8561 | 0.8862 |
+| BM25 | 0.9512 | 0.9049 | 0.8943 |
+
+By question type (each cell is Hit@5 / Recall@5 / MRR):
+
+| Type (count) | Dense | BM25 |
+| --- | --- | --- |
+| Factoid (19) | 0.8947 / 0.8421 / 0.8333 | 0.8947 / 0.8684 / 0.7719 |
+| Multi-section (10) | 1 / 0.9100 / 0.9500 | 1 / 0.9100 / 1 |
+| Table lookup (7) | 0.8571 / 0.8571 / 0.8571 | 1 / 1 / 1 |
+| Date/version (5) | 1 / 0.8000 / 1 | 1 / 0.9000 / 1 |
+
+## Question-level comparison
+
+Compare Recall@5 first and reciprocal rank when recall ties; report Hit@5 separately. BM25 won 7 questions, dense won 5, and 29 were exact ties. Example cells are Hit@5 / Recall@5 / reciprocal rank.
+
+| ID | Favored method | Dense | BM25 |
+| --- | --- | --- | --- |
+| G042 | BM25 | 0 / 0 / 0 | 1 / 1 / 1 |
+| G007 | BM25 | 1 / 0.5 / 1 | 1 / 1 / 1 |
+| G028 | BM25 | 1 / 0.5 / 1 | 1 / 1 / 1 |
+| G009 | Dense | 1 / 1 / 1 | 1 / 0.5 / 1 |
+| G004 | Dense | 1 / 1 / 1 | 1 / 1 / 0.3333 |
+| G034 | Dense | 1 / 1 / 1 | 1 / 1 / 0.3333 |
+
+## Findings and limitations
+
+BM25 scored higher overall on this development set, while dense had higher factoid MRR. G003 and G035 were missed by both methods; G035 has a known extraction/indexing gap with zero indexed chunks. Page-level matches do not guarantee answer-bearing chunk text, raw dense and BM25 scores are not directly comparable, and metric differences alone do not establish causes. These results do not establish independent generalization. Future ingestion must keep both collections synchronized.
+
+Saved evidence: [dense baseline](eval/results/retrieval_20261012T191839173509Z_af6558ebe4a5bce1f853b19340b8acdfe77ea87db78f6dd033f4fb3c73a9c58f.json), [BM25 evaluation](eval/results/retrieval_bm25_20261014T095834356877Z_5047cbf0cbf3f1ac63547757db03dfa232d1159d1d06350c5abca79b22162fe8.json). Associated architecture record: [Decision 008](DECISIONS.md#decision-008-separate-bm25-retrieval-and-development-set-comparison-phase-3-step-31).

@@ -4,12 +4,13 @@ import argparse
 import sys
 from typing import Any
 
+from qdrant_client.models import ScoredPoint
+
 from policylens.ingestion.metadata import ChunkMetadata
 from policylens.vectorstore import search_chunks
 
 
-def retrieve(query: str, k: int = 5) -> list[dict[str, Any]]:
-    """Return up to k chunks, preserving Qdrant ranking, scores, and available metadata."""
+def _validate_retrieval_inputs(query: str, k: int) -> None:
     if not isinstance(query, str):
         raise TypeError("query must be a string")
     if not query.strip():
@@ -19,8 +20,11 @@ def retrieve(query: str, k: int = 5) -> list[dict[str, Any]]:
     if k <= 0:
         raise ValueError("k must be greater than zero")
 
+
+def _map_search_results(points: list[ScoredPoint]) -> list[dict[str, Any]]:
+    """Preserve Qdrant order, scores, and available canonical chunk metadata."""
     results: list[dict[str, Any]] = []
-    for point in search_chunks(query=query, limit=k):
+    for point in points:
         payload = point.payload or {}
         results.append(
             {
@@ -36,6 +40,12 @@ def retrieve(query: str, k: int = 5) -> list[dict[str, Any]]:
             }
         )
     return results
+
+
+def retrieve(query: str, k: int = 5) -> list[dict[str, Any]]:
+    """Return up to k chunks, preserving Qdrant ranking, scores, and available metadata."""
+    _validate_retrieval_inputs(query, k)
+    return _map_search_results(search_chunks(query=query, limit=k))
 
 
 def print_results(results: list[dict[str, Any]]) -> None:

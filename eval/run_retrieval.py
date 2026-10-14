@@ -1,4 +1,4 @@
-"""Evaluate dense retrieval on verified development questions only."""
+"""Evaluate dense or BM25 retrieval on verified development questions only."""
 
 import argparse
 import hashlib
@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from policylens.bm25 import retrieve_bm25
 from policylens.config import get_settings
 from policylens.retrieval import retrieve
 
@@ -92,10 +93,21 @@ def load_holdout(golden_ids: set[str]) -> set[str]:
     return set(ids)
 
 
-def evaluate(k: int) -> dict[str, Any]:
+def _average_metrics(rows: list[dict[str, Any]]) -> dict[str, float]:
+    count = len(rows)
+    return {
+        "hit_at_k": sum(row["hit_at_k"] for row in rows) / count,
+        "recall_at_k": sum(row["recall_at_k"] for row in rows) / count,
+        "mrr": sum(row["reciprocal_rank"] for row in rows) / count,
+    }
+
+
+def evaluate(k: int, method: str = "dense") -> dict[str, Any]:
     """Run one ordered development-only retrieval evaluation."""
     if type(k) is not int or k < 1:
         raise ValueError("k must be a positive integer")
+    if method not in ("dense", "bm25"):
+        raise ValueError("method must be 'dense' or 'bm25'")
     golden = load_golden()
     holdout_ids = load_holdout({record["id"] for record in golden})
     development = [record for record in golden if record["id"] not in holdout_ids]
@@ -106,21 +118,34 @@ def evaluate(k: int) -> dict[str, Any]:
         raise ValueError("All evaluated questions must have verified=true")
 
     settings = get_settings()
-    configuration = {
-        "k": k,
-        "embedding_model": settings.embedding_model,
-        "qdrant_collection": settings.qdrant_collection,
-    }
+    if method == "dense":
+        configuration = {
+            "k": k,
+            "embedding_model": settings.embedding_model,
+            "qdrant_collection": settings.qdrant_collection,
+        }
+        retriever = retrieve
+    else:
+        configuration = {
+            "method": "bm25",
+            "k": k,
+            "qdrant_collection": settings.bm25_collection,
+            "bm25_model": "qdrant/bm25",
+            "sparse_vector": "bm25",
+            "modifier": "idf",
+        }
+        retriever = retrieve_bm25
     canonical = json.dumps(configuration, sort_keys=True, separators=(",", ":"))
     configuration_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
     per_question = []
     for record in eligible:
-        results = retrieve(record["question"], k=k)
+        results = retriever(record["question"], k=k)
         sources = record["gold_sources"]
         per_question.append(
             {
                 "id": record["id"],
+                "type": record["type"],
                 "hit_at_k": hit_at_k(results, sources, k),
                 "recall_at_k": recall_at_k(results, sources, k),
                 "reciprocal_rank": reciprocal_rank(results, sources, k),
@@ -128,9 +153,14 @@ def evaluate(k: int) -> dict[str, Any]:
         )
 
     count = len(per_question)
+    metrics_by_type = {}
+    for question_type in dict.fromkeys(row["type"] for row in per_question):
+        rows = [row for row in per_question if row["type"] == question_type]
+        metrics_by_type[question_type] = {"count": len(rows), **_average_metrics(rows)}
     now = datetime.now(timezone.utc)
     return {
         "timestamp_utc": now.isoformat(timespec="microseconds").replace("+00:00", "Z"),
+        "method": method,
         "configuration_hash": configuration_hash,
         "configuration": configuration,
         "counts": {
@@ -140,11 +170,8 @@ def evaluate(k: int) -> dict[str, Any]:
             "answerable_evaluated": count,
             "unanswerable_excluded": len(development) - count,
         },
-        "metrics": {
-            "hit_at_k": sum(row["hit_at_k"] for row in per_question) / count,
-            "recall_at_k": sum(row["recall_at_k"] for row in per_question) / count,
-            "mrr": sum(row["reciprocal_rank"] for row in per_question) / count,
-        },
+        "metrics": _average_metrics(per_question),
+        "metrics_by_type": metrics_by_type,
         "per_question": per_question,
     }
 
@@ -153,7 +180,8 @@ def save_results(report: dict[str, Any]) -> Path:
     """Create the results directory only after evaluation has completed."""
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = report["timestamp_utc"].replace("-", "").replace(":", "").replace(".", "")
-    path = RESULTS_DIR / f"retrieval_{timestamp}_{report['configuration_hash']}.json"
+    prefix = "retrieval_bm25" if report.get("method", "dense") == "bm25" else "retrieval"
+    path = RESULTS_DIR / f"{prefix}_{timestamp}_{report['configuration_hash']}.json"
     with path.open("x", encoding="utf-8") as output:
         json.dump(report, output, indent=2, ensure_ascii=False)
         output.write("\n")
@@ -161,25 +189,30 @@ def save_results(report: dict[str, Any]) -> Path:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Evaluate dense retrieval on development questions"
-    )
+    parser = argparse.ArgumentParser(description="Evaluate retrieval on development questions")
     parser.add_argument("--k", type=int, default=5, help="Number of retrieved chunks (default: 5)")
+    parser.add_argument("--method", choices=("dense", "bm25"), default="dense")
     args = parser.parse_args()
     if args.k < 1:
         parser.error("--k must be a positive integer")
 
-    report = evaluate(args.k)
+    report = evaluate(args.k, method=args.method)
     output_path = save_results(report)
     config = report["configuration"]
     counts = report["counts"]
     metrics = report["metrics"]
-    rows = [
-        (
-            "Configuration",
+    if args.method == "dense":
+        configuration_text = (
             f"k={config['k']}, embedding_model={config['embedding_model']}, "
-            f"qdrant_collection={config['qdrant_collection']}",
-        ),
+            f"qdrant_collection={config['qdrant_collection']}"
+        )
+    else:
+        configuration_text = (
+            f"method=bm25, k={config['k']}, bm25_model={config['bm25_model']}, "
+            f"qdrant_collection={config['qdrant_collection']}, vector={config['sparse_vector']}"
+        )
+    rows = [
+        ("Configuration", configuration_text),
         ("Development questions", counts["development_questions"]),
         ("Answerable evaluated", counts["answerable_evaluated"]),
         ("Unanswerable excluded", counts["unanswerable_excluded"]),
@@ -190,6 +223,14 @@ def main() -> None:
     print(f"{'Retrieval evaluation':<24} Value")
     for label, value in rows:
         print(f"{label:<24} {value}")
+    print("By question type:")
+    print(f"{'Type':<16} {'Count':>5} {f'Hit@{args.k}':>8} {f'Recall@{args.k}':>10} {'MRR':>8}")
+    for question_type, values in report["metrics_by_type"].items():
+        print(
+            f"{question_type:<16} {values['count']:>5} "
+            f"{values['hit_at_k']:>8.4f} {values['recall_at_k']:>10.4f} "
+            f"{values['mrr']:>8.4f}"
+        )
     print(f"Saved: {output_path}")
 
 

@@ -53,6 +53,7 @@ class Settings(BaseSettings):
     qdrant_url: str = "http://localhost:6333"
     qdrant_api_key: SecretStr | None = None
     qdrant_collection: str = "policylens_chunks"
+    bm25_collection: str = "policylens_bm25"
     embedding_batch_size: int = 32
 
     def safe_dump(self) -> dict[str, Any]:

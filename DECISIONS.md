@@ -170,5 +170,44 @@ The Step 2.5 dense-retrieval baseline is frozen before retrieval improvements. T
 
    Page-level Hit@k and Recall@k can equal 1 even when returned chunks omit part of the required answer, as G050 and G052 show. Similarity scores alone do not establish relevance or a root cause.
 
-3. **Future improvement hypotheses, not implemented**
-   - Test extraction support for image-only/non-extractable PDFs; stronger exact-identifier matching; diversity against near-duplicate chunks; neighboring-chunk/page context for multi-section questions; and chunk-level answer-evidence coverage checks. These are untested hypotheses, not measured gains. No tuning was performed.
+
+---
+
+## Decision 008: Separate BM25 Retrieval and Development-Set Comparison (Phase 3, Step 3.1)
+
+### Status
+Accepted
+
+### Context
+The frozen dense baseline from Step 2.5 provides a reference for a sparse-only BM25 experiment on the same development questions. The 12 frozen hold-out questions were not evaluated.
+
+### Decisions Made
+
+1. **Separate sparse index**
+   - Keep dense retrieval in `policylens_chunks` using `BAAI/bge-small-en-v1.5`. Use a separate BM25-only collection, `policylens_bm25`, with server-side `qdrant/bm25` encoding, named sparse vector `bm25`, and the IDF modifier.
+   - Both collections contain 669 points with identical IDs and complete payloads. The existing dense collection and its baseline remain unchanged. New ingestion must synchronize the two indexes; this is not implemented yet.
+
+2. **Frozen development-set comparison**
+   - Saved evidence: [dense baseline](eval/results/retrieval_20261012T191839173509Z_af6558ebe4a5bce1f853b19340b8acdfe77ea87db78f6dd033f4fb3c73a9c58f.json) and [BM25 result](eval/results/retrieval_bm25_20261014T095834356877Z_5047cbf0cbf3f1ac63547757db03dfa232d1159d1d06350c5abca79b22162fe8.json). Both use `k=5`: 48 development questions, 41 answerable evaluated, and 7 unanswerable excluded.
+
+   | Method | Hit@5 | Recall@5 | MRR |
+   | --- | ---: | ---: | ---: |
+   | Dense | 0.9268 | 0.8561 | 0.8862 |
+   | BM25 | 0.9512 | 0.9049 | 0.8943 |
+
+   | Question type (count) | Dense Hit/Recall/MRR | BM25 Hit/Recall/MRR |
+   | --- | --- | --- |
+   | Factoid (19) | 0.8947 / 0.8421 / 0.8333 | 0.8947 / 0.8684 / 0.7719 |
+   | Multi-section (10) | 1 / 0.9100 / 0.9500 | 1 / 0.9100 / 1 |
+   | Table lookup (7) | 0.8571 / 0.8571 / 0.8571 | 1 / 1 / 1 |
+   | Date/version (5) | 1 / 0.8000 / 1 | 1 / 0.9000 / 1 |
+
+3. **Question-level comparison**
+   - Compare Recall@5 first, then reciprocal rank when recall ties; report Hit@5 separately. This yields 7 BM25 wins, 5 dense wins, and 29 exact ties.
+   - Representative BM25 wins: G042 changed from dense 0/0/0 to BM25 1/1/1; G007 and G028 each changed from 1/0.5/1 to 1/1/1 (Hit/Recall/RR).
+   - Representative dense wins: G009 was 1/1/1 versus BM25 1/0.5/1; G004 and G034 were each 1/1/1 versus BM25 1/1/0.333.
+
+4. **Interpretation and limits**
+   - BM25 improves the aggregate development-set metrics and table lookups here, while factoid MRR is lower. These 41 answerable development questions are not an independent test set; no hold-out outcomes were inspected.
+   - G003 and G035 were missed by both methods. G035 has a known zero-chunk source caused upstream by extraction/indexing. A page-level hit does not prove that an answer-bearing passage was returned.
+   - Dense and BM25 similarity scores are not directly comparable. Configuration hashes record settings, not full Qdrant index snapshots. Retrieved passages were not inspected for every comparison, so these metrics alone do not establish causes or universal BM25 superiority.
