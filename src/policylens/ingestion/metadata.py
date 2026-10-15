@@ -6,10 +6,27 @@ and manifest mapping utilities for the ingestion pipeline.
 
 import csv
 import hashlib
+import re
+from datetime import date
 from pathlib import Path
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
+
+_MONTHS = {
+    "Jan": 1,
+    "Feb": 2,
+    "Mar": 3,
+    "Apr": 4,
+    "May": 5,
+    "Jun": 6,
+    "Jul": 7,
+    "Aug": 8,
+    "Sep": 9,
+    "Oct": 10,
+    "Nov": 11,
+    "Dec": 12,
+}
 
 
 class ChunkMetadata(BaseModel):
@@ -24,6 +41,9 @@ class ChunkMetadata(BaseModel):
         default=None, description="Official circular or notification number"
     )
     issue_date: str | None = Field(default=None, description="Document issue date from manifest")
+    issue_date_iso: str | None = Field(
+        default=None, description="Document issue date as RFC 3339 UTC midnight"
+    )
     effective_date: str | None = Field(
         default=None, description="Document effective date (un-inferred, default None)"
     )
@@ -65,6 +85,20 @@ def generate_doc_id(source_file: str, regulator: str = "", circular_no: str = ""
     return hashlib.sha256(key.encode("utf-8")).hexdigest()
 
 
+def normalize_issue_date(value: str | None) -> str:
+    """Convert a manifest date to an RFC 3339 UTC-midnight timestamp."""
+    if not isinstance(value, str) or not value:
+        raise ValueError("issue_date is required in '%b %d, %Y' format")
+    match = re.fullmatch(r"([A-Z][a-z]{2}) (0[1-9]|[12][0-9]|3[01]), ([0-9]{4})", value)
+    if match is None or match.group(1) not in _MONTHS:
+        raise ValueError("issue_date must be a valid date in '%b %d, %Y' format")
+    try:
+        parsed = date(int(match.group(3)), _MONTHS[match.group(1)], int(match.group(2)))
+    except ValueError as exc:
+        raise ValueError("issue_date must be a valid date in '%b %d, %Y' format") from exc
+    return f"{parsed.isoformat()}T00:00:00Z"
+
+
 def load_manifest(
     manifest_path: str | Path = "data/manifest.csv",
 ) -> dict[str, dict[str, Any]]:
@@ -80,12 +114,18 @@ def load_manifest(
             filename = row.get("file", "").strip()
             if not filename:
                 continue
+            issue_date = (row.get("date") or "").strip()
+            try:
+                issue_date_iso = normalize_issue_date(issue_date)
+            except ValueError as exc:
+                raise ValueError(f"Invalid issue date for {filename}: {exc}") from exc
             records[filename] = {
                 "source_file": filename,
                 "regulator": row.get("regulator", "").strip(),
                 "title": row.get("title", "").strip(),
                 "circular_no": row.get("circular_number", "").strip() or None,
-                "issue_date": row.get("date", "").strip() or None,
+                "issue_date": issue_date,
+                "issue_date_iso": issue_date_iso,
                 "source_url": row.get("source_url", "").strip() or None,
                 "effective_date": None,
                 "status": None,
@@ -115,6 +155,7 @@ def get_document_metadata(
             "title": basename,
             "circular_no": None,
             "issue_date": None,
+            "issue_date_iso": None,
             "source_url": None,
             "effective_date": None,
             "status": None,
@@ -140,6 +181,7 @@ def build_chunk_metadata(
 ) -> ChunkMetadata:
     """Build a validated ChunkMetadata instance for a chunk."""
     doc_info = doc_metadata or get_document_metadata(source_file)
+    issue_date = doc_info.get("issue_date")
     return ChunkMetadata(
         doc_id=doc_info.get("doc_id")
         or generate_doc_id(
@@ -150,7 +192,8 @@ def build_chunk_metadata(
         title=doc_info.get("title", source_file),
         regulator=doc_info.get("regulator", "UNKNOWN"),
         circular_no=doc_info.get("circular_no"),
-        issue_date=doc_info.get("issue_date"),
+        issue_date=issue_date,
+        issue_date_iso=normalize_issue_date(issue_date) if issue_date is not None else None,
         effective_date=doc_info.get("effective_date"),
         status=doc_info.get("status"),
         supersedes=doc_info.get("supersedes"),

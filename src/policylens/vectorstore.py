@@ -4,7 +4,9 @@ Provides collection initialization with dense and sparse named vectors,
 deterministic UUIDv5 point IDs for idempotent ingestion, and batch embedding.
 """
 
+import re
 import uuid
+from datetime import date, datetime, time, timedelta, timezone
 from typing import Any
 
 from qdrant_client import QdrantClient, models
@@ -42,6 +44,87 @@ def generate_point_id(doc_id: str, chunk_index: int) -> str:
     """Generate a deterministic UUIDv5 point ID from document ID and chunk index."""
     key = f"{doc_id}:{chunk_index}"
     return str(uuid.uuid5(uuid.NAMESPACE_DNS, key))
+
+
+def build_regulator_filter(regulator: str | None) -> models.Filter | None:
+    """Restrict retrieval to one canonical regulator when requested."""
+    if regulator is None:
+        return None
+    if regulator not in ("RBI", "SEBI"):
+        raise ValueError("regulator must be 'RBI' or 'SEBI'")
+    return models.Filter(
+        must=[models.FieldCondition(key="regulator", match=models.MatchValue(value=regulator))]
+    )
+
+
+def build_retrieval_filter(
+    regulator: str | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
+) -> models.Filter | None:
+    """Build an AND pre-filter for regulator and inclusive issue calendar dates."""
+    regulator_filter = build_regulator_filter(regulator)
+    conditions = list(regulator_filter.must) if regulator_filter is not None else []
+
+    def parse_date(value: str | None, name: str) -> date | None:
+        if value is None:
+            return None
+        if not isinstance(value, str) or re.fullmatch(r"\d{4}-\d{2}-\d{2}", value) is None:
+            raise ValueError(f"{name} must be a valid YYYY-MM-DD date")
+        try:
+            return date.fromisoformat(value)
+        except ValueError as exc:
+            raise ValueError(f"{name} must be a valid YYYY-MM-DD date") from exc
+
+    start = parse_date(start_date, "start_date")
+    end = parse_date(end_date, "end_date")
+    if start is not None and end is not None and start > end:
+        raise ValueError("start_date must not be after end_date")
+    if start is not None or end is not None:
+        bounds = {}
+        if start is not None:
+            bounds["gte"] = datetime.combine(start, time.min, tzinfo=timezone.utc)
+        if end is not None:
+            if end == date.max:
+                bounds["lte"] = datetime.max.replace(tzinfo=timezone.utc)
+            else:
+                bounds["lt"] = datetime.combine(
+                    end + timedelta(days=1), time.min, tzinfo=timezone.utc
+                )
+        conditions.append(
+            models.FieldCondition(key="issue_date_iso", range=models.DatetimeRange(**bounds))
+        )
+    return models.Filter(must=conditions) if conditions else None
+
+
+def ensure_filter_indexes(client: QdrantClient | None = None) -> None:
+    """Add only missing regulator/date indexes to the three existing collections."""
+    settings = get_settings()
+    names = (settings.qdrant_collection, settings.bm25_collection, settings.hybrid_collection)
+    if len(set(names)) != 3:
+        raise ValueError("Filter collections must have different names")
+    q_client = client if client is not None else get_qdrant_client()
+    required = {
+        "regulator": models.PayloadSchemaType.KEYWORD,
+        "issue_date_iso": models.PayloadSchemaType.DATETIME,
+    }
+    missing = []
+    for name in names:
+        if not q_client.collection_exists(name):
+            raise ValueError(f"Collection {name!r} does not exist")
+        schema = q_client.get_collection(name).payload_schema or {}
+        for field, field_type in required.items():
+            existing = schema.get(field)
+            if existing is None:
+                missing.append((name, field, field_type))
+            elif existing.data_type != field_type:
+                raise ValueError(f"Collection {name!r} has incompatible {field!r} index")
+    for name, field, field_type in missing:
+        result = q_client.create_payload_index(
+            collection_name=name, field_name=field, field_schema=field_type, wait=True
+        )
+        if result.status != models.UpdateStatus.COMPLETED:
+            raise RuntimeError(f"Index creation did not complete for {name}.{field}")
 
 
 def init_collection(
@@ -151,6 +234,7 @@ def search_chunks(
     collection_name: str | None = None,
     embedder: SentenceTransformer | None = None,
     limit: int = 5,
+    query_filter: models.Filter | None = None,
 ) -> list[models.ScoredPoint]:
     """Execute a dense vector search query against the Qdrant collection."""
     settings = get_settings()
@@ -164,6 +248,7 @@ def search_chunks(
         query=query_vector,
         using="dense",
         limit=limit,
+        **({"query_filter": query_filter} if query_filter is not None else {}),
     )
     return res.points
 

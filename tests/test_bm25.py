@@ -261,6 +261,63 @@ def test_retrieve_bm25_empty_results(monkeypatch):
     assert client.query_points.call_args.kwargs["limit"] == 5
 
 
+@pytest.mark.parametrize("regulator", ["RBI", "SEBI"])
+def test_retrieve_bm25_prefilters_regulator(monkeypatch, regulator):
+    client = Mock()
+    client.query_points.return_value.points = [
+        models.ScoredPoint(
+            id=1,
+            version=1,
+            score=0.7,
+            payload={"text": "Evidence", "regulator": regulator, "doc_id": "doc", "page": 2},
+        )
+    ]
+    monkeypatch.setattr(bm25, "QdrantClient", Mock(return_value=client))
+
+    result = bm25.retrieve_bm25("question", regulator=regulator)
+
+    assert client.query_points.call_args.kwargs["query_filter"] == models.Filter(
+        must=[models.FieldCondition(key="regulator", match=models.MatchValue(value=regulator))]
+    )
+    assert result[0]["metadata"] == {"doc_id": "doc", "regulator": regulator, "page": 2}
+    client.upsert.assert_not_called()
+
+
+def test_retrieve_bm25_combines_regulator_and_date(monkeypatch):
+    client = Mock()
+    client.query_points.return_value.points = []
+    monkeypatch.setattr(bm25, "QdrantClient", Mock(return_value=client))
+    assert (
+        bm25.retrieve_bm25(
+            "question", regulator="SEBI", start_date="2026-08-24", end_date="2026-09-01"
+        )
+        == []
+    )
+    conditions = client.query_points.call_args.kwargs["query_filter"].must
+    assert [condition.key for condition in conditions] == ["regulator", "issue_date_iso"]
+    assert conditions[0].match.value == "SEBI"
+    assert conditions[1].range.lt.isoformat() == "2026-09-02T00:00:00+00:00"
+
+
+def test_retrieve_bm25_rejects_bad_date_before_client(monkeypatch):
+    factory = Mock(side_effect=AssertionError("Invalid date must not contact Qdrant"))
+    monkeypatch.setattr(bm25, "QdrantClient", factory)
+    with pytest.raises(ValueError, match="end_date"):
+        bm25.retrieve_bm25("question", end_date="bad")
+    factory.assert_not_called()
+
+
+@pytest.mark.parametrize("regulator", ["rbi", "OTHER", "", 123, True])
+def test_retrieve_bm25_rejects_invalid_regulator_before_client(monkeypatch, regulator):
+    factory = Mock(side_effect=AssertionError("Invalid filter must not contact Qdrant"))
+    monkeypatch.setattr(bm25, "QdrantClient", factory)
+
+    with pytest.raises(ValueError, match="regulator must be 'RBI' or 'SEBI'"):
+        bm25.retrieve_bm25("question", regulator=regulator)
+
+    factory.assert_not_called()
+
+
 @pytest.mark.parametrize(
     "question, k, error",
     [

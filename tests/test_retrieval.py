@@ -1,11 +1,13 @@
 """Deterministic tests of the dense retrieval wrapper and terminal output."""
 
+from datetime import datetime, timezone
 from unittest.mock import Mock
 
 import pytest
+from qdrant_client import models
 from qdrant_client.models import ScoredPoint
 
-from policylens import retrieval
+from policylens import retrieval, vectorstore
 from policylens.ingestion.metadata import ChunkMetadata
 
 
@@ -55,6 +57,127 @@ def test_default_k(search):
     search.assert_called_once_with(query="question", limit=5)
 
 
+@pytest.mark.parametrize("regulator", ["RBI", "SEBI"])
+def test_regulator_filter_and_dense_query(regulator, search):
+    query_filter = vectorstore.build_regulator_filter(regulator)
+    assert query_filter == models.Filter(
+        must=[models.FieldCondition(key="regulator", match=models.MatchValue(value=regulator))]
+    )
+    assert vectorstore.build_regulator_filter(None) is None
+
+    search.return_value = [
+        ScoredPoint(
+            id=1,
+            version=1,
+            score=0.8,
+            payload={"text": "Evidence", "regulator": regulator, "doc_id": "doc", "page": 2},
+        )
+    ]
+    result = retrieval.retrieve("question", regulator=regulator)
+    search.assert_called_once_with(query="question", limit=5, query_filter=query_filter)
+    assert result[0]["metadata"] == {"doc_id": "doc", "regulator": regulator, "page": 2}
+
+    client = Mock()
+    client.query_points.return_value.points = []
+    embedder = Mock()
+    embedder.encode.return_value.tolist.return_value = [0.1, 0.2]
+    assert (
+        vectorstore.search_chunks(
+            "question",
+            client=client,
+            collection_name="test",
+            embedder=embedder,
+            query_filter=query_filter,
+        )
+        == []
+    )
+    assert client.query_points.call_args.kwargs == {
+        "collection_name": "test",
+        "query": [0.1, 0.2],
+        "using": "dense",
+        "limit": 5,
+        "query_filter": query_filter,
+    }
+    client.upsert.assert_not_called()
+
+
+@pytest.mark.parametrize("regulator", ["rbi", "OTHER", "", 123, True])
+def test_invalid_regulator_rejected_before_search(regulator, search):
+    with pytest.raises(ValueError, match="regulator must be 'RBI' or 'SEBI'"):
+        retrieval.retrieve("question", regulator=regulator)
+    search.assert_not_called()
+
+
+def test_combined_regulator_and_inclusive_dates(search):
+    retrieval.retrieve("question", regulator="RBI", start_date="2026-08-24", end_date="2026-08-24")
+    query_filter = search.call_args.kwargs["query_filter"]
+    assert query_filter == models.Filter(
+        must=[
+            models.FieldCondition(key="regulator", match=models.MatchValue(value="RBI")),
+            models.FieldCondition(
+                key="issue_date_iso",
+                range=models.DatetimeRange(
+                    gte=datetime(2026, 8, 24, tzinfo=timezone.utc),
+                    lt=datetime(2026, 8, 25, tzinfo=timezone.utc),
+                ),
+            ),
+        ]
+    )
+
+
+@pytest.mark.parametrize(
+    ("start_date", "end_date"),
+    [
+        ("2026-02-30", None),
+        ("2026-2-03", None),
+        (None, "2026-13-01"),
+        ("2026-09-01", "2026-08-31"),
+    ],
+)
+def test_invalid_date_filter_rejected_before_search(search, start_date, end_date):
+    with pytest.raises(ValueError):
+        retrieval.retrieve("question", start_date=start_date, end_date=end_date)
+    search.assert_not_called()
+
+
+def test_date_only_filter_and_unfiltered_compatibility(search):
+    retrieval.retrieve("question", end_date="2026-10-02")
+    condition = search.call_args.kwargs["query_filter"].must[0]
+    assert condition.key == "issue_date_iso"
+    assert condition.range.lt == datetime(2026, 10, 3, tzinfo=timezone.utc)
+    search.reset_mock()
+    retrieval.retrieve("question")
+    search.assert_called_once_with(query="question", limit=5)
+
+
+def test_index_setup_reuses_existing_and_rejects_incompatible():
+    client = Mock()
+    client.collection_exists.return_value = True
+    schema = {
+        "regulator": models.PayloadIndexInfo(data_type=models.PayloadSchemaType.KEYWORD, points=669)
+    }
+    client.get_collection.return_value.payload_schema = schema
+    client.create_payload_index.return_value.status = models.UpdateStatus.COMPLETED
+    vectorstore.ensure_filter_indexes(client)
+    assert client.create_payload_index.call_count == 3
+    for entry in client.create_payload_index.call_args_list:
+        assert entry.kwargs["field_name"] == "issue_date_iso"
+        assert entry.kwargs["field_schema"] == models.PayloadSchemaType.DATETIME
+        assert entry.kwargs["wait"] is True
+    client.create_payload_index.reset_mock()
+    schema["issue_date_iso"] = models.PayloadIndexInfo(
+        data_type=models.PayloadSchemaType.DATETIME, points=669
+    )
+    vectorstore.ensure_filter_indexes(client)
+    client.create_payload_index.assert_not_called()
+    schema["issue_date_iso"] = models.PayloadIndexInfo(
+        data_type=models.PayloadSchemaType.KEYWORD, points=669
+    )
+    with pytest.raises(ValueError, match="incompatible"):
+        vectorstore.ensure_filter_indexes(client)
+    client.create_payload_index.assert_not_called()
+
+
 def test_result_mapping_preserves_order_scores_and_metadata(search):
     metadata = {
         "doc_id": "document-id",
@@ -62,6 +185,7 @@ def test_result_mapping_preserves_order_scores_and_metadata(search):
         "regulator": "RBI",
         "circular_no": "RBI/test",
         "issue_date": "Oct 01, 2026",
+        "issue_date_iso": "2026-10-01T00:00:00Z",
         "effective_date": None,
         "status": None,
         "supersedes": ["previous-circular"],

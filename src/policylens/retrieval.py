@@ -7,7 +7,7 @@ from typing import Any
 from qdrant_client.models import ScoredPoint
 
 from policylens.ingestion.metadata import ChunkMetadata
-from policylens.vectorstore import search_chunks
+from policylens.vectorstore import build_retrieval_filter, search_chunks
 
 
 def _validate_retrieval_inputs(query: str, k: int) -> None:
@@ -42,10 +42,18 @@ def _map_search_results(points: list[ScoredPoint]) -> list[dict[str, Any]]:
     return results
 
 
-def retrieve(query: str, k: int = 5) -> list[dict[str, Any]]:
+def retrieve(
+    query: str,
+    k: int = 5,
+    regulator: str | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
+) -> list[dict[str, Any]]:
     """Return up to k chunks, preserving Qdrant ranking, scores, and available metadata."""
     _validate_retrieval_inputs(query, k)
-    return _map_search_results(search_chunks(query=query, limit=k))
+    query_filter = build_retrieval_filter(regulator, start_date, end_date)
+    search_kwargs = {"query_filter": query_filter} if query_filter is not None else {}
+    return _map_search_results(search_chunks(query=query, limit=k, **search_kwargs))
 
 
 def print_results(results: list[dict[str, Any]]) -> None:

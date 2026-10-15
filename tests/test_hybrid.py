@@ -375,6 +375,68 @@ def test_retrieve_hybrid_empty_results(retrieval_dependencies):
     client.upsert.assert_not_called()
 
 
+@pytest.mark.parametrize("regulator", ["RBI", "SEBI"])
+def test_retrieve_hybrid_prefilters_both_branches(retrieval_dependencies, regulator):
+    client, _, _, _ = retrieval_dependencies
+    client.query_points.return_value.points = [
+        models.ScoredPoint(
+            id=1,
+            version=1,
+            score=0.03,
+            payload={"text": "Evidence", "regulator": regulator, "doc_id": "doc", "page": 2},
+        )
+    ]
+
+    result = hybrid.retrieve_hybrid("question", regulator=regulator)
+
+    prefetch = client.query_points.call_args.kwargs["prefetch"]
+    expected = models.Filter(
+        must=[models.FieldCondition(key="regulator", match=models.MatchValue(value=regulator))]
+    )
+    assert len(prefetch) == 2
+    assert prefetch[0].filter == expected
+    assert prefetch[1].filter == expected
+    assert prefetch[0].filter is prefetch[1].filter
+    assert result[0]["metadata"] == {"doc_id": "doc", "regulator": regulator, "page": 2}
+    client.upsert.assert_not_called()
+
+
+def test_retrieve_hybrid_combines_regulator_and_date_in_both_branches(
+    retrieval_dependencies,
+):
+    client, _, _, _ = retrieval_dependencies
+    client.query_points.return_value.points = []
+    hybrid.retrieve_hybrid("question", regulator="RBI", start_date="2026-08-24")
+    dense, sparse = client.query_points.call_args.kwargs["prefetch"]
+    assert dense.filter is sparse.filter
+    assert [condition.key for condition in dense.filter.must] == [
+        "regulator",
+        "issue_date_iso",
+    ]
+    assert dense.filter.must[1].range.gte.isoformat() == "2026-08-24T00:00:00+00:00"
+
+
+def test_retrieve_hybrid_rejects_bad_date_before_embedding(retrieval_dependencies):
+    client, factory, _, embeddings = retrieval_dependencies
+    with pytest.raises(ValueError, match="start_date must not be after end_date"):
+        hybrid.retrieve_hybrid("question", start_date="2026-09-01", end_date="2026-08-31")
+    embeddings.assert_not_called()
+    factory.assert_not_called()
+    client.query_points.assert_not_called()
+
+
+@pytest.mark.parametrize("regulator", ["rbi", "OTHER", "", 123, True])
+def test_retrieve_hybrid_rejects_invalid_regulator_before_work(retrieval_dependencies, regulator):
+    client, client_factory, _, embedding_factory = retrieval_dependencies
+
+    with pytest.raises(ValueError, match="regulator must be 'RBI' or 'SEBI'"):
+        hybrid.retrieve_hybrid("question", regulator=regulator)
+
+    embedding_factory.assert_not_called()
+    client_factory.assert_not_called()
+    client.query_points.assert_not_called()
+
+
 @pytest.mark.parametrize(
     ("question", "k", "candidate_k", "error", "message"),
     [

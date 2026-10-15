@@ -7,7 +7,7 @@ from qdrant_client import QdrantClient, models
 from policylens.config import get_settings
 from policylens.llm import get_embeddings
 from policylens.retrieval import _map_search_results, _validate_retrieval_inputs
-from policylens.vectorstore import get_qdrant_client
+from policylens.vectorstore import build_retrieval_filter, get_qdrant_client
 
 
 def init_hybrid_collection(
@@ -106,7 +106,14 @@ def backfill_hybrid(client: QdrantClient | None = None, batch_size: int = 16) ->
         offset = next_offset
 
 
-def retrieve_hybrid(question: str, k: int = 5, candidate_k: int = 5) -> list[dict[str, Any]]:
+def retrieve_hybrid(
+    question: str,
+    k: int = 5,
+    candidate_k: int = 5,
+    regulator: str | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
+) -> list[dict[str, Any]]:
     """Return Qdrant's native RRF fusion of dense and BM25 candidates."""
     _validate_retrieval_inputs(question, k)
     if not isinstance(candidate_k, int) or isinstance(candidate_k, bool):
@@ -116,6 +123,8 @@ def retrieve_hybrid(question: str, k: int = 5, candidate_k: int = 5) -> list[dic
     if candidate_k < k:
         raise ValueError("candidate_k must be at least k")
 
+    query_filter = build_retrieval_filter(regulator, start_date, end_date)
+    prefetch_filter = {"filter": query_filter} if query_filter is not None else {}
     settings = get_settings()
     dense_query = get_embeddings().encode(question, normalize_embeddings=True).tolist()
     api_key = settings.qdrant_api_key.get_secret_value() if settings.qdrant_api_key else None
@@ -123,11 +132,12 @@ def retrieve_hybrid(question: str, k: int = 5, candidate_k: int = 5) -> list[dic
     points = client.query_points(
         collection_name=settings.hybrid_collection,
         prefetch=[
-            models.Prefetch(query=dense_query, using="dense", limit=candidate_k),
+            models.Prefetch(query=dense_query, using="dense", limit=candidate_k, **prefetch_filter),
             models.Prefetch(
                 query=models.Document(text=question, model="qdrant/bm25"),
                 using="bm25",
                 limit=candidate_k,
+                **prefetch_filter,
             ),
         ],
         query=models.RrfQuery(rrf=models.Rrf(k=61)),

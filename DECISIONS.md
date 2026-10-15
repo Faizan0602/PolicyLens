@@ -244,3 +244,29 @@ The same 41 answerable development questions were evaluated at `k=5`; 7 unanswer
 - BM25-only had the highest Recall@5 and MRR in this development-set experiment; hybrid tied its Hit@5 but had lower Recall@5 and MRR.
 - Against BM25, hybrid had one question-level metric win, six regressions, and 34 ties. Candidate inspection showed gold pages can be demoted by RRF even when present in both candidate lists; G021 also showed varying order for equal fused scores. These observations do not establish a universal cause for every question.
 - Page-level matches do not guarantee answer-bearing text. The hold-out remains untouched, and no parameter tuning was performed. Future ingestion must synchronize all three collections.
+
+---
+
+## Decision 010: Metadata Pre-Filtering and Regulatory Status Limitations (Phase 3, Step 3.3)
+
+### Status
+Accepted for regulator and issue-date filtering; active-by-default remains blocked.
+
+### Context
+The dense, BM25, and hybrid collections each contain 669 chunks. Filtering inside Qdrant excludes nonmatching candidates before ranking; highly selective filters may return fewer than `k` results. Payload indexes support more efficient filtered retrieval.
+
+### Decisions Made
+
+1. **Optional retrieval pre-filters**
+   - Support `RBI` or `SEBI` as `regulator`, and `YYYY-MM-DD` `start_date` and `end_date`. Date bounds include the full calendar day. Combine supplied conditions with AND inside Qdrant; native hybrid RRF applies the same filter to both dense and BM25 prefetch branches. Calls without filters retain existing behavior.
+
+2. **Issue-date metadata and indexes**
+   - Preserve original `issue_date` strings and store `issue_date_iso` as RFC 3339 UTC-midnight timestamps. All 669 points in each collection received metadata-only `set_payload()` updates; a subsequent read-only check found zero pending dates in all three. No dense embeddings or sparse vectors were regenerated.
+   - Verify regulator keyword and `issue_date_iso` datetime payload indexes across the dense, BM25, and hybrid collections.
+
+3. **Regulatory status and authorization boundary**
+   - Regulatory `status` remains null and unverified for every existing document, so active-by-default filtering is not implemented. PostgreSQL ingestion status does not establish regulatory status. Manifest issue dates were format-validated but not independently checked against every official source.
+   - All indexed documents currently have `access_level=public`. No RBAC system was added; any future authorization restriction must come from trusted backend identity and policy, never a client-supplied role.
+
+### Verification
+154 focused offline tests passed, along with Ruff lint, Ruff formatting, and `git diff --check`. Live filtered queries returned five matching results each for dense retrieval with RBI and September 1–October 2, 2026, BM25 with SEBI and August 1–October 2, 2026, and hybrid RRF with the same SEBI date range. These checks establish filter behavior for the tested queries, not exhaustive retrieval quality.

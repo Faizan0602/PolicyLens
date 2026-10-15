@@ -6,7 +6,7 @@ from qdrant_client import QdrantClient, models
 
 from policylens.config import get_settings
 from policylens.retrieval import _map_search_results, _validate_retrieval_inputs
-from policylens.vectorstore import get_qdrant_client
+from policylens.vectorstore import build_retrieval_filter, get_qdrant_client
 
 
 def init_bm25_collection(
@@ -88,9 +88,16 @@ def backfill_bm25(client: QdrantClient | None = None, batch_size: int = 16) -> i
         offset = next_offset
 
 
-def retrieve_bm25(question: str, k: int = 5) -> list[dict[str, Any]]:
+def retrieve_bm25(
+    question: str,
+    k: int = 5,
+    regulator: str | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
+) -> list[dict[str, Any]]:
     """Search the separate BM25 sparse collection and return dense-compatible results."""
     _validate_retrieval_inputs(question, k)
+    query_filter = build_retrieval_filter(regulator, start_date, end_date)
     settings = get_settings()
     api_key = settings.qdrant_api_key.get_secret_value() if settings.qdrant_api_key else None
     client = QdrantClient(url=settings.qdrant_url, api_key=api_key, cloud_inference=True)
@@ -100,5 +107,6 @@ def retrieve_bm25(question: str, k: int = 5) -> list[dict[str, Any]]:
         using="bm25",
         limit=k,
         with_payload=True,
+        **({"query_filter": query_filter} if query_filter is not None else {}),
     ).points
     return _map_search_results(points)

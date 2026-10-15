@@ -222,3 +222,11 @@ Against BM25, hybrid had one metric win (G004), six regressions (G008, G021, G03
 These are development-set findings, not independent generalization. Page-level matches do not guarantee answer-bearing chunk text, and native tie ordering need not match the manual implementation. No parameter tuning was performed. BM25-only remains the best observed configuration here by Recall@5 and MRR, with Hit@5 tied with hybrid. Future ingestion must synchronize all three collections.
 
 Saved evidence: [dense baseline](eval/results/retrieval_20261012T191839173509Z_af6558ebe4a5bce1f853b19340b8acdfe77ea87db78f6dd033f4fb3c73a9c58f.json), [BM25 evaluation](eval/results/retrieval_bm25_20261014T095834356877Z_5047cbf0cbf3f1ac63547757db03dfa232d1159d1d06350c5abca79b22162fe8.json), [hybrid evaluation](eval/results/retrieval_hybrid_20261014T112307814856Z_d0bfed4a543cfd45b7657595060f953681e1ee0360400368f28007db81c1c702.json).
+
+# Step 3.3: Metadata Filtering
+
+Dense, BM25, and hybrid retrieval accept optional `regulator` (`RBI` or `SEBI`), `start_date`, and `end_date` (`YYYY-MM-DD`). Qdrant applies these as an AND pre-filter; hybrid applies the same filter to both candidate branches. Date bounds include the whole requested calendar day in UTC. With no filters, the existing retrieval queries remain unchanged. Offline tests cover combined filters, invalid dates, both hybrid branches, and unfiltered calls.
+
+New ingestion serializes `issue_date_iso`. Existing points still require the prepared payload-only update and datetime indexes before live date-filtered retrieval is reliable. `python -m policylens.issue_date_backfill` validates all three 669-point collections without writes. After separate approval, `--apply --confirm` updates only missing `issue_date_iso` values; `policylens.vectorstore.ensure_filter_indexes()` creates only missing regulator keyword and issue-date datetime indexes. Neither write operation has been run in this step.
+
+Regulatory `status` is unverified and null for existing documents. Active-by-default filtering is blocked until regulatory status is verified from authoritative sources; PostgreSQL ingestion status is not a substitute.
