@@ -1,4 +1,4 @@
-"""Evaluate retrieval methods on verified development questions only."""
+"""Evaluate retrieval on development questions or the explicitly selected frozen hold-out."""
 
 import argparse
 import hashlib
@@ -12,7 +12,13 @@ from typing import Any
 from policylens.bm25 import retrieve_bm25
 from policylens.config import get_settings
 from policylens.hybrid import retrieve_hybrid
-from policylens.reranker import MODEL_NAME, _get_reranker, rerank
+from policylens.reranker import (
+    ABSTENTION_THRESHOLD,
+    MODEL_NAME,
+    _get_reranker,
+    decide_abstention,
+    rerank,
+)
 from policylens.retrieval import retrieve
 
 if __package__:
@@ -119,28 +125,60 @@ def _average_metrics(rows: list[dict[str, Any]]) -> dict[str, float]:
     }
 
 
-def evaluate(k: int, method: str = "dense") -> dict[str, Any]:
-    """Run one ordered development-only retrieval evaluation."""
+def evaluate(
+    k: int,
+    method: str = "dense",
+    candidate_k: int = RERANK_CANDIDATES,
+    split: str = "development",
+) -> dict[str, Any]:
+    """Run one ordered retrieval evaluation on the selected split."""
     if type(k) is not int or k < 1:
         raise ValueError("k must be a positive integer")
     if method not in ("dense", "bm25", "hybrid", "bm25_rerank", "hybrid_rerank"):
         raise ValueError("method must be dense, bm25, hybrid, bm25_rerank, or hybrid_rerank")
+    if type(candidate_k) is not int or candidate_k not in (10, 20, 30):
+        raise ValueError("candidate_k must be 10, 20, or 30")
+    if method != "bm25_rerank" and candidate_k != RERANK_CANDIDATES:
+        raise ValueError("candidate_k tuning is supported only for bm25_rerank")
     if method == "hybrid" and k > 5:
         raise ValueError("hybrid k must not exceed candidate_k=5")
     reranking = method in ("bm25_rerank", "hybrid_rerank")
     if reranking and k != 5:
         raise ValueError("reranking methods require final k=5")
+    if split not in ("development", "holdout"):
+        raise ValueError("split must be development or holdout")
+    if split == "holdout" and (method != "bm25_rerank" or candidate_k != 20):
+        raise ValueError("holdout requires frozen BM25 reranking with candidate_k=20")
+    if split == "holdout" and (
+        MODEL_NAME != "BAAI/bge-reranker-base" or ABSTENTION_THRESHOLD != 0.60
+    ):
+        raise ValueError("Frozen reranker model or abstention threshold has changed")
     golden = load_golden()
     holdout_ids = load_holdout({record["id"] for record in golden})
     development = [record for record in golden if record["id"] not in holdout_ids]
-    eligible = [record for record in development if record["answerable"]]
+    selected = (
+        [record for record in golden if record["id"] in holdout_ids]
+        if split == "holdout"
+        else development
+    )
+    eligible = (
+        selected if split == "holdout" else [record for record in selected if record["answerable"]]
+    )
     if not eligible:
-        raise ValueError("No answerable development questions to evaluate")
+        message = (
+            "No answerable development questions to evaluate"
+            if split == "development"
+            else "No hold-out questions to evaluate"
+        )
+        raise ValueError(message)
     if any(record["verified"] is not True for record in eligible):
         raise ValueError("All evaluated questions must have verified=true")
 
     settings = get_settings()
-    retrieval_kwargs = {"k": RERANK_CANDIDATES if reranking else k}
+    if split == "holdout" and settings.bm25_collection != "policylens_bm25":
+        raise ValueError("Frozen BM25 collection has changed")
+    rerank_depth = candidate_k if method == "bm25_rerank" else RERANK_CANDIDATES
+    retrieval_kwargs = {"k": rerank_depth if reranking else k}
     if method == "dense":
         configuration = {
             "k": k,
@@ -159,7 +197,7 @@ def evaluate(k: int, method: str = "dense") -> dict[str, Any]:
         }
         if reranking:
             configuration.update(
-                candidate_k=RERANK_CANDIDATES,
+                candidate_k=candidate_k,
                 final_k=k,
                 reranker_model=MODEL_NAME,
             )
@@ -182,42 +220,96 @@ def evaluate(k: int, method: str = "dense") -> dict[str, Any]:
             configuration.update(final_k=k, reranker_model=MODEL_NAME)
         retriever = retrieve_hybrid
         retrieval_kwargs["candidate_k"] = RERANK_CANDIDATES if reranking else 5
+    if split == "holdout":
+        configuration.update(split="holdout", abstention_threshold=ABSTENTION_THRESHOLD)
     canonical = json.dumps(configuration, sort_keys=True, separators=(",", ":"))
     configuration_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
     per_question = []
     control_rows = []
+    retrieval_latencies = []
     rerank_latencies = []
     model = _get_reranker() if reranking else None
     for record in eligible:
+        if split == "holdout":
+            start = time.perf_counter()
         results = retriever(record["question"], **retrieval_kwargs)
+        if split == "holdout":
+            retrieval_latencies.append((time.perf_counter() - start) * 1000)
         sources = record["gold_sources"]
         row = {"id": record["id"], "type": record["type"]}
         if reranking:
-            control = {
-                "id": record["id"],
-                "type": record["type"],
-                "hit_at_k": hit_at_k(results, sources, k),
-                "recall_at_k": recall_at_k(results, sources, k),
-                "reciprocal_rank": reciprocal_rank(results, sources, k),
-            }
-            control_rows.append(control)
-            row["control"] = {
-                key: control[key] for key in ("hit_at_k", "recall_at_k", "reciprocal_rank")
-            }
-            row["control_sources"] = _source_refs(results[:k])
+            if split == "development":
+                control = {
+                    "id": record["id"],
+                    "type": record["type"],
+                    "hit_at_k": hit_at_k(results, sources, k),
+                    "recall_at_k": recall_at_k(results, sources, k),
+                    "reciprocal_rank": reciprocal_rank(results, sources, k),
+                }
+                control_rows.append(control)
+                row["control"] = {
+                    key: control[key] for key in ("hit_at_k", "recall_at_k", "reciprocal_rank")
+                }
+                row["control_sources"] = _source_refs(results[:k])
             start = time.perf_counter()
             results = rerank(record["question"], results, k=k, model=model)
             latency_ms = (time.perf_counter() - start) * 1000
             rerank_latencies.append(latency_ms)
-            row["rerank_latency_ms"] = latency_ms
-            row["retrieved_sources"] = _source_refs(results)
-        row.update(
-            hit_at_k=hit_at_k(results, sources, k),
-            recall_at_k=recall_at_k(results, sources, k),
-            reciprocal_rank=reciprocal_rank(results, sources, k),
-        )
+            if split == "development":
+                row["rerank_latency_ms"] = latency_ms
+                row["retrieved_sources"] = _source_refs(results)
+        if split == "holdout":
+            decision = decide_abstention(results)
+            row.update(
+                answerable=record["answerable"],
+                abstain=decision["abstain"],
+                top_rerank_score=decision["top_rerank_score"],
+            )
+        if record["answerable"]:
+            row.update(
+                hit_at_k=hit_at_k(results, sources, k),
+                recall_at_k=recall_at_k(results, sources, k),
+                reciprocal_rank=reciprocal_rank(results, sources, k),
+            )
         per_question.append(row)
+
+    if split == "holdout":
+        answerable_rows = [row for row in per_question if row["answerable"]]
+        unanswerable_rows = [row for row in per_question if not row["answerable"]]
+        correct_refusals = sum(row["abstain"] for row in unanswerable_rows)
+        wrong_refusals = sum(row["abstain"] for row in answerable_rows)
+        return {
+            "timestamp_utc": datetime.now(timezone.utc)
+            .isoformat(timespec="microseconds")
+            .replace("+00:00", "Z"),
+            "method": "bm25_rerank_holdout",
+            "configuration_hash": configuration_hash,
+            "configuration": configuration,
+            "counts": {
+                "holdout_questions": len(per_question),
+                "answerable_evaluated": len(answerable_rows),
+                "unanswerable_evaluated": len(unanswerable_rows),
+                "correct_refusals": correct_refusals,
+                "missed_refusals": len(unanswerable_rows) - correct_refusals,
+                "wrong_refusals": wrong_refusals,
+                "correct_acceptances": len(answerable_rows) - wrong_refusals,
+            },
+            "rates": {
+                "correct_refusal_rate": correct_refusals / len(unanswerable_rows)
+                if unanswerable_rows
+                else None,
+                "wrong_refusal_rate": wrong_refusals / len(answerable_rows)
+                if answerable_rows
+                else None,
+            },
+            "metrics": _average_metrics(answerable_rows)
+            if answerable_rows
+            else {"hit_at_k": None, "recall_at_k": None, "mrr": None},
+            "retrieval_latency_p50_ms": statistics.median(retrieval_latencies),
+            "rerank_latency_p50_ms": statistics.median(rerank_latencies),
+            "per_question": per_question,
+        }
 
     count = len(per_question)
     metrics_by_type = {}
@@ -261,12 +353,20 @@ def save_results(report: dict[str, Any]) -> Path:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Evaluate retrieval on development questions")
+    parser = argparse.ArgumentParser(description="Evaluate retrieval on the selected split")
+    parser.add_argument("--split", choices=("development", "holdout"), default="development")
     parser.add_argument("--k", type=int, default=5, help="Number of retrieved chunks (default: 5)")
     parser.add_argument(
         "--method",
         choices=("dense", "bm25", "hybrid", "bm25_rerank", "hybrid_rerank"),
         default="dense",
+    )
+    parser.add_argument(
+        "--candidate-k",
+        type=int,
+        choices=(10, 20, 30),
+        default=RERANK_CANDIDATES,
+        help="BM25 rerank candidate depth (default: 20)",
     )
     args = parser.parse_args()
     if args.k < 1:
@@ -275,8 +375,32 @@ def main() -> None:
         parser.error("hybrid --k must not exceed candidate_k=5")
     if args.method in ("bm25_rerank", "hybrid_rerank") and args.k != 5:
         parser.error("reranking methods require --k 5")
+    if args.method != "bm25_rerank" and args.candidate_k != RERANK_CANDIDATES:
+        parser.error("--candidate-k tuning is supported only for bm25_rerank")
+    if args.split == "holdout":
+        if args.method != "bm25_rerank" or args.candidate_k != RERANK_CANDIDATES:
+            parser.error("holdout requires --method bm25_rerank, --k 5, and --candidate-k 20")
+        report = evaluate(5, method="bm25_rerank", split="holdout")
+        output_path = save_results(report)
+        print(
+            json.dumps(
+                {
+                    key: report[key]
+                    for key in (
+                        "counts",
+                        "rates",
+                        "metrics",
+                        "retrieval_latency_p50_ms",
+                        "rerank_latency_p50_ms",
+                    )
+                },
+                indent=2,
+            )
+        )
+        print(f"Saved: {output_path}")
+        return
 
-    report = evaluate(args.k, method=args.method)
+    report = evaluate(args.k, method=args.method, candidate_k=args.candidate_k)
     output_path = save_results(report)
     config = report["configuration"]
     counts = report["counts"]

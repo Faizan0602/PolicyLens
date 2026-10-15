@@ -258,3 +258,27 @@ BM25 retrieves up to 20 chunks; `BAAI/bge-reranker-base` reranks them, and the h
 The [score report](eval/results/rerank_score_analysis_20261015T131329110974Z.json) and [distribution plot](eval/results/rerank_score_analysis_20261015T131329110974Z.svg) cover 41 answerable and 7 unanswerable development questions. At 0.60, the gate correctly refused 4/7 unanswerable questions (57.1%), missed 3/7 (42.9%), wrongly refused 1/41 answerable questions (2.4%), and correctly accepted 40/41 (97.6%). A wrong refusal declines a question the indexed documents could answer, reducing usefulness. The distributions overlap: a much higher tested cutoff catches more unanswerable questions but causes excessive wrong refusals. One score threshold cannot reliably detect every unanswerable question.
 
 The standalone `decide_abstention()` function is implemented and tested; 40 focused offline tests passed. It is not yet connected to LLM answer generation. The 12 frozen hold-out questions remain untouched.
+
+# Step 3.7: Development Retrieval-Depth Tuning
+
+BM25 candidate depth was the only tuned variable (10, 20, or 30). All runs used the same 41 answerable development questions, `BAAI/bge-reranker-base`, and a fixed final `k=5`. The seven unanswerable development questions were excluded from retrieval-quality metrics. Chunk size, overlap, and final output depth were not tuned.
+
+| BM25 candidates | Hit@5 | Recall@5 | MRR | Rerank p50 (ms) | Saved report |
+| ---: | ---: | ---: | ---: | ---: | --- |
+| 10 | 0.9512 | 0.9049 | 0.8951 | 1290.04 | [top-10](eval/results/retrieval_bm25_rerank_20261015T180050898462Z_3367c2ac2731ca5fac0c3682446a229998352d49915bdf23281a47723a20a3eb.json) |
+| 20 | 0.9512 | 0.9293 | 0.8951 | 2598.60 | [top-20](eval/results/retrieval_bm25_rerank_20261015T122408293824Z_4d93aa37e83e77ea2458a5c9e1a6760db1bea494d877701f961c1eac06d4cb9c.json) |
+| 30 | 0.9512 | 0.9293 | 0.8829 | 4056.33 | [top-30](eval/results/retrieval_bm25_rerank_20261015T180615157410Z_18c49fb4ca41841eb7ea583de346eef9649e4a0e15408469b4397c2d23a7aaf5.json) |
+
+Freeze `candidate_k=20`, `BAAI/bge-reranker-base`, final `k=5`, and abstention threshold `0.60` before hold-out evaluation. Depth 20 improved Recall@5 over 10 and matched 30's recall with higher MRR and lower reranking time. Latency is reranker-only p50, not end-to-end time. Metadata filters were verified for correctness, not tested as a quality-improving ablation. Query rewriting was not implemented and has no measured result. All 12 frozen hold-out questions remain untouched.
+
+# Step 3.7: Final Frozen Hold-Out Evaluation
+
+Status: Completed once with the development-selected configuration: BM25 top 20 → `BAAI/bge-reranker-base` → top 5, using the 0.60 abstention threshold. Chunk size, overlap, and final output depth were fixed rather than tuned. The 12-question hold-out contained 10 answerable and 2 unanswerable questions.
+
+| Split and method | Hit@5 | Recall@5 | MRR | Retrieval-only p50 (ms) | Rerank-only p50 (ms) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Frozen hold-out, BM25 + reranker | 0.8000 | 0.8000 | 0.7333 | 30.09 | 3397.60 |
+
+The gate correctly refused 2/2 unanswerable questions and missed 0/2; it wrongly refused 1/10 answerable questions and correctly accepted 9/10. Retrieval metrics exclude the two unanswerable questions and do not measure answer-generation correctness. Retrieval and reranking p50 values are measured separately, not as end-to-end latency. This small hold-out has substantial uncertainty and should not be treated as a stable population estimate.
+
+Saved evidence: [frozen hold-out report](eval/results/retrieval_bm25_rerank_holdout_20261015T182257754654Z_15f93293e5ee0669801fa0d69164bf1c69a9379717dfd17791ba89f2c65cef46.json). The [development ablation reports](#step-34-cross-encoder-reranking) and [depth-tuning reports](#step-37-development-retrieval-depth-tuning) above are development measurements, not hold-out results. Metadata filters were functionally verified but not quality-ablated; query rewriting was **not implemented** and has no measured result.

@@ -374,3 +374,180 @@ def test_rerank_requires_final_five_before_loading_model(evaluation_data, monkey
     dense.assert_not_called()
     bm25.assert_not_called()
     hybrid.assert_not_called()
+
+
+@pytest.mark.parametrize("depth", [10, 20, 30])
+def test_bm25_rerank_candidate_depth_reaches_retrieval_and_report(
+    evaluation_data, monkeypatch, depth
+):
+    _, bm25, hybrid = evaluation_data
+    bm25.side_effect = lambda question, k: [
+        {"text": f"Evidence {index}", "metadata": {"doc_id": question, "page": 1}}
+        for index in range(k)
+    ]
+    model = Mock()
+    model.predict.side_effect = lambda pairs, **_kwargs: [0.5] * len(pairs)
+    monkeypatch.setattr(run_retrieval, "_get_reranker", Mock(return_value=model))
+
+    report = run_retrieval.evaluate(5, method="bm25_rerank", candidate_k=depth)
+
+    assert bm25.call_args_list == [
+        call(question, k=depth) for question in ("D01", "D02", "D03", "D04", "D05")
+    ]
+    assert all(len(entry.args[0]) == depth for entry in model.predict.call_args_list)
+    assert report["configuration"]["candidate_k"] == depth
+    assert report["configuration"]["final_k"] == 5
+    assert report["counts"]["answerable_evaluated"] == 5
+    assert report["counts"]["holdout_questions"] == 12
+    assert "rerank_latency_p50_ms" in report
+    if depth == 20:
+        assert report["configuration_hash"] == (
+            "4d93aa37e83e77ea2458a5c9e1a6760db1bea494d877701f961c1eac06d4cb9c"
+        )
+    hybrid.assert_not_called()
+
+
+@pytest.mark.parametrize("depth", [None, True, 5, 15, 20.0])
+def test_invalid_candidate_depth_fails_before_retrieval(evaluation_data, depth):
+    dense, bm25, hybrid = evaluation_data
+    with pytest.raises(ValueError, match="candidate_k must be 10, 20, or 30"):
+        run_retrieval.evaluate(5, method="bm25_rerank", candidate_k=depth)
+    dense.assert_not_called()
+    bm25.assert_not_called()
+    hybrid.assert_not_called()
+
+
+def test_candidate_depth_cli_selection_and_other_method_rejection(
+    evaluation_data, monkeypatch, capsys
+):
+    _, bm25, hybrid = evaluation_data
+    bm25.side_effect = lambda question, k: [
+        {"text": "Evidence", "metadata": {"doc_id": question, "page": 1}}
+    ]
+    model = Mock()
+    model.predict.side_effect = lambda pairs, **_kwargs: [0.5] * len(pairs)
+    monkeypatch.setattr(run_retrieval, "_get_reranker", Mock(return_value=model))
+    monkeypatch.setattr(
+        "sys.argv", ["run_retrieval", "--method", "bm25_rerank", "--candidate-k", "10"]
+    )
+
+    run_retrieval.main()
+
+    reports = list(run_retrieval.RESULTS_DIR.glob("retrieval_bm25_rerank_*.json"))
+    assert len(reports) == 1
+    saved = json.loads(reports[0].read_text(encoding="utf-8"))
+    assert saved["configuration"]["candidate_k"] == 10
+    assert "candidate_k=10" in capsys.readouterr().out
+    assert bm25.call_count == 5
+
+    monkeypatch.setattr("sys.argv", ["run_retrieval", "--method", "hybrid", "--candidate-k", "10"])
+    with pytest.raises(SystemExit) as caught:
+        run_retrieval.main()
+    assert caught.value.code == 2
+    assert "only for bm25_rerank" in capsys.readouterr().err
+    hybrid.assert_not_called()
+
+
+def test_holdout_uses_frozen_pipeline_and_synthetic_selected_ids(evaluation_data, monkeypatch):
+    dense, bm25, hybrid = evaluation_data
+    path = run_retrieval.GOLDEN_PATH
+    records = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    for record in records:
+        if record["id"] in {"H10", "H11", "H12"}:
+            record.update(answerable=False, gold_sources=[], reference_answer="not found")
+    path.write_text("\n".join(json.dumps(row) for row in records) + "\n", encoding="utf-8")
+    bm25.side_effect = lambda question, k: (
+        []
+        if question == "H12"
+        else [{"text": "Evidence", "metadata": {"doc_id": question, "page": 1}}]
+    )
+    model = Mock()
+    model.predict.side_effect = lambda pairs, **_: [0.4 if pairs[0][0] in {"H09", "H10"} else 0.8]
+    loader = Mock(return_value=model)
+    monkeypatch.setattr(run_retrieval, "_get_reranker", loader)
+    gate = Mock(wraps=run_retrieval.decide_abstention)
+    monkeypatch.setattr(run_retrieval, "decide_abstention", gate)
+    clock = iter(index * 0.001 for index in range(48))
+    monkeypatch.setattr(run_retrieval.time, "perf_counter", lambda: next(clock))
+    monkeypatch.setattr(
+        "sys.argv", ["run_retrieval", "--split", "holdout", "--method", "bm25_rerank"]
+    )
+
+    run_retrieval.main()
+
+    reports = list(run_retrieval.RESULTS_DIR.glob("retrieval_bm25_rerank_holdout_*.json"))
+    assert len(reports) == 1
+    report = json.loads(reports[0].read_text(encoding="utf-8"))
+    assert [row["id"] for row in report["per_question"]] == [
+        f"H{index:02}" for index in range(1, 13)
+    ]
+    assert bm25.call_args_list == [call(f"H{index:02}", k=20) for index in range(1, 13)]
+    assert report["configuration"]["candidate_k"] == 20
+    assert report["configuration"]["final_k"] == 5
+    assert report["configuration"]["reranker_model"] == "BAAI/bge-reranker-base"
+    assert report["configuration"]["abstention_threshold"] == 0.60
+    assert report["metrics"] == {"hit_at_k": 1.0, "recall_at_k": 1.0, "mrr": 1.0}
+    assert report["counts"]["correct_refusals"] == 2
+    assert report["counts"]["missed_refusals"] == 1
+    assert report["counts"]["wrong_refusals"] == 1
+    assert report["counts"]["correct_acceptances"] == 8
+    assert report["rates"] == {
+        "correct_refusal_rate": pytest.approx(2 / 3),
+        "wrong_refusal_rate": pytest.approx(1 / 9),
+    }
+    assert report["retrieval_latency_p50_ms"] == pytest.approx(1.0)
+    assert report["rerank_latency_p50_ms"] == pytest.approx(1.0)
+    assert report["per_question"][-1]["top_rerank_score"] is None
+    assert gate.call_count == 12
+    loader.assert_called_once_with()
+    dense.assert_not_called()
+    hybrid.assert_not_called()
+
+
+def test_holdout_empty_answerability_groups_have_null_rates(evaluation_data, monkeypatch):
+    _, bm25, _ = evaluation_data
+    bm25.side_effect = lambda question, k: [
+        {"text": "Evidence", "metadata": {"doc_id": question, "page": 1}}
+    ]
+    model = Mock()
+    model.predict.side_effect = lambda pairs, **_: [0.8]
+    monkeypatch.setattr(run_retrieval, "_get_reranker", Mock(return_value=model))
+    answerable = run_retrieval.evaluate(5, method="bm25_rerank", split="holdout")
+    assert answerable["rates"]["correct_refusal_rate"] is None
+
+    path = run_retrieval.GOLDEN_PATH
+    records = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    for record in records:
+        if record["id"].startswith("H"):
+            record.update(answerable=False, gold_sources=[], reference_answer="not found")
+    path.write_text("\n".join(json.dumps(row) for row in records) + "\n", encoding="utf-8")
+    bm25.side_effect = lambda question, k: []
+    unanswerable = run_retrieval.evaluate(5, method="bm25_rerank", split="holdout")
+    assert unanswerable["metrics"] == {"hit_at_k": None, "recall_at_k": None, "mrr": None}
+    assert unanswerable["rates"] == {"correct_refusal_rate": 1.0, "wrong_refusal_rate": None}
+
+
+@pytest.mark.parametrize(
+    "args",
+    [
+        ["--split", "holdout"],
+        ["--split", "holdout", "--method", "bm25_rerank", "--k", "6"],
+        ["--split", "holdout", "--method", "bm25_rerank", "--candidate-k", "10"],
+    ],
+)
+def test_holdout_rejects_overrides_before_retrieval(evaluation_data, monkeypatch, args):
+    _, bm25, _ = evaluation_data
+    loader = Mock(side_effect=AssertionError("Model must not load"))
+    monkeypatch.setattr(run_retrieval, "_get_reranker", loader)
+    monkeypatch.setattr("sys.argv", ["run_retrieval", *args])
+    with pytest.raises(SystemExit) as caught:
+        run_retrieval.main()
+    assert caught.value.code == 2
+    loader.assert_not_called()
+    bm25.assert_not_called()
+
+
+def test_holdout_rejects_changed_threshold(evaluation_data, monkeypatch):
+    monkeypatch.setattr(run_retrieval, "ABSTENTION_THRESHOLD", 0.61)
+    with pytest.raises(ValueError, match="Frozen reranker model or abstention threshold"):
+        run_retrieval.evaluate(5, method="bm25_rerank", split="holdout")
