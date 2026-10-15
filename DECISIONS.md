@@ -292,3 +292,25 @@ BM25 and native hybrid RRF rank chunks using first-stage signals. A BGE cross-en
 
 ### Conclusions
 BM25 + reranker is provisionally preferred to hybrid + reranker because their evaluated quality metrics are equal and BM25 has the simpler first-stage retrieval path. This development-set result does not establish superior unseen performance, calibrated confidence, or improved answer correctness. The 12 frozen hold-out questions remain untouched.
+
+---
+
+## Decision 012: Reranker-Based Abstention Threshold (Phase 3, Step 3.6)
+
+### Status
+Completed development-set threshold experiment; answer-generation integration pending.
+
+### Context
+BM25 retrieves up to 20 candidates, and `BAAI/bge-reranker-base` reranks them. The highest `rerank_score` provides a simple evidence gate, but even Sigmoid-activated scores are not calibrated probabilities of answer correctness.
+
+### Decisions Made
+
+1. **Fixed evidence gate**
+   - Use threshold 0.60: abstain with no candidates or a top score below 0.60; otherwise accept the retrieved evidence. This gate does not generate an answer or guarantee factual correctness.
+
+2. **Development-set trade-off**
+   - On 41 answerable and 7 unanswerable development questions, 0.60 gave 4/7 correct refusals (57.1%), 3/7 missed refusals (42.9%), 1/41 wrong refusals (2.4%), and 40/41 correct acceptances (97.6%). The [saved score analysis](eval/results/rerank_score_analysis_20261015T131329110974Z.json) tested a cutoff just below 0.60 with identical counts.
+   - A much lower tested cutoff refused only 1/7 unanswerable questions; a much higher cutoff refused all 7 but wrongly refused 24/41 answerable questions. The selected cutoff limits wrong refusals while catching some unsupported questions.
+
+### Limitations
+Three unanswerable questions still pass the gate, score distributions overlap, and the development set contains only seven unanswerable examples. The 12 frozen hold-out questions remain untouched. The standalone gate is implemented and tested, but it is not yet integrated with LLM generation.

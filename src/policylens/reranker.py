@@ -9,6 +9,11 @@ from sentence_transformers import CrossEncoder
 from policylens.retrieval import _validate_retrieval_inputs
 
 MODEL_NAME = "BAAI/bge-reranker-base"
+ABSTENTION_THRESHOLD = 0.60
+ABSTENTION_MESSAGE = (
+    "I couldn't find sufficient evidence in the indexed regulatory documents "
+    "to answer this question reliably."
+)
 
 
 @lru_cache(maxsize=1)
@@ -48,3 +53,33 @@ def rerank(
             raise ValueError("reranker returned a non-finite score")
         ranked.append({**candidate, "rerank_score": rerank_score})
     return sorted(ranked, key=lambda candidate: candidate["rerank_score"], reverse=True)[:k]
+
+
+def decide_abstention(reranked_results: list[dict[str, Any]]) -> dict[str, Any]:
+    """Gate retrieved evidence by its highest cross-encoder score, without generating an answer."""
+    if not isinstance(reranked_results, list):
+        raise TypeError("reranked_results must be a list")
+    scores = []
+    for index, result in enumerate(reranked_results):
+        if not isinstance(result, dict):
+            raise TypeError(f"reranked result {index} must be a dictionary")
+        score = result.get("rerank_score")
+        if (
+            isinstance(score, bool)
+            or not isinstance(score, int | float)
+            or not math.isfinite(score)
+        ):
+            raise ValueError(f"reranked result {index} must have a finite rerank_score")
+        scores.append(float(score))
+
+    top_score = max(scores, default=None)
+    abstain = top_score is None or top_score < ABSTENTION_THRESHOLD
+    return {
+        "abstain": abstain,
+        "top_rerank_score": top_score,
+        "message": (
+            ABSTENTION_MESSAGE
+            if abstain
+            else "Retrieved evidence meets the score threshold; answer correctness is not assured."
+        ),
+    }

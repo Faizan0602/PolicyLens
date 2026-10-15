@@ -115,3 +115,55 @@ def test_invalid_model_scores_are_rejected(scores):
     model.predict.return_value = scores
     with pytest.raises(ValueError):
         reranker.rerank("Question", [candidate("A", 0.2, 1), candidate("B", 0.1, 2)], model=model)
+
+
+@pytest.mark.parametrize(
+    ("score", "abstain"),
+    [(0.59, True), (0.60, False), (0.61, False)],
+)
+def test_abstention_threshold(score, abstain):
+    result = reranker.decide_abstention([{"rerank_score": score, "score": 0.99}])
+    assert result["abstain"] is abstain
+    assert result["top_rerank_score"] == score
+    assert result["message"] == (
+        reranker.ABSTENTION_MESSAGE
+        if abstain
+        else "Retrieved evidence meets the score threshold; answer correctness is not assured."
+    )
+
+
+def test_no_candidates_abstains():
+    assert reranker.decide_abstention([]) == {
+        "abstain": True,
+        "top_rerank_score": None,
+        "message": reranker.ABSTENTION_MESSAGE,
+    }
+
+
+def test_abstention_uses_highest_score_without_changing_results():
+    results = [{"rerank_score": 0.2}, {"rerank_score": 0.72}, {"rerank_score": 0.4}]
+    original = deepcopy(results)
+    decision = reranker.decide_abstention(results)
+    assert decision["abstain"] is False
+    assert decision["top_rerank_score"] == 0.72
+    assert results == original
+
+
+@pytest.mark.parametrize(
+    "results",
+    [
+        None,
+        {},
+        [None],
+        [{}],
+        [{"rerank_score": None}],
+        [{"rerank_score": True}],
+        [{"rerank_score": "0.8"}],
+        [{"rerank_score": float("nan")}],
+        [{"rerank_score": float("inf")}],
+        [{"rerank_score": 0.8}, {}],
+    ],
+)
+def test_invalid_reranked_results_are_rejected(results):
+    with pytest.raises((TypeError, ValueError), match="reranked"):
+        reranker.decide_abstention(results)

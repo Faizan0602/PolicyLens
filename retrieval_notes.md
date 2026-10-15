@@ -250,3 +250,11 @@ The original top five from each 20-candidate retrieval serve as controls: BM25 s
 After reranking, 25 of 41 questions had identical ordered `(doc_id, page)` results across the two methods; 16 differed. Rank-one document/page agreed in all 41, and no per-question Hit@5, Recall@5, or reciprocal-rank values differed. The reports omit Qdrant point IDs, so matching document/page references do not prove identical chunks. The added latency has no proven benefit for answer correctness or unseen questions. Scoring all 669 chunks with the cross-encoder on every query would be considerably more expensive than reranking 20 candidates.
 
 Saved evidence: [BM25 + reranker](eval/results/retrieval_bm25_rerank_20261015T122408293824Z_4d93aa37e83e77ea2458a5c9e1a6760db1bea494d877701f961c1eac06d4cb9c.json), [hybrid + reranker](eval/results/retrieval_hybrid_rerank_20261015T123138677133Z_49abbae93ee83b902bf70141a714133d964b26eab106e1e8fcf75314d36e286e.json).
+
+# Step 3.6: Abstention Threshold
+
+BM25 retrieves up to 20 chunks; `BAAI/bge-reranker-base` reranks them, and the highest `rerank_score` gates the evidence. No candidates or a score below the selected development-set threshold of 0.60 triggers abstention; a score at or above 0.60 accepts the evidence for possible answer generation. The model uses Sigmoid activation, but its scores are not calibrated answer-confidence probabilities.
+
+The [score report](eval/results/rerank_score_analysis_20261015T131329110974Z.json) and [distribution plot](eval/results/rerank_score_analysis_20261015T131329110974Z.svg) cover 41 answerable and 7 unanswerable development questions. At 0.60, the gate correctly refused 4/7 unanswerable questions (57.1%), missed 3/7 (42.9%), wrongly refused 1/41 answerable questions (2.4%), and correctly accepted 40/41 (97.6%). A wrong refusal declines a question the indexed documents could answer, reducing usefulness. The distributions overlap: a much higher tested cutoff catches more unanswerable questions but causes excessive wrong refusals. One score threshold cannot reliably detect every unanswerable question.
+
+The standalone `decide_abstention()` function is implemented and tested; 40 focused offline tests passed. It is not yet connected to LLM answer generation. The 12 frozen hold-out questions remain untouched.
