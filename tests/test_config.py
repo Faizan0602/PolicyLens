@@ -96,3 +96,60 @@ def test_safe_dump_masks_sensitive_keys():
     assert '"app_name": "PolicyLens"' in repr_str
     assert "super-secret-key-123" not in repr_str
     assert "gemini-secret-token-456" not in repr_str
+
+
+def test_database_url_password_is_masked_without_changing_connection_value():
+    url = "postgresql+psycopg://analyst:p%40ss%3Aword@db.example:5432/policylens?sslmode=require"
+    settings = Settings(_env_file=None, database_url=url)
+
+    safe_url = settings.safe_dump()["database_url"]
+    assert settings.database_url == url
+    assert "db.example:5432/policylens?sslmode=require" in safe_url
+    assert "analyst" in safe_url
+    assert "p%40ss%3Aword" not in safe_url
+    assert "p@ss:word" not in safe_url
+    assert "p%40ss%3Aword" not in settings.safe_repr()
+
+
+def test_unparseable_database_url_is_fully_masked():
+    settings = Settings(_env_file=None, database_url="malformed-secret-value")
+    assert settings.safe_dump()["database_url"] == "**********"
+    assert "malformed-secret-value" not in settings.safe_repr()
+
+
+def test_database_url_query_credentials_are_masked():
+    settings = Settings(
+        _env_file=None,
+        database_url=(
+            "postgresql://db.example/policylens?sslmode=require&sslpassword=query-secret"
+        ),
+    )
+    safe_url = settings.safe_dump()["database_url"]
+    assert "sslmode=require" in safe_url
+    assert "query-secret" not in safe_url
+    assert "query-secret" not in settings.safe_repr()
+
+
+def test_real_environment_precedes_dotenv_and_cached_settings_need_refresh(tmp_path, monkeypatch):
+    (tmp_path / ".env").write_text(
+        "POLICYLENS_LLM_PROVIDER=groq\nPOLICYLENS_LLM_MODEL=llama-3.3-70b-versatile\n",
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("POLICYLENS_LLM_PROVIDER", "gemini")
+    monkeypatch.setenv("POLICYLENS_LLM_MODEL", "gemini-test-model")
+    get_settings.cache_clear()
+    try:
+        first = get_settings()
+        assert (first.llm_provider, first.llm_model) == ("gemini", "gemini-test-model")
+        monkeypatch.delenv("POLICYLENS_LLM_PROVIDER")
+        monkeypatch.delenv("POLICYLENS_LLM_MODEL")
+        assert get_settings() is first
+        get_settings.cache_clear()
+        refreshed = get_settings()
+        assert (refreshed.llm_provider, refreshed.llm_model) == (
+            "groq",
+            "llama-3.3-70b-versatile",
+        )
+    finally:
+        get_settings.cache_clear()

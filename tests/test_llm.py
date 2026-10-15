@@ -201,6 +201,29 @@ def test_groq_factory_uses_configured_model_and_secret(provider):
     client_factory.assert_called_once_with(model="configured-groq-model", api_key="test-groq-key")
 
 
+def test_effective_groq_settings_select_matching_model_without_network(tmp_path, monkeypatch):
+    from policylens.config import get_settings
+
+    (tmp_path / ".env").write_text(
+        "POLICYLENS_LLM_PROVIDER=groq\n"
+        "POLICYLENS_LLM_MODEL=llama-3.3-70b-versatile\n"
+        "POLICYLENS_GROQ_API_KEY=synthetic-test-key\n",
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+    for name in ("POLICYLENS_LLM_PROVIDER", "POLICYLENS_LLM_MODEL", "POLICYLENS_GROQ_API_KEY"):
+        monkeypatch.delenv(name, raising=False)
+    get_settings.cache_clear()
+    try:
+        with patch("policylens.llm.GroqLLM") as client_factory:
+            assert get_llm() is client_factory.return_value
+        client_factory.assert_called_once_with(
+            model="llama-3.3-70b-versatile", api_key="synthetic-test-key"
+        )
+    finally:
+        get_settings.cache_clear()
+
+
 @pytest.mark.parametrize("api_key", [None, "", " \n\t "])
 def test_groq_missing_credentials_rejected_without_sdk_environment_fallback(api_key):
     # Synthetic keys only; neither .env nor local credentials are read.

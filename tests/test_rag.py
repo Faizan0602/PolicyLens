@@ -1,5 +1,6 @@
 """Deterministic formatting and LCEL tests, without live retrieval or LLM calls."""
 
+import io
 import json
 from copy import deepcopy
 from unittest.mock import Mock, call
@@ -9,6 +10,7 @@ from langchain_core.runnables import Runnable
 
 from policylens import rag
 from policylens.rag import build_rag_chain, format_evidence
+from policylens.reranker import ABSTENTION_MESSAGE
 
 
 def test_context_and_source_record_mapping():
@@ -152,6 +154,17 @@ def fake_llm(monkeypatch):
     client.generate.return_value = "Supported answer [Source 1]."
     # Each test supplies a fake client unless it explicitly exercises the factory.
     monkeypatch.setattr(rag, "get_llm", Mock(side_effect=AssertionError("Unexpected factory call")))
+    monkeypatch.setattr(
+        rag,
+        "rerank",
+        Mock(
+            side_effect=lambda question, candidates, k: [
+                {**candidate, "rerank_score": 0.8}
+                for candidate in candidates
+                if isinstance(candidate.get("text"), str) and candidate["text"].strip()
+            ][:k]
+        ),
+    )
     return client
 
 
@@ -170,19 +183,20 @@ def test_chain_retrieves_and_formats_once_and_preserves_sources(monkeypatch, fak
     evidence = format_evidence(chunks)
     search = Mock(return_value=chunks)
     formatter = Mock(return_value=evidence)
-    monkeypatch.setattr(rag, "retrieve", search)
+    monkeypatch.setattr(rag, "retrieve_bm25", search)
     monkeypatch.setattr(rag, "format_evidence", formatter)
     question = "What is the RBI reporting deadline?"
     fake_llm.generate.return_value = "  Supported answer [Source 1].\n"
 
-    chain = build_rag_chain(k=2, llm=fake_llm)
+    chain = build_rag_chain(llm=fake_llm)
     assert isinstance(chain, Runnable)
     search.assert_not_called()
     fake_llm.generate.assert_not_called()
     result = chain.invoke(question)
 
-    search.assert_called_once_with(question, k=2)
-    formatter.assert_called_once_with(chunks)
+    search.assert_called_once_with(question, k=20)
+    rag.rerank.assert_called_once_with(question, chunks, k=5)
+    formatter.assert_called_once_with([{**chunk, "rerank_score": 0.8} for chunk in chunks])
     fake_llm.generate.assert_called_once()
     prompt = fake_llm.generate.call_args.args[0]
     assert fake_llm.generate.call_args.kwargs == {"temperature": 0}
@@ -193,22 +207,74 @@ def test_chain_retrieves_and_formats_once_and_preserves_sources(monkeypatch, fak
     assert json.loads(source_json) == evidence["sources"]
     assert "'doc_id':" not in source_json  # JSON text, not a Python dictionary representation.
     assert result["answer"] == "  Supported answer [Source 1].\n"
+    assert result["abstained"] is False
     assert isinstance(result["answer"], str)
     assert result["sources"] is evidence["sources"]
     assert [source["source_file"] for source in result["sources"]] == ["first.pdf", "second.pdf"]
     assert chunks == original
 
 
+def test_low_rerank_score_refuses_without_llm_or_misleading_sources(monkeypatch, fake_llm):
+    candidates = [{"text": "Unrelated passage", "source_file": "other.pdf", "page": 1}]
+    search = Mock(return_value=candidates)
+    monkeypatch.setattr(rag, "retrieve_bm25", search)
+    monkeypatch.setattr(rag, "rerank", Mock(return_value=[{**candidates[0], "rerank_score": 0.59}]))
+
+    result = build_rag_chain(llm=fake_llm).invoke("Question")
+
+    search.assert_called_once_with("Question", k=20)
+    rag.rerank.assert_called_once_with("Question", candidates, k=5)
+    fake_llm.generate.assert_not_called()
+    assert result == {"answer": ABSTENTION_MESSAGE, "sources": [], "abstained": True}
+
+
+def test_threshold_boundary_accepts_reranked_source_metadata(monkeypatch, fake_llm):
+    candidate = {
+        "text": "Applicable rule on page two.",
+        "score": 2.4,
+        "source_file": "original.pdf",
+        "page": 2,
+        "metadata": {
+            "doc_id": "d" * 64,
+            "chunk_index": 7,
+            "title": "Original circular",
+            "circular_no": "RBI/example",
+            "source_url": "https://example.com/original",
+        },
+    }
+    monkeypatch.setattr(rag, "retrieve_bm25", Mock(return_value=[candidate]))
+    monkeypatch.setattr(rag, "rerank", Mock(return_value=[{**candidate, "rerank_score": 0.60}]))
+
+    result = build_rag_chain(llm=fake_llm).invoke("Question")
+
+    assert result["abstained"] is False
+    assert result["answer"] == fake_llm.generate.return_value
+    assert result["sources"] == format_evidence([candidate])["sources"]
+    prompt = fake_llm.generate.call_args.args[0]
+    assert "Applicable rule on page two." in prompt
+    assert '"chunk_index": 7' in prompt
+    assert '"doc_id": "' + "d" * 64 + '"' in prompt
+    assert '"page": 2' in prompt
+
+
+def test_frozen_output_depth_rejects_override_before_loading_llm(monkeypatch):
+    factory = Mock(side_effect=AssertionError("LLM must not initialize"))
+    monkeypatch.setattr(rag, "get_llm", factory)
+    with pytest.raises(ValueError, match="final k=5"):
+        build_rag_chain(k=2)
+    factory.assert_not_called()
+
+
 def test_chain_uses_configured_factory_when_no_client_is_supplied(monkeypatch, fake_llm):
     factory = Mock(return_value=fake_llm)
     search = Mock(return_value=[{"text": "Evidence"}])
     monkeypatch.setattr(rag, "get_llm", factory)
-    monkeypatch.setattr(rag, "retrieve", search)
+    monkeypatch.setattr(rag, "retrieve_bm25", search)
 
     result = build_rag_chain().invoke("Question")
 
     factory.assert_called_once_with()
-    search.assert_called_once_with("Question", k=5)
+    search.assert_called_once_with("Question", k=20)
     assert result["answer"] == fake_llm.generate.return_value
 
 
@@ -218,14 +284,14 @@ def test_chain_multiple_invocations_keep_question_specific_sources(monkeypatch, 
         "Second question": [{"text": "Second evidence", "source_file": "second.pdf"}],
     }
     search = Mock(side_effect=lambda question, k: evidence_by_question[question])
-    monkeypatch.setattr(rag, "retrieve", search)
+    monkeypatch.setattr(rag, "retrieve_bm25", search)
     chain = build_rag_chain(llm=fake_llm)
 
     first = chain.invoke("First question")
     first_snapshot = deepcopy(first)
     second = chain.invoke("Second question")
 
-    assert search.call_args_list == [call("First question", k=5), call("Second question", k=5)]
+    assert search.call_args_list == [call("First question", k=20), call("Second question", k=20)]
     for result, question in [(first, "First question"), (second, "Second question")]:
         assert result["sources"] == format_evidence(evidence_by_question[question])["sources"]
     first_prompt, second_prompt = (entry.args[0] for entry in fake_llm.generate.call_args_list)
@@ -241,13 +307,13 @@ def test_chain_concurrent_invocations_keep_sources_separate(monkeypatch, fake_ll
     search = Mock(
         side_effect=lambda question, k: [{"text": question, "source_file": f"{question}.pdf"}]
     )
-    monkeypatch.setattr(rag, "retrieve", search)
+    monkeypatch.setattr(rag, "retrieve_bm25", search)
     questions = ["First", "Second", "Third"]
 
     results = build_rag_chain(llm=fake_llm).batch(questions, config={"max_concurrency": 3})
 
     assert search.call_count == len(questions)
-    search.assert_has_calls([call(question, k=5) for question in questions], any_order=True)
+    search.assert_has_calls([call(question, k=20) for question in questions], any_order=True)
     assert [result["sources"][0]["source_file"] for result in results] == [
         f"{question}.pdf" for question in questions
     ]
@@ -256,19 +322,20 @@ def test_chain_concurrent_invocations_keep_sources_separate(monkeypatch, fake_ll
 @pytest.mark.parametrize("chunks", [[], [{"text": None}], [{"text": " \n "}, {"text": 123}]])
 def test_chain_empty_or_unusable_evidence_skips_llm(monkeypatch, fake_llm, chunks):
     search = Mock(return_value=chunks)
-    monkeypatch.setattr(rag, "retrieve", search)
+    monkeypatch.setattr(rag, "retrieve_bm25", search)
 
     result = build_rag_chain(llm=fake_llm).invoke("Question")
 
-    search.assert_called_once_with("Question", k=5)
+    search.assert_called_once_with("Question", k=20)
     fake_llm.generate.assert_not_called()
     assert result["sources"] == []
-    assert result["answer"] == "not found in the provided documents"
+    assert result["answer"] == ABSTENTION_MESSAGE
+    assert result["abstained"] is True
 
 
 def test_chain_allows_model_to_abstain_without_dropping_sources(monkeypatch, fake_llm):
     chunks = [{"text": "Evidence about another regulatory category.", "source_file": "other.pdf"}]
-    monkeypatch.setattr(rag, "retrieve", Mock(return_value=chunks))
+    monkeypatch.setattr(rag, "retrieve_bm25", Mock(return_value=chunks))
     fake_llm.generate.return_value = "not found in the provided documents"
 
     result = build_rag_chain(llm=fake_llm).invoke("What is the deadline?")
@@ -287,7 +354,7 @@ def test_chain_allows_model_to_abstain_without_dropping_sources(monkeypatch, fak
 
 def test_chain_returns_formatted_sources_independent_of_model_citations(monkeypatch, fake_llm):
     chunks = [{"text": "Evidence", "source_file": "actual.pdf"}]
-    monkeypatch.setattr(rag, "retrieve", Mock(return_value=chunks))
+    monkeypatch.setattr(rag, "retrieve_bm25", Mock(return_value=chunks))
     fake_llm.generate.return_value = "An unsupported model citation [Source 99]."
 
     result = build_rag_chain(llm=fake_llm).invoke("Question")
@@ -300,27 +367,27 @@ def test_chain_returns_formatted_sources_independent_of_model_citations(monkeypa
 def test_chain_retrieval_failure_propagates(monkeypatch, fake_llm):
     failure = RuntimeError("Retrieval unavailable")
     search = Mock(side_effect=failure)
-    monkeypatch.setattr(rag, "retrieve", search)
+    monkeypatch.setattr(rag, "retrieve_bm25", search)
 
     with pytest.raises(RuntimeError, match="Retrieval unavailable") as caught:
         build_rag_chain(llm=fake_llm).invoke("Question")
 
     assert caught.value is failure
-    search.assert_called_once_with("Question", k=5)
+    search.assert_called_once_with("Question", k=20)
     fake_llm.generate.assert_not_called()
 
 
 def test_chain_llm_failure_propagates(monkeypatch, fake_llm):
     failure = RuntimeError("Generation unavailable")
     search = Mock(return_value=[{"text": "Evidence"}])
-    monkeypatch.setattr(rag, "retrieve", search)
+    monkeypatch.setattr(rag, "retrieve_bm25", search)
     fake_llm.generate.side_effect = failure
 
     with pytest.raises(RuntimeError, match="Generation unavailable") as caught:
         build_rag_chain(llm=fake_llm).invoke("Question")
 
     assert caught.value is failure
-    search.assert_called_once_with("Question", k=5)
+    search.assert_called_once_with("Question", k=20)
     fake_llm.generate.assert_called_once()
 
 
@@ -328,7 +395,7 @@ def test_chain_preserves_literal_braces_and_document_text(monkeypatch, fake_llm)
     text = '  Regulatory text: {deadline}\r\n{"category": "NBFC"}\n  '
     chunks = [{"text": text, "metadata": {"title": "Document {title}"}}]
     original = deepcopy(chunks)
-    monkeypatch.setattr(rag, "retrieve", Mock(return_value=chunks))
+    monkeypatch.setattr(rag, "retrieve_bm25", Mock(return_value=chunks))
 
     result = build_rag_chain(llm=fake_llm).invoke("What does {deadline} mean?")
 
@@ -352,7 +419,7 @@ def test_chain_loads_prompt_from_module_relative_path(monkeypatch, tmp_path, fak
     )
     monkeypatch.setattr(rag, "__file__", str(project / "src" / "policylens" / "rag.py"))
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(rag, "retrieve", Mock(return_value=[{"text": "Evidence"}]))
+    monkeypatch.setattr(rag, "retrieve_bm25", Mock(return_value=[{"text": "Evidence"}]))
 
     build_rag_chain(llm=fake_llm).invoke("Question from the user")
 
@@ -371,7 +438,7 @@ def test_chain_reuse_across_empty_evidence_does_not_reuse_sources(monkeypatch, f
     first_chunks = [{"text": "First evidence", "source_file": "first.pdf"}]
     last_chunks = [{"text": "Last evidence", "source_file": "last.pdf"}]
     search = Mock(side_effect=[first_chunks, [], last_chunks])
-    monkeypatch.setattr(rag, "retrieve", search)
+    monkeypatch.setattr(rag, "retrieve_bm25", search)
     chain = build_rag_chain(llm=fake_llm)
 
     first = chain.invoke("First question")
@@ -379,14 +446,14 @@ def test_chain_reuse_across_empty_evidence_does_not_reuse_sources(monkeypatch, f
     last = chain.invoke("Last question")
 
     assert search.call_args_list == [
-        call("First question", k=5),
-        call("Unanswered question", k=5),
-        call("Last question", k=5),
+        call("First question", k=20),
+        call("Unanswered question", k=20),
+        call("Last question", k=20),
     ]
     assert fake_llm.generate.call_count == 2
     assert first["sources"] == format_evidence(first_chunks)["sources"]
     assert empty["sources"] == []
-    assert empty["answer"] == "not found in the provided documents"
+    assert empty["answer"] == ABSTENTION_MESSAGE
     assert last["sources"] == format_evidence(last_chunks)["sources"]
     assert last["sources"][0]["tag"] == "Source 1"
 
@@ -395,15 +462,13 @@ def test_chain_reuse_across_empty_evidence_does_not_reuse_sources(monkeypatch, f
 def cli_dependencies(monkeypatch, fake_llm):
     search = Mock(return_value=[])
     factory = Mock(return_value=fake_llm)
-    monkeypatch.setattr(rag, "retrieve", search)
+    monkeypatch.setattr(rag, "retrieve_bm25", search)
     monkeypatch.setattr(rag, "get_llm", factory)
     return search, factory
 
 
-@pytest.mark.parametrize("k_args, expected_k", [([], 5), (["--k", "2"], 2)])
-def test_cli_answer_and_source_output(
-    monkeypatch, capsys, fake_llm, cli_dependencies, k_args, expected_k
-):
+@pytest.mark.parametrize("k_args", [[], ["--k", "5"]])
+def test_cli_answer_and_source_output(monkeypatch, capsys, fake_llm, cli_dependencies, k_args):
     search, factory = cli_dependencies
     chunks = [
         {
@@ -433,7 +498,7 @@ def test_cli_answer_and_source_output(
     rag.main()
 
     output = capsys.readouterr()
-    search.assert_called_once_with(question, k=expected_k)
+    search.assert_called_once_with(question, k=20)
     factory.assert_called_once_with()
     fake_llm.generate.assert_called_once()
     assert question in fake_llm.generate.call_args.args[0]
@@ -483,10 +548,27 @@ def test_cli_empty_evidence_output(monkeypatch, capsys, fake_llm, cli_dependenci
     rag.main()
 
     output = capsys.readouterr()
-    search.assert_called_once_with("Question", k=5)
+    search.assert_called_once_with("Question", k=20)
     fake_llm.generate.assert_not_called()
-    assert output.out == "Answer:\nnot found in the provided documents\n\nSources:\nNo sources.\n"
+    assert output.out == f"Answer:\n{ABSTENTION_MESSAGE}\n\nSources:\nNo sources.\n"
     assert output.err == ""
+
+
+def test_cli_escapes_characters_unsupported_by_windows_output(
+    monkeypatch, fake_llm, cli_dependencies
+):
+    search, _ = cli_dependencies
+    search.return_value = [{"text": "Evidence"}]
+    fake_llm.generate.return_value = "Use the T‑1 price."
+    output_bytes = io.BytesIO()
+    output = io.TextIOWrapper(output_bytes, encoding="cp1252", errors="strict")
+    monkeypatch.setattr("sys.stdout", output)
+    monkeypatch.setattr("sys.argv", ["rag", "--query", "Question"])
+
+    rag.main()
+
+    output.flush()
+    assert b"Use the T\\u20111 price." in output_bytes.getvalue()
 
 
 @pytest.mark.parametrize(
@@ -495,8 +577,9 @@ def test_cli_empty_evidence_output(monkeypatch, capsys, fake_llm, cli_dependenci
         ([], "required: --query"),
         (["--query", ""], "--query must not be empty or whitespace-only"),
         (["--query", " \n\t "], "--query must not be empty or whitespace-only"),
-        (["--query", "Question", "--k", "0"], "--k must be greater than zero"),
-        (["--query", "Question", "--k", "-1"], "--k must be greater than zero"),
+        (["--query", "Question", "--k", "0"], "--k must be 5"),
+        (["--query", "Question", "--k", "-1"], "--k must be 5"),
+        (["--query", "Question", "--k", "2"], "--k must be 5"),
         (["--query", "Question", "--k", "abc"], "invalid int value"),
         (["--query", "Question", "--k", "2.5"], "invalid int value"),
         (["--query", "Question", "--k"], "expected one argument"),
@@ -532,7 +615,7 @@ def test_cli_help_does_not_build_chain(monkeypatch, capsys):
     output = capsys.readouterr()
     assert "--query" in output.out
     assert "--k" in output.out
-    assert "default: 5" in output.out
+    assert "fixed at 5" in output.out
     assert output.err == ""
 
 
@@ -560,9 +643,29 @@ def test_cli_failures_are_clear_without_exposing_exception_details(
     output = capsys.readouterr()
     assert "RAG error: could not complete retrieval or inference" in output.err
     assert "Check LLM configuration, credentials, and retrieval/API connectivity" in output.err
+    assert "Failure: RuntimeError." in output.err
     assert secret not in output.out + output.err
     assert "api_key=" not in output.out + output.err
     assert "Traceback" not in output.err
     assert output.out == ""
     if failure_stage != "generation":
         fake_llm.generate.assert_not_called()
+
+
+def test_cli_reports_http_status_without_provider_error_details(monkeypatch, capsys):
+    class ProviderError(Exception):
+        status_code = 404
+
+    def fail_chain(*, k):
+        raise ProviderError("TEST_ONLY_SECRET_SENTINEL")
+
+    monkeypatch.setattr(rag, "build_rag_chain", fail_chain)
+    monkeypatch.setattr("sys.argv", ["rag", "--query", "Question"])
+
+    with pytest.raises(SystemExit) as caught:
+        rag.main()
+
+    assert caught.value.code == 1
+    output = capsys.readouterr()
+    assert "Failure: ProviderError (HTTP 404)." in output.err
+    assert "TEST_ONLY_SECRET_SENTINEL" not in output.err

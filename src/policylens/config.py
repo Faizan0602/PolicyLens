@@ -9,6 +9,8 @@ from typing import Any, Literal
 
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy.engine import make_url
+from sqlalchemy.exc import ArgumentError
 
 SENSITIVE_KEY_SUBSTRINGS = ("key", "secret", "password", "token", "auth", "credential")
 
@@ -65,6 +67,19 @@ class Settings(BaseSettings):
                 sensitive in key.lower() for sensitive in SENSITIVE_KEY_SUBSTRINGS
             ):
                 data[key] = "**********"
+            elif key == "database_url":
+                try:
+                    url = make_url(value)
+                    secret_query = {
+                        name: "**********"
+                        for name in url.query
+                        if any(sensitive in name.lower() for sensitive in SENSITIVE_KEY_SUBSTRINGS)
+                    }
+                    if secret_query:
+                        url = url.update_query_dict(secret_query)
+                    data[key] = url.render_as_string(hide_password=True)
+                except (ArgumentError, ValueError, TypeError):
+                    data[key] = "**********"
             else:
                 data[key] = value
         return data

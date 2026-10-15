@@ -17,8 +17,12 @@ from langchain_core.runnables import (
     RunnablePassthrough,
 )
 
+from policylens.bm25 import retrieve_bm25
 from policylens.llm import LLMClient, get_llm
-from policylens.retrieval import retrieve
+from policylens.reranker import ABSTENTION_MESSAGE, decide_abstention, rerank
+
+_CANDIDATE_K = 20
+_FINAL_K = 5
 
 
 def format_evidence(chunks: list[dict[str, Any]]) -> dict[str, Any]:
@@ -66,12 +70,14 @@ def format_evidence(chunks: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def build_rag_chain(k: int = 5, llm: LLMClient | None = None) -> Runnable:
-    """Build a question-to-answer chain with one retrieval per invocation.
+    """Build the frozen BM25-to-reranker chain with one retrieval per invocation.
 
-    Sources stay in invocation-local evidence and come from format_evidence(),
-    never from model output. Empty evidence skips generation; errors propagate.
+    Sources stay in invocation-local accepted evidence, never in model output.
+    Rejected evidence skips generation; errors propagate.
     The configured client is initialized at construction unless one is supplied.
     """
+    if isinstance(k, bool) or not isinstance(k, int) or k != _FINAL_K:
+        raise ValueError("The frozen RAG pipeline requires final k=5")
     client = llm if llm is not None else get_llm()
     prompt_path = Path(__file__).resolve().parents[2] / "prompts" / "answer_v1.txt"
     prompt_text = prompt_path.read_text(encoding="utf-8")
@@ -93,22 +99,37 @@ def build_rag_chain(k: int = 5, llm: LLMClient | None = None) -> Runnable:
     )
     answer = RunnableBranch(
         (
-            lambda evidence: not evidence["context"],
-            RunnableLambda(lambda _: "not found in the provided documents"),
+            lambda evidence: evidence["abstained"],
+            RunnableLambda(lambda _: ABSTENTION_MESSAGE),
         ),
         generate_answer,
     )
 
     def prepare_evidence(state: dict[str, Any]) -> dict[str, Any]:
-        return {"question": state["question"], **format_evidence(state["chunks"])}
+        decision = decide_abstention(state["chunks"])
+        if decision["abstain"]:
+            return {"question": state["question"], "context": "", "sources": [], "abstained": True}
+        return {
+            "question": state["question"],
+            **format_evidence(state["chunks"]),
+            "abstained": False,
+        }
+
+    def retrieve_and_rerank(question: str) -> list[dict[str, Any]]:
+        candidates = retrieve_bm25(question, k=_CANDIDATE_K)
+        return rerank(question, candidates, k=_FINAL_K)
 
     return (
         RunnableParallel(
             question=RunnablePassthrough(),
-            chunks=RunnableLambda(lambda question: retrieve(question, k=k)),
+            chunks=RunnableLambda(retrieve_and_rerank),
         )
         | RunnableLambda(prepare_evidence)
-        | RunnableParallel(answer=answer, sources=RunnableLambda(itemgetter("sources")))
+        | RunnableParallel(
+            answer=answer,
+            sources=RunnableLambda(itemgetter("sources")),
+            abstained=RunnableLambda(itemgetter("abstained")),
+        )
     )
 
 
@@ -116,24 +137,31 @@ def main() -> None:
     """Answer a question using the configured chain and print its returned sources."""
     parser = argparse.ArgumentParser(description="PolicyLens grounded RAG")
     parser.add_argument("--query", required=True, help="Question to answer")
-    parser.add_argument("--k", type=int, default=5, help="Maximum chunks to retrieve (default: 5)")
+    parser.add_argument("--k", type=int, default=5, help="Final evidence depth (fixed at 5)")
     args = parser.parse_args()
     if not args.query.strip():
         parser.error("--query must not be empty or whitespace-only")
-    if args.k <= 0:
-        parser.error("--k must be greater than zero")
+    if args.k != _FINAL_K:
+        parser.error("--k must be 5 for the frozen RAG pipeline")
 
     try:
         result = build_rag_chain(k=args.k).invoke(args.query)
-    except Exception:
-        # SDK errors can contain credentials or request details; do not echo them.
+    except Exception as exc:
+        # SDK error messages can contain credentials or request details; do not echo them.
+        failure = type(exc).__name__
+        status_code = getattr(exc, "status_code", None)
+        if isinstance(status_code, int) and 400 <= status_code <= 599:
+            failure += f" (HTTP {status_code})"
         print(
             "RAG error: could not complete retrieval or inference. "
-            "Check LLM configuration, credentials, and retrieval/API connectivity.",
+            "Check LLM configuration, credentials, and retrieval/API connectivity. "
+            f"Failure: {failure}.",
             file=sys.stderr,
         )
         sys.exit(1)
 
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(errors="backslashreplace")
     print("Answer:")
     print(result["answer"])
     print("\nSources:")
