@@ -211,3 +211,36 @@ The frozen dense baseline from Step 2.5 provides a reference for a sparse-only B
    - BM25 improves the aggregate development-set metrics and table lookups here, while factoid MRR is lower. These 41 answerable development questions are not an independent test set; no hold-out outcomes were inspected.
    - G003 and G035 were missed by both methods. G035 has a known zero-chunk source caused upstream by extraction/indexing. A page-level hit does not prove that an answer-bearing passage was returned.
    - Dense and BM25 similarity scores are not directly comparable. Configuration hashes record settings, not full Qdrant index snapshots. Retrieved passages were not inspected for every comparison, so these metrics alone do not establish causes or universal BM25 superiority.
+
+---
+
+## Decision 009: Native Hybrid RRF and Retrieval Ablation (Phase 3, Step 3.2)
+
+### Status
+Completed for the fixed development-set experiment.
+
+### Context
+Dense and BM25 retrieval had already been evaluated separately. Qdrant native RRF needs both vector representations in the queried collection, so a separate `policylens_hybrid` collection preserves the two baseline collections. All 669 hybrid point IDs and payloads match the dense collection, and its stored dense vectors match element by element.
+
+### Decisions Made
+
+1. **Manual and native fusion**
+   - Implement manual RRF in `src/policylens/rrf.py` with smoothing 60. Use Qdrant native `Rrf(k=61)` to align the rank formula under the verified rank conventions.
+   - Prefetch five candidates from each named vector, `dense` and `bm25`, and return five fused results. G042's manual and native top-five point-ID rankings matched; equal-score tie ordering is not guaranteed to match generally.
+
+2. **Baseline preservation**
+   - Keep `policylens_chunks` and `policylens_bm25` unchanged. Record the fixed hybrid result as experimental evidence even though it did not outperform BM25; no fusion parameters were tuned.
+
+### Evaluation
+The same 41 answerable development questions were evaluated at `k=5`; 7 unanswerable development questions and all 12 frozen hold-out questions were excluded. Saved reports: [dense baseline](eval/results/retrieval_20261012T191839173509Z_af6558ebe4a5bce1f853b19340b8acdfe77ea87db78f6dd033f4fb3c73a9c58f.json), [BM25](eval/results/retrieval_bm25_20261014T095834356877Z_5047cbf0cbf3f1ac63547757db03dfa232d1159d1d06350c5abca79b22162fe8.json), and [hybrid](eval/results/retrieval_hybrid_20261014T112307814856Z_d0bfed4a543cfd45b7657595060f953681e1ee0360400368f28007db81c1c702.json).
+
+| Method | Hit@5 | Recall@5 | MRR |
+| --- | ---: | ---: | ---: |
+| Dense | 0.9268 | 0.8561 | 0.8862 |
+| BM25 | 0.9512 | 0.9049 | 0.8943 |
+| Native hybrid RRF | 0.9512 | 0.8927 | 0.8476 |
+
+### Conclusions
+- BM25-only had the highest Recall@5 and MRR in this development-set experiment; hybrid tied its Hit@5 but had lower Recall@5 and MRR.
+- Against BM25, hybrid had one question-level metric win, six regressions, and 34 ties. Candidate inspection showed gold pages can be demoted by RRF even when present in both candidate lists; G021 also showed varying order for equal fused scores. These observations do not establish a universal cause for every question.
+- Page-level matches do not guarantee answer-bearing text. The hold-out remains untouched, and no parameter tuning was performed. Future ingestion must synchronize all three collections.

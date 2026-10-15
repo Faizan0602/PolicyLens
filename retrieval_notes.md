@@ -179,3 +179,46 @@ Compare Recall@5 first and reciprocal rank when recall ties; report Hit@5 separa
 BM25 scored higher overall on this development set, while dense had higher factoid MRR. G003 and G035 were missed by both methods; G035 has a known extraction/indexing gap with zero indexed chunks. Page-level matches do not guarantee answer-bearing chunk text, raw dense and BM25 scores are not directly comparable, and metric differences alone do not establish causes. These results do not establish independent generalization. Future ingestion must keep both collections synchronized.
 
 Saved evidence: [dense baseline](eval/results/retrieval_20261012T191839173509Z_af6558ebe4a5bce1f853b19340b8acdfe77ea87db78f6dd033f4fb3c73a9c58f.json), [BM25 evaluation](eval/results/retrieval_bm25_20261014T095834356877Z_5047cbf0cbf3f1ac63547757db03dfa232d1159d1d06350c5abca79b22162fe8.json). Associated architecture record: [Decision 008](DECISIONS.md#decision-008-separate-bm25-retrieval-and-development-set-comparison-phase-3-step-31).
+
+# Step 3.2: Hybrid Search with Reciprocal Rank Fusion
+
+Status: Completed for the fixed configuration below. The same 41 answerable development questions were evaluated; 7 unanswerable development questions and all 12 frozen hold-out questions were excluded.
+
+## Architecture
+
+- Manual RRF is implemented in `src/policylens/rrf.py`. Native Qdrant RRF uses the separate `policylens_hybrid` collection, leaving the dense and BM25 baseline collections unchanged.
+- The hybrid collection has 669 points with verified matching IDs, complete payloads, and stored dense vectors. Its named vectors are `dense` and `bm25` (IDF).
+- Each branch supplies five candidates; the fused result contains at most five. Manual smoothing is 60, corresponding to native `Rrf(k=61)` under the verified rank conventions.
+- Manual and native RRF returned the same top-five point IDs in the same order for G042. This does not establish universal tie-order equivalence; G021 showed rank variation on equal RRF scores.
+
+## Development-set ablation
+
+| Method | Hit@5 | Recall@5 | MRR |
+| --- | ---: | ---: | ---: |
+| Dense | 0.9268 | 0.8561 | 0.8862 |
+| BM25 | 0.9512 | 0.9049 | 0.8943 |
+| Hybrid RRF | 0.9512 | 0.8927 | 0.8476 |
+
+Hybrid results by question type (Hit@5 / Recall@5 / MRR):
+
+| Type (count) | Hybrid |
+| --- | --- |
+| Factoid (19) | 0.8947 / 0.8421 / 0.7237 |
+| Multi-section (10) | 1 / 0.9100 / 0.9500 |
+| Table lookup (7) | 1 / 1 / 0.9286 |
+| Date/version (5) | 1 / 0.9000 / 1 |
+
+Against BM25, hybrid had one metric win (G004), six regressions (G008, G021, G034, G036, G042, G050), and 34 ties on Recall@5 and reciprocal rank. Hit@5 did not change for any of the 41 questions. G036 lost one gold page from the final five. G008 kept Recall@5 at 0.6 but returned gold pages 2, 7, and 8 instead of BM25's 2, 6, and 8.
+
+## Candidate-level findings
+
+- G042: A non-gold point ranked first in dense and third in BM25; contributions from both lists put it above the gold pages, which remained at fused ranks 2 and 4.
+- G008: A non-gold page-14 point ranked second in both lists and became fused rank 1.
+- G036: Gold page 2 was BM25 candidate rank 4 but fell outside the fused top five.
+- G050: A non-gold page-5 point outranked gold page 4; both came from the same document.
+- G021: The gold page and a non-gold page tied on RRF score. Repeated unchanged native queries placed the gold point at rank 1 or 2, explaining the saved reciprocal-rank regression without a candidate miss.
+- G034: The gold point appeared in both candidate lists but ranked fourth after fusion. It ranked third in the separate BM25 collection and fourth in the hybrid collection's BM25 search, despite matching stored sparse vectors for the compared points and IDF in both collections; the reason for this small rank difference remains unverified.
+
+These are development-set findings, not independent generalization. Page-level matches do not guarantee answer-bearing chunk text, and native tie ordering need not match the manual implementation. No parameter tuning was performed. BM25-only remains the best observed configuration here by Recall@5 and MRR, with Hit@5 tied with hybrid. Future ingestion must synchronize all three collections.
+
+Saved evidence: [dense baseline](eval/results/retrieval_20261012T191839173509Z_af6558ebe4a5bce1f853b19340b8acdfe77ea87db78f6dd033f4fb3c73a9c58f.json), [BM25 evaluation](eval/results/retrieval_bm25_20261014T095834356877Z_5047cbf0cbf3f1ac63547757db03dfa232d1159d1d06350c5abca79b22162fe8.json), [hybrid evaluation](eval/results/retrieval_hybrid_20261014T112307814856Z_d0bfed4a543cfd45b7657595060f953681e1ee0360400368f28007db81c1c702.json).

@@ -1,4 +1,4 @@
-"""Offline tests for development-only dense and BM25 evaluation."""
+"""Offline tests for development-only dense, BM25, and hybrid evaluation."""
 
 import json
 from types import SimpleNamespace
@@ -48,6 +48,7 @@ def evaluation_data(tmp_path, monkeypatch):
             embedding_model="BAAI/bge-small-en-v1.5",
             qdrant_collection="policylens_chunks",
             bm25_collection="policylens_bm25",
+            hybrid_collection="policylens_hybrid",
         ),
     )
 
@@ -63,20 +64,26 @@ def evaluation_data(tmp_path, monkeypatch):
     }
     dense = Mock(side_effect=lambda question, k: responses[question])
     bm25 = Mock(side_effect=lambda question, k: responses[question])
+    hybrid = Mock(side_effect=lambda question, k, candidate_k: responses[question])
     monkeypatch.setattr(run_retrieval, "retrieve", dense)
     monkeypatch.setattr(run_retrieval, "retrieve_bm25", bm25)
-    return dense, bm25
+    monkeypatch.setattr(run_retrieval, "retrieve_hybrid", hybrid)
+    return dense, bm25, hybrid
 
 
 def test_method_selection_and_frozen_holdout_exclusion(evaluation_data):
-    dense, bm25 = evaluation_data
+    dense, bm25, hybrid = evaluation_data
 
     dense_report = run_retrieval.evaluate(5)
     bm25_report = run_retrieval.evaluate(5, method="bm25")
+    hybrid_report = run_retrieval.evaluate(5, method="hybrid")
 
     expected = [call(question_id, k=5) for question_id in ("D01", "D02", "D03", "D04", "D05")]
     assert dense.call_args_list == expected
     assert bm25.call_args_list == expected
+    assert hybrid.call_args_list == [
+        call(question_id, k=5, candidate_k=5) for question_id in ("D01", "D02", "D03", "D04", "D05")
+    ]
     assert dense_report["method"] == "dense"
     assert dense_report["configuration"] == {
         "k": 5,
@@ -95,6 +102,34 @@ def test_method_selection_and_frozen_holdout_exclusion(evaluation_data):
         "modifier": "idf",
     }
     assert bm25_report["configuration_hash"] != dense_report["configuration_hash"]
+    assert bm25_report["configuration_hash"] == (
+        "5047cbf0cbf3f1ac63547757db03dfa232d1159d1d06350c5abca79b22162fe8"
+    )
+    assert hybrid_report["configuration"] == {
+        "method": "hybrid",
+        "k": 5,
+        "candidate_k": 5,
+        "qdrant_collection": "policylens_hybrid",
+        "embedding_model": "BAAI/bge-small-en-v1.5",
+        "bm25_model": "qdrant/bm25",
+        "dense_vector": "dense",
+        "sparse_vector": "bm25",
+        "modifier": "idf",
+        "rrf_smoothing": 60,
+        "rrf_k": 61,
+    }
+    assert hybrid_report["configuration_hash"] not in {
+        dense_report["configuration_hash"],
+        bm25_report["configuration_hash"],
+    }
+    assert hybrid_report["counts"] == bm25_report["counts"]
+    assert [row["id"] for row in hybrid_report["per_question"]] == [
+        "D01",
+        "D02",
+        "D03",
+        "D04",
+        "D05",
+    ]
     assert bm25_report["counts"] == {
         "golden_questions": 18,
         "holdout_questions": 12,
@@ -157,11 +192,57 @@ def test_existing_dense_report_shape_keeps_dense_filename(evaluation_data):
     assert not path.name.startswith("retrieval_bm25_")
 
 
+def test_cli_writes_separate_hybrid_json_without_touching_baselines(
+    evaluation_data, monkeypatch, capsys
+):
+    results_dir = run_retrieval.RESULTS_DIR
+    results_dir.mkdir(parents=True)
+    baseline_paths = [
+        results_dir / "retrieval_existing_dense_baseline.json",
+        results_dir / "retrieval_bm25_existing_baseline.json",
+    ]
+    for path in baseline_paths:
+        path.write_text("existing baseline\n", encoding="utf-8")
+    monkeypatch.setattr("sys.argv", ["run_retrieval", "--method", "hybrid"])
+
+    run_retrieval.main()
+
+    reports = list(results_dir.glob("retrieval_hybrid_*.json"))
+    assert len(reports) == 1
+    saved = json.loads(reports[0].read_text(encoding="utf-8"))
+    assert saved["method"] == "hybrid"
+    assert saved["configuration"]["candidate_k"] == 5
+    assert saved["counts"]["holdout_questions"] == 12
+    assert saved["counts"]["answerable_evaluated"] == 5
+    assert len(saved["per_question"]) == 5
+    assert saved["metrics"]["hit_at_k"] == 0.8
+    assert saved["metrics_by_type"]["multi-section"]["recall_at_k"] == 0.5
+    assert all(path.read_text(encoding="utf-8") == "existing baseline\n" for path in baseline_paths)
+    assert "method=hybrid" in capsys.readouterr().out
+
+
+def test_hybrid_depth_validation_precedes_retrieval(evaluation_data, monkeypatch, capsys):
+    dense, bm25, hybrid = evaluation_data
+    with pytest.raises(ValueError, match="candidate_k=5"):
+        run_retrieval.evaluate(6, method="hybrid")
+    dense.assert_not_called()
+    bm25.assert_not_called()
+    hybrid.assert_not_called()
+
+    monkeypatch.setattr("sys.argv", ["run_retrieval", "--method", "hybrid", "--k", "6"])
+    with pytest.raises(SystemExit) as caught:
+        run_retrieval.main()
+    assert caught.value.code == 2
+    assert "candidate_k=5" in capsys.readouterr().err
+    hybrid.assert_not_called()
+
+
 def test_invalid_method_is_rejected_before_retrieval(evaluation_data):
-    dense, bm25 = evaluation_data
+    dense, bm25, hybrid = evaluation_data
 
     with pytest.raises(ValueError, match="method must be"):
-        run_retrieval.evaluate(5, method="hybrid")
+        run_retrieval.evaluate(5, method="unsupported")
 
     dense.assert_not_called()
     bm25.assert_not_called()
+    hybrid.assert_not_called()

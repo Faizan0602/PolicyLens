@@ -1,4 +1,4 @@
-"""Evaluate dense or BM25 retrieval on verified development questions only."""
+"""Evaluate dense, BM25, or hybrid retrieval on verified development questions only."""
 
 import argparse
 import hashlib
@@ -9,6 +9,7 @@ from typing import Any
 
 from policylens.bm25 import retrieve_bm25
 from policylens.config import get_settings
+from policylens.hybrid import retrieve_hybrid
 from policylens.retrieval import retrieve
 
 if __package__:
@@ -106,8 +107,10 @@ def evaluate(k: int, method: str = "dense") -> dict[str, Any]:
     """Run one ordered development-only retrieval evaluation."""
     if type(k) is not int or k < 1:
         raise ValueError("k must be a positive integer")
-    if method not in ("dense", "bm25"):
-        raise ValueError("method must be 'dense' or 'bm25'")
+    if method not in ("dense", "bm25", "hybrid"):
+        raise ValueError("method must be 'dense', 'bm25', or 'hybrid'")
+    if method == "hybrid" and k > 5:
+        raise ValueError("hybrid k must not exceed candidate_k=5")
     golden = load_golden()
     holdout_ids = load_holdout({record["id"] for record in golden})
     development = [record for record in golden if record["id"] not in holdout_ids]
@@ -118,6 +121,7 @@ def evaluate(k: int, method: str = "dense") -> dict[str, Any]:
         raise ValueError("All evaluated questions must have verified=true")
 
     settings = get_settings()
+    retrieval_kwargs = {"k": k}
     if method == "dense":
         configuration = {
             "k": k,
@@ -125,7 +129,7 @@ def evaluate(k: int, method: str = "dense") -> dict[str, Any]:
             "qdrant_collection": settings.qdrant_collection,
         }
         retriever = retrieve
-    else:
+    elif method == "bm25":
         configuration = {
             "method": "bm25",
             "k": k,
@@ -135,12 +139,28 @@ def evaluate(k: int, method: str = "dense") -> dict[str, Any]:
             "modifier": "idf",
         }
         retriever = retrieve_bm25
+    else:
+        configuration = {
+            "method": "hybrid",
+            "k": k,
+            "candidate_k": 5,
+            "qdrant_collection": settings.hybrid_collection,
+            "embedding_model": settings.embedding_model,
+            "bm25_model": "qdrant/bm25",
+            "dense_vector": "dense",
+            "sparse_vector": "bm25",
+            "modifier": "idf",
+            "rrf_smoothing": 60,
+            "rrf_k": 61,
+        }
+        retriever = retrieve_hybrid
+        retrieval_kwargs["candidate_k"] = 5
     canonical = json.dumps(configuration, sort_keys=True, separators=(",", ":"))
     configuration_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
     per_question = []
     for record in eligible:
-        results = retriever(record["question"], k=k)
+        results = retriever(record["question"], **retrieval_kwargs)
         sources = record["gold_sources"]
         per_question.append(
             {
@@ -180,7 +200,8 @@ def save_results(report: dict[str, Any]) -> Path:
     """Create the results directory only after evaluation has completed."""
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = report["timestamp_utc"].replace("-", "").replace(":", "").replace(".", "")
-    prefix = "retrieval_bm25" if report.get("method", "dense") == "bm25" else "retrieval"
+    method = report.get("method", "dense")
+    prefix = f"retrieval_{method}" if method in ("bm25", "hybrid") else "retrieval"
     path = RESULTS_DIR / f"{prefix}_{timestamp}_{report['configuration_hash']}.json"
     with path.open("x", encoding="utf-8") as output:
         json.dump(report, output, indent=2, ensure_ascii=False)
@@ -191,10 +212,12 @@ def save_results(report: dict[str, Any]) -> Path:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate retrieval on development questions")
     parser.add_argument("--k", type=int, default=5, help="Number of retrieved chunks (default: 5)")
-    parser.add_argument("--method", choices=("dense", "bm25"), default="dense")
+    parser.add_argument("--method", choices=("dense", "bm25", "hybrid"), default="dense")
     args = parser.parse_args()
     if args.k < 1:
         parser.error("--k must be a positive integer")
+    if args.method == "hybrid" and args.k > 5:
+        parser.error("hybrid --k must not exceed candidate_k=5")
 
     report = evaluate(args.k, method=args.method)
     output_path = save_results(report)
@@ -206,10 +229,17 @@ def main() -> None:
             f"k={config['k']}, embedding_model={config['embedding_model']}, "
             f"qdrant_collection={config['qdrant_collection']}"
         )
-    else:
+    elif args.method == "bm25":
         configuration_text = (
             f"method=bm25, k={config['k']}, bm25_model={config['bm25_model']}, "
             f"qdrant_collection={config['qdrant_collection']}, vector={config['sparse_vector']}"
+        )
+    else:
+        configuration_text = (
+            f"method=hybrid, k={config['k']}, candidate_k={config['candidate_k']}, "
+            f"qdrant_collection={config['qdrant_collection']}, "
+            f"embedding_model={config['embedding_model']}, bm25_model={config['bm25_model']}, "
+            f"rrf_k={config['rrf_k']}"
         )
     rows = [
         ("Configuration", configuration_text),

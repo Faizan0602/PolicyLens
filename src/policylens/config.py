@@ -54,6 +54,7 @@ class Settings(BaseSettings):
     qdrant_api_key: SecretStr | None = None
     qdrant_collection: str = "policylens_chunks"
     bm25_collection: str = "policylens_bm25"
+    hybrid_collection: str = "policylens_hybrid"
     embedding_batch_size: int = 32
 
     def safe_dump(self) -> dict[str, Any]:
