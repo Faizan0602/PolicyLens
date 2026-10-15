@@ -1,8 +1,10 @@
-"""Evaluate dense, BM25, or hybrid retrieval on verified development questions only."""
+"""Evaluate retrieval methods on verified development questions only."""
 
 import argparse
 import hashlib
 import json
+import statistics
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -10,6 +12,7 @@ from typing import Any
 from policylens.bm25 import retrieve_bm25
 from policylens.config import get_settings
 from policylens.hybrid import retrieve_hybrid
+from policylens.reranker import MODEL_NAME, _get_reranker, rerank
 from policylens.retrieval import retrieve
 
 if __package__:
@@ -30,6 +33,19 @@ REQUIRED_FIELDS = {
     "answerable",
     "verified",
 }
+RERANK_CANDIDATES = 20
+
+
+def _source_refs(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Keep ordered document/page identifiers for later error analysis."""
+    return [
+        {
+            "rank": rank,
+            "doc_id": (result.get("metadata") or {}).get("doc_id"),
+            "page": (result.get("metadata") or {}).get("page"),
+        }
+        for rank, result in enumerate(results, start=1)
+    ]
 
 
 def load_golden() -> list[dict[str, Any]]:
@@ -107,10 +123,13 @@ def evaluate(k: int, method: str = "dense") -> dict[str, Any]:
     """Run one ordered development-only retrieval evaluation."""
     if type(k) is not int or k < 1:
         raise ValueError("k must be a positive integer")
-    if method not in ("dense", "bm25", "hybrid"):
-        raise ValueError("method must be 'dense', 'bm25', or 'hybrid'")
+    if method not in ("dense", "bm25", "hybrid", "bm25_rerank", "hybrid_rerank"):
+        raise ValueError("method must be dense, bm25, hybrid, bm25_rerank, or hybrid_rerank")
     if method == "hybrid" and k > 5:
         raise ValueError("hybrid k must not exceed candidate_k=5")
+    reranking = method in ("bm25_rerank", "hybrid_rerank")
+    if reranking and k != 5:
+        raise ValueError("reranking methods require final k=5")
     golden = load_golden()
     holdout_ids = load_holdout({record["id"] for record in golden})
     development = [record for record in golden if record["id"] not in holdout_ids]
@@ -121,7 +140,7 @@ def evaluate(k: int, method: str = "dense") -> dict[str, Any]:
         raise ValueError("All evaluated questions must have verified=true")
 
     settings = get_settings()
-    retrieval_kwargs = {"k": k}
+    retrieval_kwargs = {"k": RERANK_CANDIDATES if reranking else k}
     if method == "dense":
         configuration = {
             "k": k,
@@ -129,21 +148,27 @@ def evaluate(k: int, method: str = "dense") -> dict[str, Any]:
             "qdrant_collection": settings.qdrant_collection,
         }
         retriever = retrieve
-    elif method == "bm25":
+    elif method in ("bm25", "bm25_rerank"):
         configuration = {
-            "method": "bm25",
+            "method": method,
             "k": k,
             "qdrant_collection": settings.bm25_collection,
             "bm25_model": "qdrant/bm25",
             "sparse_vector": "bm25",
             "modifier": "idf",
         }
+        if reranking:
+            configuration.update(
+                candidate_k=RERANK_CANDIDATES,
+                final_k=k,
+                reranker_model=MODEL_NAME,
+            )
         retriever = retrieve_bm25
     else:
         configuration = {
-            "method": "hybrid",
+            "method": method,
             "k": k,
-            "candidate_k": 5,
+            "candidate_k": RERANK_CANDIDATES if reranking else 5,
             "qdrant_collection": settings.hybrid_collection,
             "embedding_model": settings.embedding_model,
             "bm25_model": "qdrant/bm25",
@@ -153,24 +178,46 @@ def evaluate(k: int, method: str = "dense") -> dict[str, Any]:
             "rrf_smoothing": 60,
             "rrf_k": 61,
         }
+        if reranking:
+            configuration.update(final_k=k, reranker_model=MODEL_NAME)
         retriever = retrieve_hybrid
-        retrieval_kwargs["candidate_k"] = 5
+        retrieval_kwargs["candidate_k"] = RERANK_CANDIDATES if reranking else 5
     canonical = json.dumps(configuration, sort_keys=True, separators=(",", ":"))
     configuration_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
     per_question = []
+    control_rows = []
+    rerank_latencies = []
+    model = _get_reranker() if reranking else None
     for record in eligible:
         results = retriever(record["question"], **retrieval_kwargs)
         sources = record["gold_sources"]
-        per_question.append(
-            {
+        row = {"id": record["id"], "type": record["type"]}
+        if reranking:
+            control = {
                 "id": record["id"],
                 "type": record["type"],
                 "hit_at_k": hit_at_k(results, sources, k),
                 "recall_at_k": recall_at_k(results, sources, k),
                 "reciprocal_rank": reciprocal_rank(results, sources, k),
             }
+            control_rows.append(control)
+            row["control"] = {
+                key: control[key] for key in ("hit_at_k", "recall_at_k", "reciprocal_rank")
+            }
+            row["control_sources"] = _source_refs(results[:k])
+            start = time.perf_counter()
+            results = rerank(record["question"], results, k=k, model=model)
+            latency_ms = (time.perf_counter() - start) * 1000
+            rerank_latencies.append(latency_ms)
+            row["rerank_latency_ms"] = latency_ms
+            row["retrieved_sources"] = _source_refs(results)
+        row.update(
+            hit_at_k=hit_at_k(results, sources, k),
+            recall_at_k=recall_at_k(results, sources, k),
+            reciprocal_rank=reciprocal_rank(results, sources, k),
         )
+        per_question.append(row)
 
     count = len(per_question)
     metrics_by_type = {}
@@ -178,7 +225,7 @@ def evaluate(k: int, method: str = "dense") -> dict[str, Any]:
         rows = [row for row in per_question if row["type"] == question_type]
         metrics_by_type[question_type] = {"count": len(rows), **_average_metrics(rows)}
     now = datetime.now(timezone.utc)
-    return {
+    report = {
         "timestamp_utc": now.isoformat(timespec="microseconds").replace("+00:00", "Z"),
         "method": method,
         "configuration_hash": configuration_hash,
@@ -194,6 +241,10 @@ def evaluate(k: int, method: str = "dense") -> dict[str, Any]:
         "metrics_by_type": metrics_by_type,
         "per_question": per_question,
     }
+    if reranking:
+        report["control_metrics"] = _average_metrics(control_rows)
+        report["rerank_latency_p50_ms"] = statistics.median(rerank_latencies)
+    return report
 
 
 def save_results(report: dict[str, Any]) -> Path:
@@ -201,7 +252,7 @@ def save_results(report: dict[str, Any]) -> Path:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = report["timestamp_utc"].replace("-", "").replace(":", "").replace(".", "")
     method = report.get("method", "dense")
-    prefix = f"retrieval_{method}" if method in ("bm25", "hybrid") else "retrieval"
+    prefix = f"retrieval_{method}" if method != "dense" else "retrieval"
     path = RESULTS_DIR / f"{prefix}_{timestamp}_{report['configuration_hash']}.json"
     with path.open("x", encoding="utf-8") as output:
         json.dump(report, output, indent=2, ensure_ascii=False)
@@ -212,12 +263,18 @@ def save_results(report: dict[str, Any]) -> Path:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate retrieval on development questions")
     parser.add_argument("--k", type=int, default=5, help="Number of retrieved chunks (default: 5)")
-    parser.add_argument("--method", choices=("dense", "bm25", "hybrid"), default="dense")
+    parser.add_argument(
+        "--method",
+        choices=("dense", "bm25", "hybrid", "bm25_rerank", "hybrid_rerank"),
+        default="dense",
+    )
     args = parser.parse_args()
     if args.k < 1:
         parser.error("--k must be a positive integer")
     if args.method == "hybrid" and args.k > 5:
         parser.error("hybrid --k must not exceed candidate_k=5")
+    if args.method in ("bm25_rerank", "hybrid_rerank") and args.k != 5:
+        parser.error("reranking methods require --k 5")
 
     report = evaluate(args.k, method=args.method)
     output_path = save_results(report)
@@ -234,12 +291,19 @@ def main() -> None:
             f"method=bm25, k={config['k']}, bm25_model={config['bm25_model']}, "
             f"qdrant_collection={config['qdrant_collection']}, vector={config['sparse_vector']}"
         )
-    else:
+    elif args.method == "hybrid":
         configuration_text = (
             f"method=hybrid, k={config['k']}, candidate_k={config['candidate_k']}, "
             f"qdrant_collection={config['qdrant_collection']}, "
             f"embedding_model={config['embedding_model']}, bm25_model={config['bm25_model']}, "
             f"rrf_k={config['rrf_k']}"
+        )
+    else:
+        configuration_text = (
+            f"method={args.method}, final_k={config['final_k']}, "
+            f"candidate_k={config['candidate_k']}, "
+            f"qdrant_collection={config['qdrant_collection']}, "
+            f"reranker_model={config['reranker_model']}"
         )
     rows = [
         ("Configuration", configuration_text),
@@ -250,6 +314,16 @@ def main() -> None:
         (f"Recall@{args.k}", f"{metrics['recall_at_k']:.4f}"),
         ("MRR", f"{metrics['mrr']:.4f}"),
     ]
+    if args.method in ("bm25_rerank", "hybrid_rerank"):
+        control = report["control_metrics"]
+        rows.extend(
+            [
+                (f"Control Hit@{args.k}", f"{control['hit_at_k']:.4f}"),
+                (f"Control Recall@{args.k}", f"{control['recall_at_k']:.4f}"),
+                ("Control MRR", f"{control['mrr']:.4f}"),
+                ("Rerank p50 (ms)", f"{report['rerank_latency_p50_ms']:.2f}"),
+            ]
+        )
     print(f"{'Retrieval evaluation':<24} Value")
     for label, value in rows:
         print(f"{label:<24} {value}")

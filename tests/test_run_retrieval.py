@@ -246,3 +246,131 @@ def test_invalid_method_is_rejected_before_retrieval(evaluation_data):
     dense.assert_not_called()
     bm25.assert_not_called()
     hybrid.assert_not_called()
+
+
+@pytest.mark.parametrize("method", ["bm25_rerank", "hybrid_rerank"])
+def test_rerank_evaluation_uses_20_candidates_and_original_top_five_control(
+    evaluation_data, monkeypatch, method
+):
+    dense, bm25, hybrid = evaluation_data
+
+    def candidates(question, **_kwargs):
+        results = [
+            {"text": f"Decoy {index}", "score": 0.9, "metadata": {"doc_id": "other", "page": 1}}
+            for index in range(20)
+        ]
+        results[5] = {
+            "text": "Gold page 1",
+            "score": 0.2,
+            "metadata": {"doc_id": question, "page": 1},
+        }
+        if question == "D03":
+            results[6] = {
+                "text": "Gold page 2",
+                "score": 0.1,
+                "metadata": {"doc_id": question, "page": 2},
+            }
+        return results
+
+    bm25.side_effect = candidates
+    hybrid.side_effect = candidates
+    model = Mock()
+    model.predict.side_effect = lambda pairs, **_kwargs: [
+        1.0 if text.startswith("Gold") else 0.0 for _, text in pairs
+    ]
+    loader = Mock(return_value=model)
+    monkeypatch.setattr(run_retrieval, "_get_reranker", loader)
+    clock = iter([0, 0.001, 1, 1.002, 2, 2.003, 3, 3.004, 4, 4.005])
+    monkeypatch.setattr(run_retrieval.time, "perf_counter", lambda: next(clock))
+
+    report = run_retrieval.evaluate(5, method=method)
+
+    expected_ids = ["D01", "D02", "D03", "D04", "D05"]
+    assert [row["id"] for row in report["per_question"]] == expected_ids
+    assert report["counts"]["holdout_questions"] == 12
+    assert report["counts"]["unanswerable_excluded"] == 1
+    assert report["control_metrics"]["hit_at_k"] == 0.0
+    assert report["metrics"]["hit_at_k"] == 1.0
+    assert report["metrics"]["recall_at_k"] == 1.0
+    assert report["rerank_latency_p50_ms"] == pytest.approx(3.0)
+    assert [row["rerank_latency_ms"] for row in report["per_question"]] == pytest.approx(
+        [1, 2, 3, 4, 5]
+    )
+    assert report["per_question"][2]["control"]["recall_at_k"] == 0.0
+    assert report["per_question"][2]["recall_at_k"] == 1.0
+    assert report["per_question"][2]["control_sources"][0] == {
+        "rank": 1,
+        "doc_id": "other",
+        "page": 1,
+    }
+    assert report["per_question"][2]["retrieved_sources"][:2] == [
+        {"rank": 1, "doc_id": "D03", "page": 1},
+        {"rank": 2, "doc_id": "D03", "page": 2},
+    ]
+    assert report["configuration"]["candidate_k"] == 20
+    assert report["configuration"]["final_k"] == 5
+    assert report["configuration"]["reranker_model"] == "BAAI/bge-reranker-base"
+    loader.assert_called_once_with()
+    assert model.predict.call_count == 5
+    assert all(len(entry.args[0]) == 20 for entry in model.predict.call_args_list)
+    if method == "bm25_rerank":
+        assert bm25.call_args_list == [call(question, k=20) for question in expected_ids]
+        assert report["configuration"]["qdrant_collection"] == "policylens_bm25"
+        hybrid.assert_not_called()
+    else:
+        assert hybrid.call_args_list == [
+            call(question, k=20, candidate_k=20) for question in expected_ids
+        ]
+        assert report["configuration"]["rrf_k"] == 61
+        assert report["configuration"]["qdrant_collection"] == "policylens_hybrid"
+        bm25.assert_not_called()
+    dense.assert_not_called()
+
+
+@pytest.mark.parametrize("method", ["bm25_rerank", "hybrid_rerank"])
+def test_rerank_cli_saves_distinct_report_without_changing_baselines(
+    evaluation_data, monkeypatch, capsys, method
+):
+    _, bm25, hybrid = evaluation_data
+    results_dir = run_retrieval.RESULTS_DIR
+    results_dir.mkdir(parents=True)
+    baseline = results_dir / "retrieval_existing_baseline.json"
+    baseline.write_text("unchanged\n", encoding="utf-8")
+    model = Mock()
+    model.predict.side_effect = lambda pairs, **_kwargs: [0.5] * len(pairs)
+    monkeypatch.setattr(run_retrieval, "_get_reranker", Mock(return_value=model))
+
+    def candidates(question, **_kwargs):
+        return [{"text": "Evidence", "score": 0.2, "metadata": {"doc_id": question, "page": 1}}]
+
+    bm25.side_effect = candidates
+    hybrid.side_effect = candidates
+    monkeypatch.setattr("sys.argv", ["run_retrieval", "--method", method])
+
+    run_retrieval.main()
+
+    reports = list(results_dir.glob(f"retrieval_{method}_*.json"))
+    assert len(reports) == 1
+    saved = json.loads(reports[0].read_text(encoding="utf-8"))
+    assert saved["method"] == method
+    assert saved["control_metrics"] == saved["metrics"]
+    assert len(saved["per_question"]) == 5
+    assert "rerank_latency_ms" in saved["per_question"][0]
+    assert "rerank_latency_p50_ms" in saved
+    assert baseline.read_text(encoding="utf-8") == "unchanged\n"
+    output = capsys.readouterr().out
+    assert f"method={method}" in output
+    assert "Rerank p50 (ms)" in output
+
+
+@pytest.mark.parametrize("method", ["bm25_rerank", "hybrid_rerank"])
+def test_rerank_requires_final_five_before_loading_model(evaluation_data, monkeypatch, method):
+    dense, bm25, hybrid = evaluation_data
+    loader = Mock(side_effect=AssertionError("Invalid depth must not load model"))
+    monkeypatch.setattr(run_retrieval, "_get_reranker", loader)
+    with pytest.raises(ValueError, match="final k=5"):
+        run_retrieval.evaluate(6, method=method)
+    loader.assert_not_called()
+    dense.assert_not_called()
+    bm25.assert_not_called()
+    hybrid.assert_not_called()

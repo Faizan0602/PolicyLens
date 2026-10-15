@@ -230,3 +230,23 @@ Dense, BM25, and hybrid retrieval accept optional `regulator` (`RBI` or `SEBI`),
 New ingestion serializes `issue_date_iso`. Existing points still require the prepared payload-only update and datetime indexes before live date-filtered retrieval is reliable. `python -m policylens.issue_date_backfill` validates all three 669-point collections without writes. After separate approval, `--apply --confirm` updates only missing `issue_date_iso` values; `policylens.vectorstore.ensure_filter_indexes()` creates only missing regulator keyword and issue-date datetime indexes. Neither write operation has been run in this step.
 
 Regulatory `status` is unverified and null for existing documents. Active-by-default filtering is blocked until regulatory status is verified from authoritative sources; PostgreSQL ingestion status is not a substitute.
+
+# Step 3.4: Cross-Encoder Reranking
+
+Status: Completed development-set experiment. `BAAI/bge-reranker-base` reranks 20 candidates from either BM25 or native hybrid RRF to a final top five. The cross-encoder is cached across questions. Each result retains its first-stage retrieval `score` and stores the separate `rerank_score`.
+
+The evaluation used 41 answerable development questions; 7 unanswerable development questions were excluded and the 12 frozen hold-out questions remained untouched.
+
+| Method | Hit@5 | Recall@5 | MRR | Rerank p50 (ms) |
+| --- | ---: | ---: | ---: | ---: |
+| Dense | 0.9268 | 0.8561 | 0.8862 | — |
+| BM25 | 0.9512 | 0.9049 | 0.8943 | — |
+| Hybrid RRF | 0.9512 | 0.8927 | 0.8476 | — |
+| BM25 + reranker | 0.9512 | 0.9293 | 0.8951 | 2598.60 |
+| Hybrid + reranker | 0.9512 | 0.9293 | 0.8951 | 2869.78 |
+
+The original top five from each 20-candidate retrieval serve as controls: BM25 scored 0.9512 / 0.9049 / 0.8882 and hybrid scored 0.9512 / 0.9049 / 0.8537 (Hit@5 / Recall@5 / MRR). Latency measures reranking only, excluding candidate retrieval and initial model loading.
+
+After reranking, 25 of 41 questions had identical ordered `(doc_id, page)` results across the two methods; 16 differed. Rank-one document/page agreed in all 41, and no per-question Hit@5, Recall@5, or reciprocal-rank values differed. The reports omit Qdrant point IDs, so matching document/page references do not prove identical chunks. The added latency has no proven benefit for answer correctness or unseen questions. Scoring all 669 chunks with the cross-encoder on every query would be considerably more expensive than reranking 20 candidates.
+
+Saved evidence: [BM25 + reranker](eval/results/retrieval_bm25_rerank_20261015T122408293824Z_4d93aa37e83e77ea2458a5c9e1a6760db1bea494d877701f961c1eac06d4cb9c.json), [hybrid + reranker](eval/results/retrieval_hybrid_rerank_20261015T123138677133Z_49abbae93ee83b902bf70141a714133d964b26eab106e1e8fcf75314d36e286e.json).

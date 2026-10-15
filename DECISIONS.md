@@ -270,3 +270,25 @@ The dense, BM25, and hybrid collections each contain 669 chunks. Filtering insid
 
 ### Verification
 154 focused offline tests passed, along with Ruff lint, Ruff formatting, and `git diff --check`. Live filtered queries returned five matching results each for dense retrieval with RBI and September 1–October 2, 2026, BM25 with SEBI and August 1–October 2, 2026, and hybrid RRF with the same SEBI date range. These checks establish filter behavior for the tested queries, not exhaustive retrieval quality.
+
+---
+
+## Decision 011: Cross-Encoder Reranking and Quality–Latency Trade-off (Phase 3, Step 3.4)
+
+### Status
+Completed development-set experiment.
+
+### Context
+BM25 and native hybrid RRF rank chunks using first-stage signals. A BGE cross-encoder scores each question together with a retrieved passage, allowing a second ranking pass at higher per-query cost. Applying it only to retrieved candidates avoids scoring all 669 chunks per question.
+
+### Decisions Made
+
+1. **Fixed reranking configuration**
+   - Use `BAAI/bge-reranker-base` on 20 BM25 or native hybrid candidates, returning five. Cache the model across questions; preserve the retrieval score separately from `rerank_score`. Hybrid retains its existing native RRF configuration with 20 candidates per branch for this experiment.
+
+2. **Quality and latency comparison**
+   - On 41 answerable development questions, BM25 + reranker and hybrid + reranker both scored Hit@5 0.9512, Recall@5 0.9293, and MRR 0.8951. BM25 alone scored 0.9512 / 0.9049 / 0.8943; hybrid alone scored 0.9512 / 0.8927 / 0.8476 (Hit@5 / Recall@5 / MRR).
+   - Median reranking time was 2598.60 ms after BM25 and 2869.78 ms after hybrid. These timings exclude first-stage retrieval and initial model loading. The first-five-of-20 controls and full results are in the [BM25 rerank report](eval/results/retrieval_bm25_rerank_20261015T122408293824Z_4d93aa37e83e77ea2458a5c9e1a6760db1bea494d877701f961c1eac06d4cb9c.json) and [hybrid rerank report](eval/results/retrieval_hybrid_rerank_20261015T123138677133Z_49abbae93ee83b902bf70141a714133d964b26eab106e1e8fcf75314d36e286e.json).
+
+### Conclusions
+BM25 + reranker is provisionally preferred to hybrid + reranker because their evaluated quality metrics are equal and BM25 has the simpler first-stage retrieval path. This development-set result does not establish superior unseen performance, calibrated confidence, or improved answer correctness. The 12 frozen hold-out questions remain untouched.
