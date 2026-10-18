@@ -2,7 +2,7 @@
 
 import pytest
 
-from policylens.citations import parse_citations
+from policylens.citations import parse_citations, validate_citations
 from policylens.ingestion.metadata import generate_doc_id
 
 
@@ -81,3 +81,47 @@ def test_valid_citations_survive_mixed_malformed_output():
         {"doc_id": "Policy_2026-1", "page": 2},
         {"doc_id": "other", "page": 7},
     ]
+
+
+@pytest.mark.parametrize(
+    ("answer", "valid", "invalid", "precision"),
+    [
+        ("Rule [doc p.2].", [{"doc_id": "doc", "page": 2}], [], 1.0),
+        ("Rule [invented p.2].", [], [{"doc_id": "invented", "page": 2}], 0.0),
+        ("Rule [doc p.3].", [], [{"doc_id": "doc", "page": 3}], 0.0),
+        (
+            "Rule [doc p.2]; another [other p.2].",
+            [{"doc_id": "doc", "page": 2}],
+            [{"doc_id": "other", "page": 2}],
+            0.5,
+        ),
+        ("Rule 【doc p.2】.", [{"doc_id": "doc", "page": 2}], [], 1.0),
+        (
+            "Rule [doc p.2]【doc p.2】; another [other p.2].",
+            [{"doc_id": "doc", "page": 2}, {"doc_id": "doc", "page": 2}],
+            [{"doc_id": "other", "page": 2}],
+            2 / 3,
+        ),
+        ("Uncited answer [Source 1]; malformed [doc p.0].", [], [], None),
+    ],
+    ids=["valid", "invented-document", "wrong-page", "mixed", "unicode", "duplicates", "none"],
+)
+def test_validate_citations_against_supplied_pages(answer, valid, invalid, precision):
+    sources = [{"doc_id": "doc", "page": 2}]
+
+    assert validate_citations(answer, sources) == {
+        "valid_citations": valid,
+        "invalid_citations": invalid,
+        "citation_count": len(valid) + len(invalid),
+        "citation_precision": precision,
+    }
+    assert sources == [{"doc_id": "doc", "page": 2}]
+
+
+def test_citations_are_invalid_without_supplied_sources():
+    assert validate_citations("Rule [doc p.2].", []) == {
+        "valid_citations": [],
+        "invalid_citations": [{"doc_id": "doc", "page": 2}],
+        "citation_count": 1,
+        "citation_precision": 0.0,
+    }

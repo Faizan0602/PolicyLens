@@ -80,7 +80,17 @@ def test_low_rerank_score_refuses_without_llm_or_misleading_sources(monkeypatch,
     search.assert_called_once_with("Question", k=20)
     rag.rerank.assert_called_once_with("Question", candidates, k=5)
     fake_llm.generate.assert_not_called()
-    assert result == {"answer": ABSTENTION_MESSAGE, "sources": [], "abstained": True}
+    assert result == {
+        "answer": ABSTENTION_MESSAGE,
+        "sources": [],
+        "abstained": True,
+        "citation_validation": {
+            "valid_citations": [],
+            "invalid_citations": [],
+            "citation_count": 0,
+            "citation_precision": None,
+        },
+    }
 
 
 def test_threshold_boundary_accepts_reranked_source_metadata(monkeypatch, fake_llm):
@@ -252,6 +262,29 @@ def test_chain_returns_formatted_sources_independent_of_model_citations(monkeypa
     assert result["answer"] == fake_llm.generate.return_value
     assert result["sources"] == format_evidence(chunks)["sources"]
     assert [source["tag"] for source in result["sources"]] == ["Source 1"]
+
+
+@pytest.mark.parametrize(("doc_id", "page"), [("invented", 1), ("actual", 99)])
+def test_generated_bad_citation_is_flagged_without_changing_answer(
+    monkeypatch, fake_llm, doc_id, page
+):
+    chunk = {"text": "Actual rule.", "page": 1, "metadata": {"doc_id": "actual"}}
+    monkeypatch.setattr(rag, "retrieve_bm25", Mock(return_value=[chunk]))
+    answer = f"Supported [actual p.1]. Unsupported 【{doc_id} p.{page}】."
+    fake_llm.generate.return_value = answer
+
+    result = build_rag_chain(llm=fake_llm).invoke("Question")
+
+    fake_llm.generate.assert_called_once()
+    assert result["answer"] == answer
+    assert result["sources"] == format_evidence([chunk])["sources"]
+    assert result["abstained"] is False
+    assert result["citation_validation"] == {
+        "valid_citations": [{"doc_id": "actual", "page": 1}],
+        "invalid_citations": [{"doc_id": doc_id, "page": page}],
+        "citation_count": 2,
+        "citation_precision": 0.5,
+    }
 
 
 def test_chain_retrieval_failure_propagates(monkeypatch, fake_llm):

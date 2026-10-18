@@ -20,6 +20,7 @@ from langchain_core.runnables import (
 )
 
 from policylens.bm25 import retrieve_bm25
+from policylens.citations import validate_citations
 from policylens.llm import GroqLLM, LLMClient, get_llm
 from policylens.reranker import ABSTENTION_MESSAGE, decide_abstention, rerank
 
@@ -205,6 +206,11 @@ def build_rag_chain(
             answer=answer,
             sources=RunnableLambda(itemgetter("sources")),
             abstained=RunnableLambda(itemgetter("abstained")),
+        )
+        | RunnablePassthrough.assign(
+            citation_validation=RunnableLambda(
+                lambda result: validate_citations(result["answer"], result["sources"])
+            )
         )
     )
 

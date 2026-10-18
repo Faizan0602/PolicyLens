@@ -341,6 +341,12 @@ def test_no_evidence_fits_returns_exact_not_found_without_generation(monkeypatch
         "answer": "not found in the provided documents",
         "sources": [],
         "abstained": True,
+        "citation_validation": {
+            "valid_citations": [],
+            "invalid_citations": [],
+            "citation_count": 0,
+            "citation_precision": None,
+        },
     }
     fake_llm.generate.assert_not_called()
 
@@ -379,6 +385,12 @@ def test_uncitable_chunk_skips_generation(monkeypatch, fake_llm, invalid):
         "answer": "not found in the provided documents",
         "sources": [],
         "abstained": True,
+        "citation_validation": {
+            "valid_citations": [],
+            "invalid_citations": [],
+            "citation_count": 0,
+            "citation_precision": None,
+        },
     }
     fake_llm.generate.assert_not_called()
 

@@ -16,7 +16,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 from policylens import rag
 from policylens.bm25 import retrieve_bm25
-from policylens.citations import parse_citations
+from policylens.citations import parse_citations, validate_citations
 from policylens.config import get_settings
 from policylens.llm import get_llm
 from policylens.reranker import (
@@ -113,9 +113,9 @@ def _load_prompts() -> tuple[dict[str, ChatPromptTemplate], dict[str, str]]:
 
 def check_citations(answer: str, sources: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Check cited document/page membership, not factual support for a claim."""
-    supplied = {(source["doc_id"], source["page"]) for source in sources}
+    validation = validate_citations(answer, sources)
     return [
-        {**citation, "in_supplied_sources": (citation["doc_id"], citation["page"]) in supplied}
+        {**citation, "in_supplied_sources": citation in validation["valid_citations"]}
         for citation in parse_citations(answer)
     ]
 
