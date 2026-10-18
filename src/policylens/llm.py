@@ -107,9 +107,19 @@ class GroqLLM:
         )
         if not response.choices:
             raise RuntimeError("Groq returned no completion choices.")
-        message = response.choices[0].message
+        choice = response.choices[0]
+        message = choice.message
         text = message.content if message is not None else None
         if not isinstance(text, str) or not text.strip():
+            if getattr(choice, "finish_reason", None) == "length":
+                usage = getattr(response, "usage", None)
+                details = getattr(usage, "completion_tokens_details", None)
+                raise RuntimeError(
+                    "Groq returned no usable response text (finish_reason=length, "
+                    f"completion_tokens={getattr(usage, 'completion_tokens', None)}, "
+                    f"reasoning_tokens={getattr(details, 'reasoning_tokens', None)}, "
+                    f"max_completion_tokens={kwargs.get('max_completion_tokens')})."
+                )
             raise RuntimeError("Groq returned no usable response text.")
         return text
 

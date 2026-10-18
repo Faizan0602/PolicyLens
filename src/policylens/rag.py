@@ -3,10 +3,12 @@
 import argparse
 import json
 import sys
+from functools import lru_cache
 from operator import itemgetter
 from pathlib import Path
 from typing import Any
 
+import tiktoken
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import (
@@ -18,11 +20,23 @@ from langchain_core.runnables import (
 )
 
 from policylens.bm25 import retrieve_bm25
-from policylens.llm import LLMClient, get_llm
+from policylens.llm import GroqLLM, LLMClient, get_llm
 from policylens.reranker import ABSTENTION_MESSAGE, decide_abstention, rerank
 
 _CANDIDATE_K = 20
 _FINAL_K = 5
+# Application planning budget, not the model's maximum context window.
+# Counts encoded prompt text; Groq's chat framing may add tokens.
+_TOTAL_PLANNING_TOKENS = 8704
+_MAX_PROMPT_TOKENS = 7680
+_MAX_COMPLETION_TOKENS = 1024
+_NOT_FOUND = "not found in the provided documents"
+
+
+@lru_cache(maxsize=1)
+def _prompt_encoding() -> tiktoken.Encoding:
+    """Load the generation model's o200k_harmony encoding only once."""
+    return tiktoken.get_encoding("o200k_harmony")
 
 
 def format_evidence(chunks: list[dict[str, Any]]) -> dict[str, Any]:
@@ -69,7 +83,48 @@ def format_evidence(chunks: list[dict[str, Any]]) -> dict[str, Any]:
     return {"context": "\n\n".join(blocks), "sources": sources}
 
 
-def build_rag_chain(k: int = 5, llm: LLMClient | None = None) -> Runnable:
+def _render_prompt(prompt: ChatPromptTemplate, question: str, evidence: dict[str, Any]) -> str:
+    """Render exactly the string sent to the LLM, including all source metadata."""
+    return prompt.invoke(
+        {
+            "question": question,
+            "context": evidence["context"],
+            "sources": json.dumps(evidence["sources"], ensure_ascii=False, indent=2),
+        }
+    ).to_string()
+
+
+def _budget_evidence(
+    question: str, chunks: list[dict[str, Any]], prompts: tuple[ChatPromptTemplate, ...]
+) -> dict[str, Any]:
+    """Keep whole chunks in ranked order when both prompt versions fit the same budget."""
+    included: list[dict[str, Any]] = []
+    evidence: dict[str, Any] = {"context": "", "sources": []}
+    encoding = _prompt_encoding()
+    for chunk in chunks:
+        if not isinstance(chunk.get("text"), str) or not chunk["text"].strip():
+            continue
+        metadata = chunk.get("metadata")
+        doc_id = metadata.get("doc_id") if isinstance(metadata, dict) else None
+        page = chunk.get("page")
+        if not isinstance(doc_id, str) or not doc_id.strip():
+            continue
+        if type(page) is not int or page <= 0:
+            continue
+        candidate = format_evidence([*included, chunk])
+        if all(
+            len(encoding.encode(_render_prompt(prompt, question, candidate), disallowed_special=()))
+            <= _MAX_PROMPT_TOKENS
+            for prompt in prompts
+        ):
+            included.append(chunk)
+            evidence = candidate
+    return evidence
+
+
+def build_rag_chain(
+    k: int = 5, llm: LLMClient | None = None, prompt_version: str = "v1"
+) -> Runnable:
     """Build the frozen BM25-to-reranker chain with one retrieval per invocation.
 
     Sources stay in invocation-local accepted evidence, never in model output.
@@ -78,29 +133,35 @@ def build_rag_chain(k: int = 5, llm: LLMClient | None = None) -> Runnable:
     """
     if isinstance(k, bool) or not isinstance(k, int) or k != _FINAL_K:
         raise ValueError("The frozen RAG pipeline requires final k=5")
+    if prompt_version not in ("v1", "v2"):
+        raise ValueError("prompt_version must be 'v1' or 'v2'")
     client = llm if llm is not None else get_llm()
-    prompt_path = Path(__file__).resolve().parents[2] / "prompts" / "answer_v1.txt"
-    prompt_text = prompt_path.read_text(encoding="utf-8")
-    system_text, human_text = prompt_text.split("END SYSTEM INSTRUCTIONS", maxsplit=1)
-    prompt = ChatPromptTemplate.from_messages(
-        [("system", system_text.strip()), ("human", human_text.strip())]
-    )
+    prompt_dir = Path(__file__).resolve().parents[2] / "prompts"
+    prompts = {}
+    for version in ("v1", "v2"):
+        prompt_text = (prompt_dir / f"answer_{version}.txt").read_text(encoding="utf-8")
+        system_text, human_text = prompt_text.split("END SYSTEM INSTRUCTIONS", maxsplit=1)
+        prompts[version] = ChatPromptTemplate.from_messages(
+            [("system", system_text.strip()), ("human", human_text.strip())]
+        )
+
+    def generate(prompt_text: str) -> str:
+        options = {"temperature": 0}
+        if isinstance(client, GroqLLM):
+            options["max_completion_tokens"] = _MAX_COMPLETION_TOKENS
+        return client.generate(prompt_text, **options)
+
     generate_answer = (
-        RunnablePassthrough.assign(
-            sources=RunnableLambda(
-                lambda evidence: json.dumps(evidence["sources"], ensure_ascii=False, indent=2)
-            )
+        RunnableLambda(
+            lambda evidence: _render_prompt(prompts[prompt_version], evidence["question"], evidence)
         )
-        | prompt
-        | RunnableLambda(
-            lambda prompt_value: client.generate(prompt_value.to_string(), temperature=0)
-        )
+        | RunnableLambda(generate)
         | StrOutputParser()
     )
     answer = RunnableBranch(
         (
             lambda evidence: evidence["abstained"],
-            RunnableLambda(lambda _: ABSTENTION_MESSAGE),
+            RunnableLambda(lambda evidence: evidence["refusal_answer"]),
         ),
         generate_answer,
     )
@@ -108,10 +169,25 @@ def build_rag_chain(k: int = 5, llm: LLMClient | None = None) -> Runnable:
     def prepare_evidence(state: dict[str, Any]) -> dict[str, Any]:
         decision = decide_abstention(state["chunks"])
         if decision["abstain"]:
-            return {"question": state["question"], "context": "", "sources": [], "abstained": True}
+            return {
+                "question": state["question"],
+                "context": "",
+                "sources": [],
+                "abstained": True,
+                "refusal_answer": ABSTENTION_MESSAGE,
+            }
+        evidence = _budget_evidence(state["question"], state["chunks"], tuple(prompts.values()))
+        if not evidence["sources"]:
+            return {
+                "question": state["question"],
+                "context": "",
+                "sources": [],
+                "abstained": True,
+                "refusal_answer": _NOT_FOUND,
+            }
         return {
             "question": state["question"],
-            **format_evidence(state["chunks"]),
+            **evidence,
             "abstained": False,
         }
 

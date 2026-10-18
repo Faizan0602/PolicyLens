@@ -262,6 +262,24 @@ def test_groq_generate_unusable_response_raises(groq_sdk, choices):
         llm.generate("Question")
 
 
+def test_groq_empty_content_reports_completion_exhaustion(groq_sdk):
+    llm = GroqLLM(model="openai/gpt-oss-120b", api_key="test-groq-key")
+    response = llm.client.chat.completions.create.return_value
+    response.choices = [Mock(message=Mock(content=None), finish_reason="length")]
+    response.usage = Mock(
+        completion_tokens=1024,
+        completion_tokens_details=Mock(reasoning_tokens=1024),
+    )
+
+    with pytest.raises(
+        RuntimeError,
+        match="finish_reason=length.*completion_tokens=1024.*reasoning_tokens=1024.*max_completion_tokens=1024",
+    ):
+        llm.generate("Question", max_completion_tokens=1024)
+
+    llm.client.chat.completions.create.assert_called_once()
+
+
 def test_groq_generate_sdk_errors_propagate_without_retry(groq_sdk):
     llm = GroqLLM(model="configured-model", api_key="test-groq-key")
     failure = RuntimeError("Service unavailable")

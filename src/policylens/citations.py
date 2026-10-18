@@ -2,14 +2,16 @@
 
 import re
 
-# Match a single bracket pair, a token ID, one space, and a positive page number.
+# Match one ASCII or Unicode bracket pair; the conditional requires matching closers.
 _CITATION_PATTERN = re.compile(
-    r"(?<!\[)\[(?P<doc_id>[A-Za-z0-9_-]+) p\.(?P<page>[1-9][0-9]*)\](?!\])"
+    r"(?<![\[【])(?:(?P<ascii>\[)|【)"
+    r"(?P<doc_id>[A-Za-z0-9_-]+) p\.(?P<page>[1-9][0-9]*)"
+    r"(?(ascii)\]|】)(?![\]】])"
 )
 
 
 def parse_citations(answer: str) -> list[dict[str, str | int]]:
-    """Extract [doc_id p.N] citations in order, retaining full IDs and duplicates.
+    """Extract [doc_id p.N] or 【doc_id p.N】 in order, retaining full IDs and duplicates.
 
     Malformed citations and [Source N] tags are ignored. IDs may contain ASCII
     letters, digits, underscores, or hyphens; no length limit is imposed.
