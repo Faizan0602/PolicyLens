@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import math
+import sys
 import time
 from collections import deque
 from datetime import datetime, timezone
@@ -19,6 +20,7 @@ from policylens.bm25 import retrieve_bm25
 from policylens.citations import parse_citations, validate_citations
 from policylens.config import get_settings
 from policylens.llm import get_llm
+from policylens.privacy import redact_for_logging
 from policylens.reranker import (
     ABSTENTION_THRESHOLD,
     MODEL_NAME,
@@ -80,7 +82,7 @@ def _generate_with_retry(
                 )
                 if name in headers
             )
-            print(f"Groq HTTP 429: {error.message}; {diagnostics}", flush=True)
+            print(redact_for_logging(f"Groq HTTP 429: {error.message}; {diagnostics}"), flush=True)
             if attempt == 5:
                 raise
             retry_after = error.response.headers.get("retry-after")
@@ -264,8 +266,13 @@ def main() -> None:
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     progress_path = RESULTS_DIR / f"prompt_comparison_{stamp}.jsonl"
     print(f"Progress file: {progress_path}", flush=True)
-    with progress_path.open("x", encoding="utf-8") as row_output:
-        report = compare_prompts(limit=args.limit, row_output=row_output)
+    try:
+        with progress_path.open("x", encoding="utf-8") as row_output:
+            report = compare_prompts(limit=args.limit, row_output=row_output)
+    except Exception as error:
+        # The SDK exception can contain original prompts; do not emit its traceback.
+        print(f"Prompt comparison failed: {type(error).__name__}.", file=sys.stderr)
+        raise SystemExit(1) from None
     path = save_results(report)
     summary = report["summary"]
     print(f"Development questions: {summary['questions_evaluated']}")

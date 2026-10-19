@@ -18,6 +18,7 @@ from policylens import rag
 from policylens.bm25 import retrieve_bm25
 from policylens.config import get_settings
 from policylens.llm import get_llm
+from policylens.privacy import redact_for_logging
 from policylens.reranker import _get_reranker, decide_abstention, rerank
 from policylens.retrieval import retrieve
 
@@ -140,7 +141,7 @@ async def _score_metrics(metrics, row):
             if getattr(result, "reason", None):
                 row["judge_reasons"][name] = result.reason
         except Exception as error:
-            row["errors"][name] = f"{type(error).__name__}: {error}"
+            row["errors"][name] = redact_for_logging(f"{type(error).__name__}: {error}")
 
 
 async def evaluate(limit: int | None = None) -> dict:
@@ -213,7 +214,8 @@ async def evaluate(limit: int | None = None) -> dict:
                         await _score_metrics(metrics, row)
                 except Exception as error:
                     row.update(
-                        status="error", errors={"pipeline": f"{type(error).__name__}: {error}"}
+                        status="error",
+                        errors={"pipeline": redact_for_logging(f"{type(error).__name__}: {error}")},
                     )
                 rows.append(row)
             print(f"Completed {len(rows) // 2}/{len(selected)} development questions", flush=True)

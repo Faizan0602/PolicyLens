@@ -19,6 +19,7 @@ from policylens.db.session import get_db
 from policylens.ingestion.chunker import chunk_pages
 from policylens.ingestion.metadata import compute_file_hash
 from policylens.ingestion.parser import parse_pdf
+from policylens.privacy import redact_for_logging
 from policylens.vectorstore import (
     delete_document_chunks,
     get_qdrant_client,
@@ -144,7 +145,7 @@ def main() -> None:
         stats = ingest_documents(path=args.path)
         print_summary(stats)
     except Exception as e:
-        print(f"Ingestion error: {e}", file=sys.stderr)
+        print(redact_for_logging(f"Ingestion error: {e}"), file=sys.stderr)
         sys.exit(1)
 
 

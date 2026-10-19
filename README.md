@@ -88,3 +88,13 @@ The frozen configuration was BM25 top 20 → `BAAI/bge-reranker-base` → top 5,
 At the frozen 0.60 threshold, the evidence gate correctly refused 2/2 unanswerable questions, missed 0/2, wrongly refused 1/10 answerable questions, and correctly accepted 9/10. These are separate from the retrieval metrics, which use only the 10 answerable questions. The [saved hold-out report](eval/results/retrieval_bm25_rerank_holdout_20261015T182257754654Z_15f93293e5ee0669801fa0d69164bf1c69a9379717dfd17791ba89f2c65cef46.json) records the fixed run; the 12-question sample leaves substantial uncertainty about performance on new questions.
 
 Metadata filters were verified functionally, not measured as a retrieval-quality ablation. Query rewriting was **not implemented** and has no measured result. Neither the retrieval scores nor the abstention counts establish that generated answers are correct.
+
+## Prompt Injection and Privacy (Phase 4, Step 4.4)
+
+Indirect prompt injection means instructions hidden in retrieved documents try to redirect the model. Both versioned prompts already label PDF text and metadata as untrusted, delimit the evidence, require grounded citations and allow a not-found response. Citation validation flags references absent from the supplied sources; it does not establish that claims are supported. PolicyLens has no model-controlled tools or agents; the main injection risk is a manipulated answer.
+
+20 offline security tests and two live Groq tests passed; both prompt v1 and v2 resisted the tested injection. A separate one-page synthetic PDF passed through real parsing, chunking, isolated BM25 retrieval, BGE reranking and Groq generation: the answer retained the seven-calendar-day rule, cited page 1 and did not follow the malicious instruction. The temporary collection was deleted; production collections and PostgreSQL were unchanged. See [technical verification results](rag_notes.md#phase-4--step-44-prompt-injection-and-privacy-verification).
+
+Project-owned diagnostic messages and saved RAGAS error details redact common email, phone, Indian PAN and Aadhaar formats. Existing RAG CLI failures already omit provider error details. User-facing answers, source evidence and evaluation answers/contexts remain unchanged; these artifacts can contain identifiers and are not anonymized exports. Third-party SDK logging is not globally filtered.
+
+These are limited mitigations. Regexes can miss identifiers or hide nonpersonal numbers. Groq currently receives the rendered prompt in one user message, so role labels are text rather than enforced system-role separation. A single attack test cannot establish general resistance, and citation membership cannot guarantee factual correctness or complete security.

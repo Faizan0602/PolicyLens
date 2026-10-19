@@ -7,6 +7,7 @@ from typing import Any
 from qdrant_client.models import ScoredPoint
 
 from policylens.ingestion.metadata import ChunkMetadata
+from policylens.privacy import redact_for_logging
 from policylens.vectorstore import build_retrieval_filter, search_chunks
 
 
@@ -88,7 +89,7 @@ def main() -> None:
     try:
         print_results(retrieve(args.query, args.k))
     except Exception as exc:
-        print(f"Retrieval error: {exc}", file=sys.stderr)
+        print(redact_for_logging(f"Retrieval error: {exc}"), file=sys.stderr)
         sys.exit(1)
 
 

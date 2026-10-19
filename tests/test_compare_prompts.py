@@ -288,8 +288,9 @@ def test_interrupted_run_keeps_only_completed_jsonl_rows(paired_setup, monkeypat
     ]
     monkeypatch.setattr("sys.argv", ["compare_prompts", "--limit", "2"])
 
-    with pytest.raises(RuntimeError, match="Generation stopped"):
+    with pytest.raises(SystemExit) as caught:
         comparison.main()
+    assert caught.value.code == 1
 
     (progress_path,) = comparison.RESULTS_DIR.glob("prompt_comparison_*.jsonl")
     rows = [json.loads(line) for line in progress_path.read_text(encoding="utf-8").splitlines()]
