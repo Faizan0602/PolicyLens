@@ -29,6 +29,13 @@ dependencies = [
 [project.optional-dependencies]
 gemini = ["google-genai>=2.29.0,<3.0.0"]
 groq = ["groq>=1.7.0,<2.0.0"]
+# 0.4.2 removed vertexai, which RAGAS 0.4.3 still imports at startup.
+eval = [
+    "ragas==0.4.3",
+    "langchain-community==0.4.1",
+    "google-genai>=2.29.0,<3.0.0",
+    "instructor[google-genai]>=1.17.0,<2.0.0",
+]
 
 dev = [
     "ruff>=0.6.0",

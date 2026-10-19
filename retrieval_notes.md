@@ -286,3 +286,30 @@ Saved evidence: [frozen hold-out report](eval/results/retrieval_bm25_rerank_hold
 # Pre-Phase-4 RAG Integration Note
 
 The RAG chain now uses the frozen BM25 top-20 → BGE reranker top-5 pipeline and the 0.60 evidence gate before LLM generation. The gate is not a factual-support check: in the pre-Phase-4 audit, the unsupported question “What RBI policy repo rate was announced on October 1, 2026?” received a 0.7991 reranker score for an irrelevant ATM cassette-swap circular and passed the gate. The threshold and retrieval configuration remain frozen. Phase 4 must assess whether generated claims and citations are actually supported; citation syntax or a high reranker score alone cannot establish that support.
+
+
+### Phase 4, Step 4.3 — RAGAS Evaluation
+
+**Setup:** RAGAS 0.4.3, Groq GPT-OSS-120B answer generation, Gemini 3.5 Flash-Lite judge (temperature 0), prompt v1, local BGE-small embeddings.
+
+**Dataset:** Five answerable development questions, evaluated under both dense top-5 and BM25 top-20 → BGE reranker top-5. Frozen hold-out excluded.
+
+| Metric | Dense baseline | BM25 + reranker |
+|---|---:|---:|
+| Faithfulness | 0.733 | 0.975 |
+| Answer relevancy | 0.821 | 0.808 |
+| Context precision | 0.867 | 0.800 |
+| Context recall | 1.000 | 0.800 |
+
+All 40 scores completed without reported evaluation errors.
+
+**Manual review:** Reviewed ten faithfulness judgments, one per generated answer.
+
+- **G002 dense:** Faithfulness scored 0.50 despite the substantive answer being directly supported by retrieved RBI text. Recorded as a manual judge disagreement; claim-level judge reasoning was unavailable.
+- **G003 BM25:** Faithfulness scored 0.875, but the answer was incorrect. It confused qualifying persons with private-equity-related entities and misstated the promoter-group restriction.
+- **G003 retrieval:** Neither configuration retrieved the annotated Payments Banks page 2 passage, despite related passages appearing in the retrieved contexts.
+- The remaining reviewed answers were substantively correct and supported by relevant passages. G003 dense largely matched the reference answer but cited a Commercial Banks provision rather than the requested Payments Banks provision.
+
+**Interpretation:** BM25 + reranking achieved higher average faithfulness, but dense retrieval had higher context precision and recall on this sample. A high faithfulness score does not guarantee correctness because an answer may be grounded in irrelevant or misinterpreted context.
+
+**Limitations:** Only the first five answerable development questions were evaluated. Results are exploratory, not representative of the full 41-question set. LLM-judge scores are noisy; the generator and judge use different models, but human inspection remains necessary.
