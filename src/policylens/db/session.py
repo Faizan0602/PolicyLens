@@ -14,11 +14,11 @@ class Base(DeclarativeBase):
     pass
 
 
-def get_engine(url: str | None = None):
-    """Create a SQLAlchemy engine driven by configuration or URL parameter."""
+def get_engine(url: str | None = None, **engine_options):
+    """Create an engine from configuration, with optional SQLAlchemy connection options."""
     settings = get_settings()
     db_url = url or settings.database_url
-    return create_engine(db_url)
+    return create_engine(db_url, **engine_options)
 
 
 def get_session_factory(engine=None) -> sessionmaker[Session]:

@@ -98,3 +98,19 @@ Indirect prompt injection means instructions hidden in retrieved documents try t
 Project-owned diagnostic messages and saved RAGAS error details redact common email, phone, Indian PAN and Aadhaar formats. Existing RAG CLI failures already omit provider error details. User-facing answers, source evidence and evaluation answers/contexts remain unchanged; these artifacts can contain identifiers and are not anonymized exports. Third-party SDK logging is not globally filtered.
 
 These are limited mitigations. Regexes can miss identifiers or hide nonpersonal numbers. Groq currently receives the rendered prompt in one user message, so role labels are text rather than enforced system-role separation. A single attack test cannot establish general resistance, and citation membership cannot guarantee factual correctness or complete security.
+
+## Backend Service (Phase 5, Step 5.1)
+
+With the `api` dependencies installed, start FastAPI from the project root:
+
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn policylens.api.app:create_app --factory --host 127.0.0.1 --port 8000
+```
+
+Open [Swagger UI](http://127.0.0.1:8000/docs) to inspect exactly **13 documented API operations**. Only `/health` and `/ready` are implemented; the other 11 operations return HTTP 501 with a `not_implemented` error. `/health` checks process liveness without querying dependencies; `/ready` checks PostgreSQL and Qdrant connectivity.
+
+Manual verification confirmed all 13 operations in Swagger, `/health` returning `{"status":"ok"}`, and `/ready` reporting both services healthy. After Qdrant was deliberately stopped, `/ready` reported Qdrant unavailable. Qdrant restarted successfully and readiness reported both services healthy again. `GET /sessions` returned the expected `not_implemented` error. These observations verify response JSON, not independent confirmation of HTTP status codes.
+
+Offline verification: **8 focused API tests and 148 relevant regression tests passed**; Ruff lint and formatting checks passed.
+
+Routers handle HTTP contracts, services coordinate application logic, and repositories perform database operations. This separation keeps business logic reusable and testable without coupling it to HTTP handlers.
