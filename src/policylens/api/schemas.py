@@ -58,7 +58,6 @@ class TokenResponse(BaseModel):
 
 class ChatRequest(_RequestModel):
     question: str = Field(min_length=1, pattern=r"\S")
-    session_id: UUID | None = None
 
 
 class SourceResponse(BaseModel):
@@ -78,6 +77,12 @@ class ChatResponse(BaseModel):
     answer: str
     sources: list[SourceResponse]
     abstained: bool
+    citation_validation: dict[str, Any]
+    session_id: UUID
+
+
+class ChatErrorResponse(ErrorResponse):
+    sources: list[SourceResponse] = Field(default_factory=list)
 
 
 class SessionResponse(BaseModel):

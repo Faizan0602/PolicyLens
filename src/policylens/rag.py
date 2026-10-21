@@ -129,7 +129,7 @@ def build_rag_chain(
     """Build the frozen BM25-to-reranker chain with one retrieval per invocation.
 
     Sources stay in invocation-local accepted evidence, never in model output.
-    Rejected evidence skips generation; errors propagate.
+    Rejected evidence skips generation; errors propagate with sources on generation failure.
     The configured client is initialized at construction unless one is supplied.
     """
     if isinstance(k, bool) or not isinstance(k, int) or k != _FINAL_K:
@@ -146,19 +146,19 @@ def build_rag_chain(
             [("system", system_text.strip()), ("human", human_text.strip())]
         )
 
-    def generate(prompt_text: str) -> str:
+    def generate(evidence: dict[str, Any]) -> str:
+        prompt_text = _render_prompt(prompts[prompt_version], evidence["question"], evidence)
         options = {"temperature": 0}
         if isinstance(client, GroqLLM):
             options["max_completion_tokens"] = _MAX_COMPLETION_TOKENS
-        return client.generate(prompt_text, **options)
+        try:
+            return client.generate(prompt_text, **options)
+        except Exception as exc:
+            # Keep invocation-local supplied sources available to the HTTP error response.
+            exc.policylens_sources = evidence["sources"]
+            raise
 
-    generate_answer = (
-        RunnableLambda(
-            lambda evidence: _render_prompt(prompts[prompt_version], evidence["question"], evidence)
-        )
-        | RunnableLambda(generate)
-        | StrOutputParser()
-    )
+    generate_answer = RunnableLambda(generate) | StrOutputParser()
     answer = RunnableBranch(
         (
             lambda evidence: evidence["abstained"],

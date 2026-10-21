@@ -1,17 +1,20 @@
-"""HTTP contracts; only liveness and readiness execute application logic."""
+"""HTTP contracts, readiness and opt-in local-development chat."""
 
 from typing import Annotated, NoReturn
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi.responses import JSONResponse
 from qdrant_client import QdrantClient
 from sqlalchemy.orm import Session
 
-from policylens.api.dependencies import get_qdrant, get_session
+from policylens.api.dependencies import get_qdrant, get_session, require_local_demo
 from policylens.api.schemas import (
+    ChatErrorResponse,
     ChatRequest,
     ChatResponse,
     DocumentResponse,
+    ErrorDetail,
     ErrorResponse,
     FeedbackRequest,
     FeedbackResponse,
@@ -27,7 +30,7 @@ from policylens.api.schemas import (
     TokenResponse,
     UserResponse,
 )
-from policylens.api.services import check_readiness
+from policylens.api.services import ChatServiceError, check_readiness, create_chat
 
 router = APIRouter()
 pending = APIRouter(
@@ -65,20 +68,29 @@ def refresh(payload: RefreshRequest):
     not_implemented()
 
 
-@pending.post(
+@router.post(
     "/chat",
     tags=["Chat"],
     response_model=ChatResponse,
+    dependencies=[Depends(require_local_demo)],
     responses={
-        200: {
-            "description": "Planned answer/source payload; SSE transport is not implemented",
-            "content": {"text/event-stream": {"schema": {"type": "string"}}},
-        }
+        403: {"model": ErrorResponse, "description": "Local development access required"},
+        503: {"model": ChatErrorResponse, "description": "A required dependency is unavailable"},
+        500: {"model": ChatErrorResponse, "description": "Chat could not be completed"},
     },
 )
-def chat(payload: ChatRequest):
-    """Planned chat with SSE and sources; currently returns HTTP 501 without generating."""
-    not_implemented()
+def chat(payload: ChatRequest, session: Annotated[Session, Depends(get_session)]):
+    """Return and save one complete JSON exchange; authentication and memory are deferred."""
+    try:
+        return create_chat(session, payload.question)
+    except ChatServiceError as exc:
+        error = ChatErrorResponse(
+            detail=ErrorDetail(code=exc.code, message=str(exc)), sources=exc.sources
+        )
+        return JSONResponse(
+            status_code=500 if exc.code == "chat_failed" else 503,
+            content=error.model_dump(mode="json"),
+        )
 
 
 @pending.get("/sessions", tags=["Sessions"], response_model=list[SessionResponse])

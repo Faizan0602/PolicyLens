@@ -107,10 +107,18 @@ With the `api` dependencies installed, start FastAPI from the project root:
 .\.venv\Scripts\python.exe -m uvicorn policylens.api.app:create_app --factory --host 127.0.0.1 --port 8000
 ```
 
-Open [Swagger UI](http://127.0.0.1:8000/docs) to inspect exactly **13 documented API operations**. Only `/health` and `/ready` are implemented; the other 11 operations return HTTP 501 with a `not_implemented` error. `/health` checks process liveness without querying dependencies; `/ready` checks PostgreSQL and Qdrant connectivity.
+Open [Swagger UI](http://127.0.0.1:8000/docs) to inspect exactly **13 documented API operations**. At Step 5.1, only `/health` and `/ready` were implemented; the other 11 operations returned HTTP 501 with a `not_implemented` error. `/health` checks process liveness without querying dependencies; `/ready` checks PostgreSQL and Qdrant connectivity.
 
 Manual verification confirmed all 13 operations in Swagger, `/health` returning `{"status":"ok"}`, and `/ready` reporting both services healthy. After Qdrant was deliberately stopped, `/ready` reported Qdrant unavailable. Qdrant restarted successfully and readiness reported both services healthy again. `GET /sessions` returned the expected `not_implemented` error. These observations verify response JSON, not independent confirmation of HTTP status codes.
 
-Offline verification: **8 focused API tests and 148 relevant regression tests passed**; Ruff lint and formatting checks passed.
+Step 5.1 offline verification: **8 focused API tests and 148 relevant regression tests passed**; Ruff lint and formatting checks passed.
 
 Routers handle HTTP contracts, services coordinate application logic, and repositories perform database operations. This separation keeps business logic reusable and testable without coupling it to HTTP handlers.
+
+## Functional JSON RAG Chat (Phase 5, Step 5.4)
+
+`POST /chat` now accepts a question and returns a complete JSON response with the answer, supplied sources, citation-validation results, abstention decision, and generated session ID. It integrates the existing BM25 top-20 retrieval, BGE reranker top-5, 0.60 evidence gate, and Groq generation pipeline. Citation validation checks document/page membership in the supplied sources; it does not prove factual support. Completed exchanges persist a chat session and its user and assistant messages in PostgreSQL.
+
+Chat is a local-development-only demo, disabled by default. It requires `POLICYLENS_DEMO_CHAT_ENABLED=true`, `POLICYLENS_ENVIRONMENT=development`, and direct loopback access. SSE streaming is intentionally deferred; authentication/RBAC and conversation memory are also deferred. The other ten workflow operations remain unimplemented.
+
+Manual verification returned a grounded answer to a real regulatory question, with one valid citation and zero invalid citations. PostgreSQL contained both messages in the generated session. Qdrant unavailability produced a safe `retrieval_unavailable` response; restarting Qdrant restored `/ready` to healthy. These observations describe response content and database records, without independently verified HTTP status codes.

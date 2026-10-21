@@ -33,13 +33,13 @@ async def lifespan(app: FastAPI):
 
 
 def create_app() -> FastAPI:
-    """Register contracts; only health and readiness are functional in Step 5.1."""
+    """Register health, readiness, local-demo chat and deferred workflow contracts."""
     app = FastAPI(
         title="PolicyLens API",
         version="0.1.0",
         description=(
-            "Step 5.1 API contracts. Only /health and /ready are implemented. "
-            "Other operations document intended success responses but return HTTP 501."
+            "Health and readiness are implemented. JSON /chat is opt-in for local development; "
+            "authentication, streaming and memory are deferred. Other operations return HTTP 501."
         ),
         lifespan=lifespan,
         redoc_url=None,

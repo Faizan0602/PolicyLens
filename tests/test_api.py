@@ -5,9 +5,10 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 from fastapi.testclient import TestClient
-from pydantic import SecretStr
+from pydantic import SecretStr, ValidationError
 
 from policylens.api import app as api_app
+from policylens.api.schemas import ChatRequest
 
 RESOURCE_ID = "00000000-0000-0000-0000-000000000001"
 NOT_IMPLEMENTED = {
@@ -73,12 +74,11 @@ def test_openapi_contracts_do_not_initialize_resources(api_resources):
                 assert response_schema["items"] == reference
             else:
                 assert response_schema == reference
-        if path not in {"/health", "/ready"}:
+        if path not in {"/health", "/ready", "/chat"}:
             assert responses["501"]["content"]["application/json"]["schema"] == {
                 "$ref": "#/components/schemas/ErrorResponse"
             }
 
-    assert "text/event-stream" in schema["paths"]["/chat"]["post"]["responses"]["200"]["content"]
     ready_responses = schema["paths"]["/ready"]["get"]["responses"]
     assert ready_responses["503"]["content"]["application/json"]["schema"] == {
         "$ref": "#/components/schemas/ReadyResponse"
@@ -150,12 +150,11 @@ def test_ready_reports_each_failure_without_disclosing_errors(api_resources, fai
     api_resources.qdrant.get_collections.assert_called_once_with()
 
 
-def test_all_workflow_routes_return_the_same_501_response(api_resources):
+def test_deferred_workflow_routes_return_the_same_501_response(api_resources):
     requests = [
         ("POST", "/auth/register", {"email": "analyst@example.com", "password": "test-password"}),
         ("POST", "/auth/login", {"email": "analyst@example.com", "password": "test-password"}),
         ("POST", "/auth/refresh", {"refresh_token": "synthetic-refresh-token"}),
-        ("POST", "/chat", {"question": "What does this circular require?"}),
         ("GET", "/sessions", None),
         ("GET", f"/sessions/{RESOURCE_ID}", None),
         ("POST", "/feedback", {"message_id": RESOURCE_ID, "rating": 1}),
@@ -180,9 +179,12 @@ def test_requests_enforce_registration_and_question_contracts(api_resources):
             "/auth/register",
             {"email": "analyst@example.com", "password": "test-password", "role": "admin"},
         ),
-        ("/chat", {"question": " \t\n"}),
     ]
     with TestClient(api_resources.app) as client:
         for path, body in invalid_requests:
             response = client.post(path, json=body)
             assert response.status_code == 422, (path, body)
+
+    # The local-demo guard runs before HTTP body validation; check the schema directly.
+    with pytest.raises(ValidationError):
+        ChatRequest(question=" \t\n")
