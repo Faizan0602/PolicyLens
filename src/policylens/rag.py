@@ -124,13 +124,18 @@ def _budget_evidence(
 
 
 def build_rag_chain(
-    k: int = 5, llm: LLMClient | None = None, prompt_version: str = "v1"
+    k: int = 5,
+    llm: LLMClient | None = None,
+    prompt_version: str = "v1",
+    *,
+    public_only: bool = False,
 ) -> Runnable:
     """Build the frozen BM25-to-reranker chain with one retrieval per invocation.
 
     Sources stay in invocation-local accepted evidence, never in model output.
     Rejected evidence skips generation; errors propagate with sources on generation failure.
     The configured client is initialized at construction unless one is supplied.
+    The API requires public-only Qdrant pre-filtering; local/evaluation defaults stay unchanged.
     """
     if isinstance(k, bool) or not isinstance(k, int) or k != _FINAL_K:
         raise ValueError("The frozen RAG pipeline requires final k=5")
@@ -193,7 +198,9 @@ def build_rag_chain(
         }
 
     def retrieve_and_rerank(question: str) -> list[dict[str, Any]]:
-        candidates = retrieve_bm25(question, k=_CANDIDATE_K)
+        candidates = retrieve_bm25(
+            question, k=_CANDIDATE_K, **({"public_only": True} if public_only else {})
+        )
         return rerank(question, candidates, k=_FINAL_K)
 
     return (

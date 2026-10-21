@@ -74,7 +74,14 @@ def test_openapi_contracts_do_not_initialize_resources(api_resources):
                 assert response_schema["items"] == reference
             else:
                 assert response_schema == reference
-        if path not in {"/health", "/ready", "/chat"}:
+        if path not in {
+            "/health",
+            "/ready",
+            "/chat",
+            "/auth/register",
+            "/auth/login",
+            "/auth/refresh",
+        }:
             assert responses["501"]["content"]["application/json"]["schema"] == {
                 "$ref": "#/components/schemas/ErrorResponse"
             }
@@ -152,9 +159,6 @@ def test_ready_reports_each_failure_without_disclosing_errors(api_resources, fai
 
 def test_deferred_workflow_routes_return_the_same_501_response(api_resources):
     requests = [
-        ("POST", "/auth/register", {"email": "analyst@example.com", "password": "test-password"}),
-        ("POST", "/auth/login", {"email": "analyst@example.com", "password": "test-password"}),
-        ("POST", "/auth/refresh", {"refresh_token": "synthetic-refresh-token"}),
         ("GET", "/sessions", None),
         ("GET", f"/sessions/{RESOURCE_ID}", None),
         ("POST", "/feedback", {"message_id": RESOURCE_ID, "rating": 1}),
@@ -185,6 +189,6 @@ def test_requests_enforce_registration_and_question_contracts(api_resources):
             response = client.post(path, json=body)
             assert response.status_code == 422, (path, body)
 
-    # The local-demo guard runs before HTTP body validation; check the schema directly.
+    # Authentication runs before HTTP body validation; check the schema directly.
     with pytest.raises(ValidationError):
         ChatRequest(question=" \t\n")

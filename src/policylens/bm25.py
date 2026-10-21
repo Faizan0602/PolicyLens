@@ -94,10 +94,20 @@ def retrieve_bm25(
     regulator: str | None = None,
     start_date: str | None = None,
     end_date: str | None = None,
+    *,
+    public_only: bool = False,
 ) -> list[dict[str, Any]]:
     """Search the separate BM25 sparse collection and return dense-compatible results."""
     _validate_retrieval_inputs(question, k)
     query_filter = build_retrieval_filter(regulator, start_date, end_date)
+    if public_only:
+        # This restriction is set by the backend, never by client-supplied roles.
+        query_filter = models.Filter(
+            must=[
+                *([query_filter] if query_filter is not None else []),
+                models.FieldCondition(key="access_level", match=models.MatchValue(value="public")),
+            ]
+        )
     settings = get_settings()
     api_key = settings.qdrant_api_key.get_secret_value() if settings.qdrant_api_key else None
     client = QdrantClient(url=settings.qdrant_url, api_key=api_key, cloud_inference=True)

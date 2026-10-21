@@ -32,8 +32,8 @@ class Settings(BaseSettings):
     environment: Literal["development", "staging", "production", "test"] = "development"
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
     debug: bool = False
-    # Unauthenticated chat is opt-in and restricted to local development.
-    demo_chat_enabled: bool = False
+    # Required for authentication: 32 random bytes encoded as 64 hex characters.
+    jwt_secret: SecretStr | None = None
 
     # Model and Provider Settings
     llm_provider: str = "mock"

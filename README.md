@@ -119,6 +119,30 @@ Routers handle HTTP contracts, services coordinate application logic, and reposi
 
 `POST /chat` now accepts a question and returns a complete JSON response with the answer, supplied sources, citation-validation results, abstention decision, and generated session ID. It integrates the existing BM25 top-20 retrieval, BGE reranker top-5, 0.60 evidence gate, and Groq generation pipeline. Citation validation checks document/page membership in the supplied sources; it does not prove factual support. Completed exchanges persist a chat session and its user and assistant messages in PostgreSQL.
 
-Chat is a local-development-only demo, disabled by default. It requires `POLICYLENS_DEMO_CHAT_ENABLED=true`, `POLICYLENS_ENVIRONMENT=development`, and direct loopback access. SSE streaming is intentionally deferred; authentication/RBAC and conversation memory are also deferred. The other ten workflow operations remain unimplemented.
+Step 5.4 originally used an opt-in local demo identity. Step 5.3 authentication below now replaces that bypass: `/chat` requires a bearer access token. SSE streaming, conversation memory, and restricted-document RBAC remain deferred. Seven other workflow operations remain unimplemented.
 
 Manual verification returned a grounded answer to a real regulatory question, with one valid citation and zero invalid citations. PostgreSQL contained both messages in the generated session. Qdrant unavailability produced a safe `retrieval_unavailable` response; restarting Qdrant restored `/ready` to healthy. These observations describe response content and database records, without independently verified HTTP status codes.
+
+## Authentication and User Isolation (Phase 5, Step 5.3)
+
+`POST /auth/register` accepts an email and a 12–128-character password, normalizes the email to lowercase, and stores an Argon2id hash with role `user`. The existing PostgreSQL unique index enforces case-insensitive email uniqueness. Duplicate registration returns a safe conflict error; login failures use the same message for unknown emails and incorrect passwords. Password hashes are never returned.
+
+`POST /auth/login` returns `access_token`, `refresh_token`, and `token_type=bearer`. Access tokens expire after 15 minutes; refresh tokens expire after seven days. HS256 verification requires the issuer, audience, user ID, token type, issue/expiry times, and token identifier. `/auth/refresh` accepts a refresh token and returns a new access token alongside the same refresh token, retaining its original expiry. Access tokens cannot be used for refresh. There is **no logout, server-side revocation, or refresh-token rotation**: a stolen refresh token remains usable until expiry unless the user is deleted or the signing key changes.
+
+`POST /chat` resolves the access token's user from PostgreSQL before running RAG, then saves a fresh session and both messages transactionally under that user. No user identity or session ID is accepted in the request body. The old demo flag no longer grants access; existing demo records are left untouched. Session listing/history endpoints remain placeholders; ownership checks must precede history access or reuse in Step 5.5.
+
+The API adds an `access_level=public` Qdrant pre-filter before BM25 ranking. Restricted, unknown, or missing access values are excluded. This relies on trusted scalar access labels: existing metadata records the regulatory corpus as public, but this step does not re-audit live payloads or implement restricted-document authorization. New restricted documents must not be mislabeled public during ingestion. Retrieval depths, reranking, prompts, and the 0.60 gate are unchanged.
+
+For local Swagger verification, install the declared API dependencies, generate a process-local signing secret, and start the server (these commands do not change the configured Groq model):
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[api]"
+$env:POLICYLENS_JWT_SECRET = & .\.venv\Scripts\python.exe -c "import secrets; print(secrets.token_hex(32))"
+.\.venv\Scripts\python.exe -m uvicorn policylens.api.app:create_app --factory --host 127.0.0.1 --port 8000
+```
+
+The secret must represent 32 random bytes as 64 hex characters; missing, malformed, or obviously repetitive keys disable authentication with a safe error. Keep a stable secret in the deployment environment to retain tokens across restarts; never commit it. Use HTTPS for deployments carrying credentials or bearer tokens.
+
+In [Swagger UI](http://127.0.0.1:8000/docs), register User A, log in, and paste the access token into **Authorize**. Call `/chat` with `{"question":"..."}` and verify `chat_sessions.user_id` matches the registered ID. Repeat for User B, verify missing/invalid bearer tokens are rejected, and try `/auth/refresh` with each token type. Cross-user session-reuse verification remains deferred with Step 5.5.
+
+Manual Swagger verification of registration, login, refresh, and authenticated chat passed, as reported locally. No additional API requests or automated tests were run for this documentation update. Refresh-token revocation, complex RBAC, and session reuse remain unimplemented; rate limiting, email verification, password reset, streaming, and conversation memory remain deferred.

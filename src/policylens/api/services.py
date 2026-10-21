@@ -2,7 +2,7 @@
 
 from functools import lru_cache
 from typing import Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from qdrant_client import QdrantClient
 from qdrant_client.common.client_exceptions import QdrantException
@@ -26,15 +26,15 @@ class ChatServiceError(Exception):
 
 @lru_cache(maxsize=1)
 def _chat_chain():
-    # Import and initialize only when an enabled local chat request is made.
+    # Import and initialize only after a request has authenticated successfully.
     from policylens.rag import build_rag_chain
 
     if get_settings().llm_provider.strip().lower() != "groq":
-        raise ValueError("Local chat requires the configured Groq provider")
-    return build_rag_chain()
+        raise ValueError("Chat requires the configured Groq provider")
+    return build_rag_chain(public_only=True)
 
 
-def create_chat(session: Session, question: str) -> ChatResponse:
+def create_chat(session: Session, question: str, user_id: UUID) -> ChatResponse:
     try:
         chain = _chat_chain()
     except Exception:
@@ -65,6 +65,7 @@ def create_chat(session: Session, question: str) -> ChatResponse:
             question,
             response.answer,
             response.citation_validation["valid_citations"],
+            user_id=user_id,
         )
     except SQLAlchemyError:
         raise ChatServiceError(

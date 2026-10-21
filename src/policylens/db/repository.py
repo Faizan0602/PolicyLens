@@ -1,18 +1,12 @@
-"""Database connectivity probes and atomic local-demo exchange persistence."""
+"""Database connectivity, user lookup and atomic exchange persistence."""
 
-from uuid import NAMESPACE_URL, UUID, uuid5
+from uuid import UUID
 
 from qdrant_client import QdrantClient
-from sqlalchemy import text
-from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from policylens.db.models import ChatSession, Message, User
-
-_DEMO_USER_ID = uuid5(NAMESPACE_URL, "policylens:local-demo-user")
-_DEMO_EMAIL = "local-demo@policylens.invalid"
-# A disabled-account marker, not a password or usable password hash.
-_DISABLED_LOGIN_MARKER = "!disabled-local-demo"
 
 
 def check_postgres(session: Session) -> None:
@@ -23,34 +17,36 @@ def check_qdrant(client: QdrantClient) -> None:
     client.get_collections()
 
 
+def find_user_by_email(session: Session, email: str) -> User | None:
+    return session.scalar(select(User).where(func.lower(User.email) == email))
+
+
+def find_user_by_id(session: Session, user_id: UUID) -> User | None:
+    return session.get(User, user_id)
+
+
+def insert_user(session: Session, email: str, password_hash: str) -> User:
+    with session.begin():
+        user = User(email=email, password_hash=password_hash, role="user")
+        session.add(user)
+        session.flush()
+        # Preserve returned scalar fields without a post-commit database read.
+        session.expunge(user)
+    return user
+
+
 def save_chat_exchange(
     session: Session,
     session_id: UUID,
     question: str,
     answer: str,
     citations: list[dict],
+    *,
+    user_id: UUID,
 ) -> None:
-    """Commit the demo identity, fresh session and two complete messages together."""
+    """Commit a fresh session and two messages for the authenticated user together."""
     with session.begin():
-        session.execute(
-            insert(User)
-            .values(
-                id=_DEMO_USER_ID,
-                email=_DEMO_EMAIL,
-                password_hash=_DISABLED_LOGIN_MARKER,
-                role="user",
-            )
-            .on_conflict_do_nothing(index_elements=[User.id])
-        )
-        user = session.get(User, _DEMO_USER_ID)
-        if (
-            user is None
-            or user.email != _DEMO_EMAIL
-            or user.password_hash != _DISABLED_LOGIN_MARKER
-            or user.role != "user"
-        ):
-            raise ValueError("Reserved demo identity does not match the disabled demo account")
-        session.add(ChatSession(id=session_id, user_id=user.id, title=question.strip()[:120]))
+        session.add(ChatSession(id=session_id, user_id=user_id, title=question.strip()[:120]))
         session.flush()
         session.add_all(
             [

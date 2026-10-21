@@ -4,7 +4,7 @@ from datetime import date, datetime
 from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr, field_validator
 
 
 class _RequestModel(BaseModel):
@@ -29,14 +29,18 @@ class ReadyResponse(BaseModel):
     dependencies: dict[str, Literal["ok", "unavailable"]]
 
 
-class RegisterRequest(_RequestModel):
-    email: EmailStr
-    password: SecretStr = Field(min_length=1)
-
-
 class LoginRequest(_RequestModel):
     email: EmailStr
-    password: SecretStr = Field(min_length=1)
+    password: SecretStr = Field(min_length=1, max_length=128)
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, value: str) -> str:
+        return value.lower()
+
+
+class RegisterRequest(LoginRequest):
+    password: SecretStr = Field(min_length=12, max_length=128)
 
 
 class RefreshRequest(_RequestModel):

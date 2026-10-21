@@ -1,4 +1,4 @@
-"""HTTP contracts, readiness and opt-in local-development chat."""
+"""HTTP contracts for authentication, JSON chat, readiness and deferred workflows."""
 
 from typing import Annotated, NoReturn
 from uuid import UUID
@@ -8,7 +8,8 @@ from fastapi.responses import JSONResponse
 from qdrant_client import QdrantClient
 from sqlalchemy.orm import Session
 
-from policylens.api.dependencies import get_qdrant, get_session, require_local_demo
+from policylens.api.auth import login_user, refresh_tokens, register_user
+from policylens.api.dependencies import get_current_user_id, get_qdrant, get_session
 from policylens.api.schemas import (
     ChatErrorResponse,
     ChatRequest,
@@ -48,41 +49,63 @@ def not_implemented() -> NoReturn:
     )
 
 
-@pending.post(
-    "/auth/register", tags=["Authentication"], status_code=201, response_model=UserResponse
+@router.post(
+    "/auth/register",
+    tags=["Authentication"],
+    status_code=201,
+    response_model=UserResponse,
+    responses={409: {"model": ErrorResponse}, 503: {"model": ErrorResponse}},
 )
-def register(payload: RegisterRequest):
-    """Planned user registration; currently returns HTTP 501."""
-    not_implemented()
+def register(payload: RegisterRequest, session: Annotated[Session, Depends(get_session)]):
+    """Register a user with a normalized email and an Argon2 password hash."""
+    return register_user(session, payload)
 
 
-@pending.post("/auth/login", tags=["Authentication"], response_model=TokenResponse)
-def login(payload: LoginRequest):
-    """Planned login; currently returns HTTP 501."""
-    not_implemented()
+@router.post(
+    "/auth/login",
+    tags=["Authentication"],
+    response_model=TokenResponse,
+    responses={401: {"model": ErrorResponse}, 503: {"model": ErrorResponse}},
+)
+def login(
+    payload: LoginRequest, response: Response, session: Annotated[Session, Depends(get_session)]
+):
+    response.headers["Cache-Control"] = "no-store"
+    return login_user(session, payload)
 
 
-@pending.post("/auth/refresh", tags=["Authentication"], response_model=TokenResponse)
-def refresh(payload: RefreshRequest):
-    """Planned token refresh; currently returns HTTP 501."""
-    not_implemented()
+@router.post(
+    "/auth/refresh",
+    tags=["Authentication"],
+    response_model=TokenResponse,
+    responses={401: {"model": ErrorResponse}, 503: {"model": ErrorResponse}},
+)
+def refresh(
+    payload: RefreshRequest, response: Response, session: Annotated[Session, Depends(get_session)]
+):
+    """Issue a new access token without extending or revoking the refresh token."""
+    response.headers["Cache-Control"] = "no-store"
+    return refresh_tokens(session, payload.refresh_token.get_secret_value())
 
 
 @router.post(
     "/chat",
     tags=["Chat"],
     response_model=ChatResponse,
-    dependencies=[Depends(require_local_demo)],
     responses={
-        403: {"model": ErrorResponse, "description": "Local development access required"},
+        401: {"model": ErrorResponse, "description": "A valid access token is required"},
         503: {"model": ChatErrorResponse, "description": "A required dependency is unavailable"},
         500: {"model": ChatErrorResponse, "description": "Chat could not be completed"},
     },
 )
-def chat(payload: ChatRequest, session: Annotated[Session, Depends(get_session)]):
-    """Return and save one complete JSON exchange; authentication and memory are deferred."""
+def chat(
+    payload: ChatRequest,
+    user_id: Annotated[UUID, Depends(get_current_user_id)],
+    session: Annotated[Session, Depends(get_session)],
+):
+    """Return and save one authenticated JSON exchange; history and memory are deferred."""
     try:
-        return create_chat(session, payload.question)
+        return create_chat(session, payload.question, user_id)
     except ChatServiceError as exc:
         error = ChatErrorResponse(
             detail=ErrorDetail(code=exc.code, message=str(exc)), sources=exc.sources
