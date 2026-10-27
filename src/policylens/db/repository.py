@@ -3,7 +3,7 @@
 from uuid import UUID
 
 from qdrant_client import QdrantClient
-from sqlalchemy import func, select, text
+from sqlalchemy import case, func, select, text
 from sqlalchemy.orm import Session
 
 from policylens.db.models import ChatSession, Message, User
@@ -35,6 +35,47 @@ def insert_user(session: Session, email: str, password_hash: str) -> User:
     return user
 
 
+def find_owned_session(session: Session, session_id: UUID, user_id: UUID) -> ChatSession | None:
+    return session.scalar(
+        select(ChatSession).where(ChatSession.id == session_id, ChatSession.user_id == user_id)
+    )
+
+
+def list_owned_sessions(session: Session, user_id: UUID) -> list[ChatSession]:
+    return list(
+        session.scalars(
+            select(ChatSession)
+            .where(ChatSession.user_id == user_id)
+            .order_by(ChatSession.created_at.desc(), ChatSession.id.desc())
+            .limit(100)
+        )
+    )
+
+
+def recent_session_messages(
+    session: Session, session_id: UUID, user_id: UUID, *, limit: int
+) -> list[Message]:
+    """Fetch a bounded recent tail, then return it in chronological order.
+
+    Pair members share PostgreSQL's transaction timestamp; role breaks that tie
+    so a user's question precedes its assistant answer. IDs make remaining ties stable.
+    """
+    messages = list(
+        session.scalars(
+            select(Message)
+            .join(ChatSession, Message.session_id == ChatSession.id)
+            .where(ChatSession.id == session_id, ChatSession.user_id == user_id)
+            .order_by(
+                Message.created_at.desc(),
+                case((Message.role == "assistant", 1), else_=0).desc(),
+                Message.id.desc(),
+            )
+            .limit(limit)
+        )
+    )
+    return messages[::-1]
+
+
 def save_chat_exchange(
     session: Session,
     session_id: UUID,
@@ -43,11 +84,22 @@ def save_chat_exchange(
     citations: list[dict],
     *,
     user_id: UUID,
+    new_session: bool = True,
 ) -> None:
-    """Commit a fresh session and two messages for the authenticated user together."""
+    """Commit both messages together, rechecking ownership when appending."""
     with session.begin():
-        session.add(ChatSession(id=session_id, user_id=user_id, title=question.strip()[:120]))
-        session.flush()
+        if new_session:
+            session.add(ChatSession(id=session_id, user_id=user_id, title=question.strip()[:120]))
+            session.flush()
+        else:
+            # Recheck after generation and serialize appends without holding a lock during RAG.
+            owned = session.scalar(
+                select(ChatSession)
+                .where(ChatSession.id == session_id, ChatSession.user_id == user_id)
+                .with_for_update()
+            )
+            if owned is None:
+                raise LookupError("Session not found")
         session.add_all(
             [
                 Message(session_id=session_id, role="user", content=question, citations=[]),

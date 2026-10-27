@@ -81,6 +81,8 @@ def test_openapi_contracts_do_not_initialize_resources(api_resources):
             "/auth/register",
             "/auth/login",
             "/auth/refresh",
+            "/sessions",
+            "/sessions/{id}",
         }:
             assert responses["501"]["content"]["application/json"]["schema"] == {
                 "$ref": "#/components/schemas/ErrorResponse"
@@ -159,8 +161,6 @@ def test_ready_reports_each_failure_without_disclosing_errors(api_resources, fai
 
 def test_deferred_workflow_routes_return_the_same_501_response(api_resources):
     requests = [
-        ("GET", "/sessions", None),
-        ("GET", f"/sessions/{RESOURCE_ID}", None),
         ("POST", "/feedback", {"message_id": RESOURCE_ID, "rating": 1}),
         ("GET", "/documents", None),
         ("GET", f"/documents/{RESOURCE_ID}/pdf", None),

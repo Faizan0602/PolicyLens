@@ -4,7 +4,6 @@ from typing import Annotated, NoReturn
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response
-from fastapi.responses import JSONResponse
 from qdrant_client import QdrantClient
 from sqlalchemy.orm import Session
 
@@ -15,7 +14,6 @@ from policylens.api.schemas import (
     ChatRequest,
     ChatResponse,
     DocumentResponse,
-    ErrorDetail,
     ErrorResponse,
     FeedbackRequest,
     FeedbackResponse,
@@ -31,7 +29,12 @@ from policylens.api.schemas import (
     TokenResponse,
     UserResponse,
 )
-from policylens.api.services import ChatServiceError, check_readiness, create_chat
+from policylens.api.services import (
+    check_readiness,
+    create_chat,
+    get_user_session,
+    get_user_sessions,
+)
 
 router = APIRouter()
 pending = APIRouter(
@@ -94,6 +97,7 @@ def refresh(
     response_model=ChatResponse,
     responses={
         401: {"model": ErrorResponse, "description": "A valid access token is required"},
+        404: {"model": ChatErrorResponse, "description": "Session not found"},
         503: {"model": ChatErrorResponse, "description": "A required dependency is unavailable"},
         500: {"model": ChatErrorResponse, "description": "Chat could not be completed"},
     },
@@ -103,29 +107,41 @@ def chat(
     user_id: Annotated[UUID, Depends(get_current_user_id)],
     session: Annotated[Session, Depends(get_session)],
 ):
-    """Return and save one authenticated JSON exchange; history and memory are deferred."""
-    try:
-        return create_chat(session, payload.question, user_id)
-    except ChatServiceError as exc:
-        error = ChatErrorResponse(
-            detail=ErrorDetail(code=exc.code, message=str(exc)), sources=exc.sources
-        )
-        return JSONResponse(
-            status_code=500 if exc.code == "chat_failed" else 503,
-            content=error.model_dump(mode="json"),
-        )
+    """Create or continue an owned session and return one complete JSON exchange."""
+    return create_chat(session, payload.question, user_id, payload.session_id)
 
 
-@pending.get("/sessions", tags=["Sessions"], response_model=list[SessionResponse])
-def list_sessions():
-    """Planned session listing; currently returns HTTP 501."""
-    not_implemented()
+@router.get(
+    "/sessions",
+    tags=["Sessions"],
+    response_model=list[SessionResponse],
+    responses={401: {"model": ErrorResponse}, 503: {"model": ChatErrorResponse}},
+)
+def list_sessions(
+    user_id: Annotated[UUID, Depends(get_current_user_id)],
+    session: Annotated[Session, Depends(get_session)],
+):
+    """List at most 100 sessions owned by the authenticated user, newest first."""
+    return get_user_sessions(session, user_id)
 
 
-@pending.get("/sessions/{id}", tags=["Sessions"], response_model=SessionDetailResponse)
-def get_session_detail(id: UUID):
-    """Planned session history; currently returns HTTP 501."""
-    not_implemented()
+@router.get(
+    "/sessions/{id}",
+    tags=["Sessions"],
+    response_model=SessionDetailResponse,
+    responses={
+        401: {"model": ErrorResponse},
+        404: {"model": ChatErrorResponse},
+        503: {"model": ChatErrorResponse},
+    },
+)
+def get_session_detail(
+    id: UUID,
+    user_id: Annotated[UUID, Depends(get_current_user_id)],
+    session: Annotated[Session, Depends(get_session)],
+):
+    """Return an owned session and its latest 100 messages in chronological order."""
+    return get_user_session(session, id, user_id)
 
 
 @pending.post("/feedback", tags=["Feedback"], status_code=201, response_model=FeedbackResponse)

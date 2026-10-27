@@ -62,6 +62,7 @@ class TokenResponse(BaseModel):
 
 class ChatRequest(_RequestModel):
     question: str = Field(min_length=1, pattern=r"\S")
+    session_id: UUID | None = None
 
 
 class SourceResponse(BaseModel):

@@ -8,6 +8,8 @@ from qdrant_client import QdrantClient
 
 from policylens.api.auth import AuthError
 from policylens.api.routes import router
+from policylens.api.schemas import ChatErrorResponse, ErrorDetail
+from policylens.api.services import ChatServiceError
 from policylens.config import get_settings
 from policylens.db.session import get_engine, get_session_factory
 
@@ -40,9 +42,10 @@ def create_app() -> FastAPI:
         title="PolicyLens API",
         version="0.1.0",
         description=(
-            "Authentication, JSON /chat, health and readiness are implemented. "
+            "Authentication, JSON /chat, sessions, health and readiness are implemented. "
             "Chat requires a bearer access token and uses public documents only. "
-            "Streaming and memory are deferred; other operations return HTTP 501."
+            "Session memory is bounded and owner-scoped. Streaming is deferred; "
+            "other operations return HTTP 501."
         ),
         lifespan=lifespan,
         redoc_url=None,
@@ -55,6 +58,16 @@ def create_app() -> FastAPI:
             status_code=exc.status_code,
             content={"detail": {"code": exc.code, "message": str(exc)}},
             headers={"WWW-Authenticate": "Bearer"} if exc.status_code == 401 else None,
+        )
+
+    @app.exception_handler(ChatServiceError)
+    async def chat_error(request: Request, exc: ChatServiceError):
+        error = ChatErrorResponse(
+            detail=ErrorDetail(code=exc.code, message=str(exc)), sources=exc.sources
+        )
+        return JSONResponse(
+            status_code={"session_not_found": 404, "chat_failed": 500}.get(exc.code, 503),
+            content=error.model_dump(mode="json"),
         )
 
     app.include_router(router)
