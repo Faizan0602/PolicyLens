@@ -6,7 +6,7 @@ from typing import Any
 # Match one ASCII or Unicode bracket pair; the conditional requires matching closers.
 _CITATION_PATTERN = re.compile(
     r"(?<![\[【])(?:(?P<ascii>\[)|【)"
-    r"(?P<doc_id>[A-Za-z0-9_-]+) p\.(?P<page>[1-9][0-9]*)"
+    r"\s*(?P<doc_id>[A-Za-z0-9_-]+) p\.(?P<page>[1-9][0-9]*)\s*"
     r"(?(ascii)\]|】)(?![\]】])"
 )
 
