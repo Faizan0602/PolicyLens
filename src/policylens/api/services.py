@@ -28,6 +28,7 @@ from policylens.db.repository import (
     recent_session_messages,
     save_chat_exchange,
 )
+from policylens.tracing import record_answer
 
 _HISTORY_EXCHANGES = 5
 _HISTORY_CHARACTERS = 8000
@@ -223,6 +224,7 @@ def create_chat(
         raise ChatServiceError(
             "chat_failed", "The chat request could not be completed.", result["sources"]
         ) from None
+    record_answer(result)
     return response
 
 

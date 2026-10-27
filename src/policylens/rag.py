@@ -3,6 +3,7 @@
 import argparse
 import json
 import sys
+from contextlib import suppress
 from functools import lru_cache
 from operator import itemgetter
 from pathlib import Path
@@ -22,7 +23,14 @@ from langchain_core.runnables import (
 from policylens.bm25 import retrieve_bm25
 from policylens.citations import validate_citations
 from policylens.llm import GroqLLM, LLMClient, get_llm
+from policylens.privacy import redact_for_tracing
 from policylens.reranker import ABSTENTION_MESSAGE, decide_abstention, rerank
+from policylens.tracing import (
+    record_candidates,
+    record_query,
+    trace_stage,
+    update_observation,
+)
 
 _CANDIDATE_K = 20
 _FINAL_K = 5
@@ -157,7 +165,37 @@ def build_rag_chain(
         if isinstance(client, GroqLLM):
             options["max_completion_tokens"] = _MAX_COMPLETION_TOKENS
         try:
-            return client.generate(prompt_text, **options)
+            with trace_stage(
+                "llm_generation",
+                as_type="generation",
+                model=getattr(client, "model", None),
+                version=prompt_version,
+                model_parameters=options,
+            ) as observation:
+                if observation is not None:
+                    with suppress(Exception):
+                        update_observation(
+                            observation,
+                            metadata={
+                                "prompt_version": prompt_version,
+                                "prompt_text_tokens": len(
+                                    _prompt_encoding().encode(prompt_text, disallowed_special=())
+                                ),
+                                "token_count_method": "o200k_harmony; excludes chat framing",
+                                "supplied_sources": [
+                                    {
+                                        key: source.get(key)
+                                        for key in ("doc_id", "chunk_index", "page")
+                                    }
+                                    for source in evidence["sources"]
+                                ],
+                            },
+                        )
+                answer_text = client.generate(prompt_text, **options)
+                if observation is not None:
+                    with suppress(Exception):
+                        update_observation(observation, output=redact_for_tracing(answer_text))
+                return answer_text
         except Exception as exc:
             # Keep invocation-local supplied sources available to the HTTP error response.
             exc.policylens_sources = evidence["sources"]
@@ -198,10 +236,16 @@ def build_rag_chain(
         }
 
     def retrieve_and_rerank(question: str) -> list[dict[str, Any]]:
-        candidates = retrieve_bm25(
-            question, k=_CANDIDATE_K, **({"public_only": True} if public_only else {})
-        )
-        return rerank(question, candidates, k=_FINAL_K)
+        record_query(question, retrieval=True)
+        with trace_stage("retrieval") as observation:
+            candidates = retrieve_bm25(
+                question, k=_CANDIDATE_K, **({"public_only": True} if public_only else {})
+            )
+            record_candidates(observation, candidates)
+        with trace_stage("reranking") as observation:
+            selected = rerank(question, candidates, k=_FINAL_K)
+            record_candidates(observation, selected)
+            return selected
 
     return (
         RunnableParallel(

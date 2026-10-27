@@ -105,6 +105,10 @@ class GroqLLM:
             messages=[{"role": "user", "content": prompt}],
             **kwargs,
         )
+        # Capture only usage numbers in an active chat trace; the return contract stays text.
+        from policylens.tracing import record_usage
+
+        record_usage(getattr(response, "usage", None))
         if not response.choices:
             raise RuntimeError("Groq returned no completion choices.")
         choice = response.choices[0]

@@ -35,6 +35,12 @@ class Settings(BaseSettings):
     # Required for authentication: 32 random bytes encoded as 64 hex characters.
     jwt_secret: SecretStr | None = None
 
+    # Optional, explicitly enabled tracing; never include credentials in trace metadata.
+    langfuse_enabled: bool = False
+    langfuse_public_key: SecretStr | None = None
+    langfuse_secret_key: SecretStr | None = None
+    langfuse_base_url: str = "https://cloud.langfuse.com"
+
     # Model and Provider Settings
     llm_provider: str = "mock"
     llm_model: str = "gemini-2.5-flash"

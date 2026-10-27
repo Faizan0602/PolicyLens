@@ -40,6 +40,7 @@ from policylens.api.services import (
     get_user_session,
     get_user_sessions,
 )
+from policylens.tracing import record_query
 
 router = APIRouter()
 pending = APIRouter(
@@ -123,6 +124,7 @@ def chat(
     session: Annotated[Session, Depends(get_session)],
 ):
     """Create or continue an owned session and return one complete JSON exchange."""
+    record_query(payload.question)
     return create_chat(session, payload.question, user_id, payload.session_id)
 
 

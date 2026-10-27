@@ -13,6 +13,7 @@ from policylens.api.schemas import ChatErrorResponse, ErrorDetail
 from policylens.api.services import ChatServiceError
 from policylens.config import get_settings
 from policylens.db.session import get_engine, get_session_factory
+from policylens.tracing import chat_trace, update_observation
 
 
 @asynccontextmanager
@@ -55,6 +56,21 @@ def create_app() -> FastAPI:
     # Single-process state shared by concurrent request threads, reset with the app.
     app.state.chat_request_times = {}
     app.state.chat_rate_lock = Lock()
+
+    @app.middleware("http")
+    async def trace_chat_request(request: Request, call_next):
+        if request.method != "POST" or request.url.path != "/chat":
+            return await call_next(request)
+        with chat_trace() as observation:
+            response = await call_next(request)
+            update_observation(
+                observation,
+                metadata={"http_status": response.status_code},
+                level="ERROR"
+                if response.status_code >= 500
+                else ("WARNING" if response.status_code >= 400 else "DEFAULT"),
+            )
+            return response
 
     @app.exception_handler(AuthError)
     async def auth_error(request: Request, exc: AuthError):

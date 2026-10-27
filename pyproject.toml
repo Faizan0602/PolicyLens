@@ -37,6 +37,10 @@ api = [
 ]
 gemini = ["google-genai>=2.29.0,<3.0.0"]
 groq = ["groq>=1.7.0,<2.0.0"]
+tracing = [
+    "langfuse>=4.7.0,<5.0.0; python_version < '3.11'",
+    "langfuse>=5.0.4,<6.0.0; python_version >= '3.11'",
+]
 # 0.4.2 removed vertexai, which RAGAS 0.4.3 still imports at startup.
 eval = [
     "ragas==0.4.3",

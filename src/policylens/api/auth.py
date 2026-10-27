@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 from policylens.api.schemas import LoginRequest, RegisterRequest, TokenResponse, UserResponse
 from policylens.config import get_settings
 from policylens.db.repository import find_user_by_email, find_user_by_id, insert_user
+from policylens.tracing import record_user_role
 
 _PASSWORDS = PasswordHasher()
 _ACCESS_LIFETIME = timedelta(minutes=15)
@@ -95,8 +96,10 @@ def token_user_id(
     try:
         # Finish the lookup transaction before a slow RAG request uses this session.
         with session.begin():
-            if find_user_by_id(session, user_id) is None:
+            user = find_user_by_id(session, user_id)
+            if user is None:
                 raise AuthError(401, "invalid_token", "Invalid or expired token.")
+            record_user_role(user.role)
     except SQLAlchemyError:
         raise AuthError(
             503, "auth_unavailable", "Authentication is temporarily unavailable."
