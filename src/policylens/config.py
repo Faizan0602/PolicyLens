@@ -4,10 +4,11 @@ Centralizes environment-driven configuration with safe representation output.
 """
 
 import json
+from decimal import Decimal
 from functools import lru_cache
 from typing import Any, Literal
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import make_url
 from sqlalchemy.exc import ArgumentError
@@ -46,6 +47,10 @@ class Settings(BaseSettings):
     llm_model: str = "gemini-2.5-flash"
     embedding_model: str = "BAAI/bge-small-en-v1.5"
     gemini_force_ipv4: bool = False
+    # Explicit model-matched USD prices; no assumed provider tariff.
+    llm_pricing_model: str | None = None
+    llm_input_price_per_million: Decimal | None = Field(default=None, ge=0)
+    llm_output_price_per_million: Decimal | None = Field(default=None, ge=0)
 
     # Sensitive API Credentials (masked in safe_dump/safe_repr)
 

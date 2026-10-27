@@ -6,11 +6,17 @@ from qdrant_client import QdrantClient
 from sqlalchemy import case, func, select, text
 from sqlalchemy.orm import Session
 
-from policylens.db.models import ChatSession, Message, User
+from policylens.db.models import ChatSession, Message, QueryLog, User
 
 
 def check_postgres(session: Session) -> None:
     session.execute(text("SELECT 1"))
+
+
+def save_query_log(session_factory, values: dict) -> None:
+    """Use a separate short transaction, after chat messages have committed."""
+    with session_factory() as session, session.begin():
+        session.add(QueryLog(**values))
 
 
 def check_qdrant(client: QdrantClient) -> None:

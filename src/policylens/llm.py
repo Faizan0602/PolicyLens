@@ -105,7 +105,7 @@ class GroqLLM:
             messages=[{"role": "user", "content": prompt}],
             **kwargs,
         )
-        # Capture only usage numbers in an active chat trace; the return contract stays text.
+        # Capture provider usage in active chat measurements, independently of Langfuse.
         from policylens.tracing import record_usage
 
         record_usage(getattr(response, "usage", None))

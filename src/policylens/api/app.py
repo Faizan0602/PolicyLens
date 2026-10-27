@@ -1,19 +1,22 @@
 """Create the API without connecting to services or loading models at import time."""
 
 from contextlib import asynccontextmanager
+from logging import getLogger
 from threading import Lock
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from qdrant_client import QdrantClient
+from starlette.concurrency import run_in_threadpool
 
 from policylens.api.auth import AuthError
 from policylens.api.routes import router
 from policylens.api.schemas import ChatErrorResponse, ErrorDetail
 from policylens.api.services import ChatServiceError
 from policylens.config import get_settings
+from policylens.db.repository import save_query_log
 from policylens.db.session import get_engine, get_session_factory
-from policylens.tracing import chat_trace, update_observation
+from policylens.tracing import chat_trace, completed_query_log, update_observation
 
 
 @asynccontextmanager
@@ -70,6 +73,14 @@ def create_app() -> FastAPI:
                 if response.status_code >= 500
                 else ("WARNING" if response.status_code >= 400 else "DEFAULT"),
             )
+            if response.status_code < 400:
+                try:
+                    values = completed_query_log()
+                    if values is not None:
+                        await run_in_threadpool(save_query_log, app.state.session_factory, values)
+                except Exception:
+                    # Logging failure must not undo a saved chat or leak error details.
+                    getLogger(__name__).warning("Completed chat query log could not be saved.")
             return response
 
     @app.exception_handler(AuthError)

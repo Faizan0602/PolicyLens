@@ -28,7 +28,7 @@ from policylens.db.repository import (
     recent_session_messages,
     save_chat_exchange,
 )
-from policylens.tracing import record_answer
+from policylens.tracing import mark_chat_completed, record_answer, trace_stage
 
 _HISTORY_EXCHANGES = 5
 _HISTORY_CHARACTERS = 8000
@@ -103,9 +103,10 @@ def _rewrite_question(question: str, history: list[dict[str, str]]) -> str:
     try:
         if len(_prompt_encoding().encode(prompt, disallowed_special=())) > _MAX_PROMPT_TOKENS:
             return question
-        rewritten = _chat_llm().generate(
-            prompt, temperature=0, max_completion_tokens=_MAX_COMPLETION_TOKENS
-        )
+        with trace_stage("rewrite"):
+            rewritten = _chat_llm().generate(
+                prompt, temperature=0, max_completion_tokens=_MAX_COMPLETION_TOKENS
+            )
         if isinstance(rewritten, str):
             rewritten = rewritten.strip()
             if (
@@ -225,6 +226,7 @@ def create_chat(
             "chat_failed", "The chat request could not be completed.", result["sources"]
         ) from None
     record_answer(result)
+    mark_chat_completed(user_id, abstained=response.abstained)
     return response
 
 

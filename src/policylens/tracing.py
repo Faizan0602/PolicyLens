@@ -1,10 +1,11 @@
-"""Optional native Langfuse observations for chat; no automatic payload capture."""
+"""Request-local chat measurements and optional native Langfuse observations."""
 
 import hashlib
 import json
 import re
 from contextlib import contextmanager, suppress
 from contextvars import ContextVar
+from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
 from time import perf_counter
@@ -88,31 +89,41 @@ def _configuration() -> dict[str, Any]:
     }
 
 
+def _configuration_hash() -> str:
+    return hashlib.sha256(
+        json.dumps(_configuration(), sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+
+
 @contextmanager
 def chat_trace():
     """One root per HTTP chat request; telemetry errors never consume application errors."""
-    root = manager = state = token = None
-    started = perf_counter()
+    root = manager = None
+    state = {
+        "root": None,
+        "role": "unauthenticated",
+        "started": perf_counter(),
+        "latencies": dict.fromkeys(("rewrite", "retrieval", "reranking", "llm_generation"), 0.0),
+        "usage": {},
+    }
+    # Collect locally even when the SDK is missing, disabled or unavailable.
+    token = _request.set(state)
     try:
         client = _client()
         if client is not None:
             configuration = _configuration()
-            digest = hashlib.sha256(
-                json.dumps(configuration, sort_keys=True, separators=(",", ":")).encode()
-            ).hexdigest()
             manager = client.start_as_current_observation(
                 name="POST /chat",
                 trace_context={"trace_id": uuid4().hex},
                 end_on_exit=False,
                 metadata={
                     "configuration": configuration,
-                    "configuration_hash": digest,
+                    "configuration_hash": _configuration_hash(),
                     "prompt_version": "v1",
                 },
             )
             root = manager.__enter__()
-            state = {"root": root, "role": "unauthenticated", "latencies": {}, "usage": {}}
-            token = _request.set(state)
+            state["root"] = root
     except Exception:
         pass
     try:
@@ -121,7 +132,7 @@ def chat_trace():
         update_observation(root, level="ERROR", status_message=type(exc).__name__)
         raise
     finally:
-        if state is not None:
+        if root is not None:
             with suppress(Exception):
                 from langfuse import propagate_attributes
 
@@ -131,7 +142,7 @@ def chat_trace():
                 root,
                 metadata={
                     "user_role": state["role"],
-                    "request_latency_ms": (perf_counter() - started) * 1000,
+                    "request_latency_ms": (perf_counter() - state["started"]) * 1000,
                     "stage_latency_ms": state["latencies"],
                     "provider_token_usage": state["usage"],
                 },
@@ -142,8 +153,7 @@ def chat_trace():
             # Do not pass provider/application exceptions to SDK auto-error capture.
             with suppress(Exception):
                 manager.__exit__(None, None, None)
-        if token is not None:
-            _request.reset(token)
+        _request.reset(token)
 
 
 def record_user_role(role: str) -> None:
@@ -173,11 +183,15 @@ def trace_stage(name: str, **fields: Any):
         return
     span = None
     started = perf_counter()
+    if name in ("rewrite", "llm_generation"):
+        # None means an attempted call has no usage yet, not zero billed tokens.
+        state["usage"]["generation" if name == "llm_generation" else "rewrite"] = None
     try:
-        from langfuse import propagate_attributes
+        if state["root"] is not None and name in _OBSERVATIONS:
+            from langfuse import propagate_attributes
 
-        with propagate_attributes(tags=[f"role:{state['role']}", "prompt:v1"]):
-            span = state["root"].start_observation(name=name, **fields)
+            with propagate_attributes(tags=[f"role:{state['role']}", "prompt:v1"]):
+                span = state["root"].start_observation(name=name, **fields)
     except Exception:
         pass
     token = _generation.set({"observation": span}) if name == "llm_generation" else None
@@ -261,3 +275,60 @@ def record_answer(result: dict[str, Any]) -> None:
                     ],
                 },
             )
+
+
+def mark_chat_completed(user_id: Any, *, abstained: bool) -> None:
+    """Keep the DB owner locally; it is never exported to Langfuse."""
+    state = _request.get()
+    if state is not None:
+        state["completed"] = {"user_id": user_id, "abstained": abstained}
+
+
+def completed_query_log() -> dict[str, Any] | None:
+    """Build one completed-request row, using provider usage only for tokens/cost."""
+    state = _request.get()
+    if state is None or "completed" not in state:
+        return None
+    settings = get_settings()
+    calls = list(state["usage"].values())
+    totals = {
+        key: sum(call[key] for call in calls)
+        if all(call is not None and key in call for call in calls)
+        else None
+        for key in ("input", "output")
+    }
+    pricing = None
+    cost = None
+    if (
+        settings.llm_provider.strip().lower() == "groq"
+        and settings.llm_pricing_model == settings.llm_model
+        and settings.llm_input_price_per_million is not None
+        and settings.llm_output_price_per_million is not None
+    ):
+        pricing = {
+            "input_usd_per_million": str(settings.llm_input_price_per_million),
+            "output_usd_per_million": str(settings.llm_output_price_per_million),
+        }
+        if totals["input"] is not None and totals["output"] is not None:
+            cost = (
+                totals["input"] * settings.llm_input_price_per_million
+                + totals["output"] * settings.llm_output_price_per_million
+            ) / Decimal(1_000_000)
+    return {
+        **state["completed"],
+        "config_hash": _configuration_hash(),
+        "prompt_version": _configuration()["prompt_version"],
+        "model": settings.llm_model,
+        "latency_per_stage": {
+            **state["latencies"],
+            "total": (perf_counter() - state["started"]) * 1000,
+        },
+        "tokens_in": totals["input"],
+        "tokens_out": totals["output"],
+        "cost": cost,
+        "token_usage": {
+            "source": "groq_response_usage",
+            "calls": state["usage"],
+            "pricing": pricing,
+        },
+    }

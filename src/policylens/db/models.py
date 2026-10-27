@@ -150,6 +150,10 @@ class QueryLog(Base):
     )
     tokens_in: Mapped[int | None] = mapped_column(Integer, nullable=True)
     tokens_out: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    model: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    token_usage: Mapped[dict[str, Any] | None] = mapped_column(
+        JSONB(none_as_null=True), nullable=True
+    )
     cost: Mapped[Decimal | None] = mapped_column(Numeric(12, 8), nullable=True)
     abstained: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
