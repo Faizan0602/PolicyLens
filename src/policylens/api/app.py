@@ -5,6 +5,7 @@ from logging import getLogger
 from threading import Lock
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from qdrant_client import QdrantClient
 from starlette.concurrency import run_in_threadpool
@@ -101,5 +102,14 @@ def create_app() -> FastAPI:
             content=error.model_dump(mode="json"),
         )
 
+    # Add last so CORS covers responses from the existing request middleware too.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=get_settings().cors_allowed_origins,
+        allow_credentials=False,
+        allow_methods=["GET", "POST"],
+        allow_headers=["Authorization", "Content-Type"],
+        expose_headers=["Retry-After", "WWW-Authenticate"],
+    )
     app.include_router(router)
     return app

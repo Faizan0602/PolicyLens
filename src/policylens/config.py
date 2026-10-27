@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     environment: Literal["development", "staging", "production", "test"] = "development"
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
     debug: bool = False
+    # Explicit frontend origins, supplied as a JSON list in the environment.
+    cors_allowed_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
     # Required for authentication: 32 random bytes encoded as 64 hex characters.
     jwt_secret: SecretStr | None = None
 
