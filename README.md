@@ -145,7 +145,7 @@ The secret must represent 32 random bytes as 64 hex characters; missing, malform
 
 In [Swagger UI](http://127.0.0.1:8000/docs), register User A, log in, and paste the access token into **Authorize**. Call `/chat` with `{"question":"..."}` and verify `chat_sessions.user_id` matches the registered ID. Repeat for User B, verify missing/invalid bearer tokens are rejected, and try `/auth/refresh` with each token type.
 
-Manual Swagger verification of registration, login, refresh, and authenticated chat passed, as reported locally. No additional API requests or automated tests were run for that documentation update. Refresh-token revocation, complex RBAC, rate limiting, email verification, password reset, and streaming remain deferred.
+Manual Swagger verification of registration, login, refresh, and authenticated chat passed, as reported locally. No additional API requests or automated tests were run for that documentation update. Refresh-token revocation, complex RBAC, email verification, password reset, and streaming remain deferred.
 
 ## Sessions and Conversation Memory (Phase 5, Step 5.5)
 
@@ -158,3 +158,11 @@ For follow-ups, the same cached Groq client rewrites the question into a standal
 Both session endpoints require bearer authentication. `GET /sessions` lists at most 100 owned sessions, newest by creation time. `GET /sessions/{id}` returns an owned session and its latest 100 messages in chronological order. There is no pagination or summary memory. Send follow-ups sequentially: concurrent requests can read the same history snapshot even though each exchange is persisted atomically. No new tables, dependencies, or retrieval settings were introduced.
 
 Manual Swagger verification passed for session reuse, message persistence, session listing, session retrieval, and cross-user ownership protection, as reported locally. No automated tests or additional API requests were run for this cleanup.
+
+## Chat Rate Limiting (Phase 5, Step 5.7)
+
+`POST /chat` admits at most **10 requests per authenticated user in a rolling 60-second window**. Identity comes from the verified access token and database user lookup; changing tokens or sessions does not reset a user's allowance. Excess requests return HTTP 429 with `detail.code=rate_limit_exceeded` and an integer `Retry-After` header in seconds. Rejection happens before session history, rewriting, retrieval, model calls, or message writes; authentication still performs its existing database lookup.
+
+Admitted attempts count even if later validation or processing fails, including session 404s. Rejected attempts do not extend the window. `/health`, `/ready`, and other routes are not rate-limited. Counters use a lock and monotonic time in application memory, expire when idle, and reset on restart. They are **not shared across worker processes or replicas**; this implementation is for a single-process MVP.
+
+Manual verification is pending. To check through Swagger without spending LLM quota, restart one server process, authorize a user, and submit a valid question with a nonexistent, valid-format session UUID ten times within 60 seconds. Those requests return 404; the next returns 429 with `Retry-After`. Wait the indicated delay and retry. A second user's allowance is independent, and health/readiness remain accessible. No automated tests or live API requests were run during implementation.

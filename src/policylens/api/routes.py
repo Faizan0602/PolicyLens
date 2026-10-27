@@ -8,7 +8,12 @@ from qdrant_client import QdrantClient
 from sqlalchemy.orm import Session
 
 from policylens.api.auth import login_user, refresh_tokens, register_user
-from policylens.api.dependencies import get_current_user_id, get_qdrant, get_session
+from policylens.api.dependencies import (
+    get_current_user_id,
+    get_qdrant,
+    get_rate_limited_chat_user_id,
+    get_session,
+)
 from policylens.api.schemas import (
     ChatErrorResponse,
     ChatRequest,
@@ -98,13 +103,23 @@ def refresh(
     responses={
         401: {"model": ErrorResponse, "description": "A valid access token is required"},
         404: {"model": ChatErrorResponse, "description": "Session not found"},
+        429: {
+            "model": ErrorResponse,
+            "description": "Chat rate limit exceeded",
+            "headers": {
+                "Retry-After": {
+                    "description": "Seconds until the user can retry",
+                    "schema": {"type": "integer", "minimum": 1},
+                }
+            },
+        },
         503: {"model": ChatErrorResponse, "description": "A required dependency is unavailable"},
         500: {"model": ChatErrorResponse, "description": "Chat could not be completed"},
     },
 )
 def chat(
     payload: ChatRequest,
-    user_id: Annotated[UUID, Depends(get_current_user_id)],
+    user_id: Annotated[UUID, Depends(get_rate_limited_chat_user_id)],
     session: Annotated[Session, Depends(get_session)],
 ):
     """Create or continue an owned session and return one complete JSON exchange."""

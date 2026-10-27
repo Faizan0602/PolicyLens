@@ -1,6 +1,7 @@
 """Create the API without connecting to services or loading models at import time."""
 
 from contextlib import asynccontextmanager
+from threading import Lock
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -51,6 +52,9 @@ def create_app() -> FastAPI:
         redoc_url=None,
         swagger_ui_oauth2_redirect_url=None,
     )
+    # Single-process state shared by concurrent request threads, reset with the app.
+    app.state.chat_request_times = {}
+    app.state.chat_rate_lock = Lock()
 
     @app.exception_handler(AuthError)
     async def auth_error(request: Request, exc: AuthError):
