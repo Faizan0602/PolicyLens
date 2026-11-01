@@ -259,9 +259,15 @@ def build_rag_chain(
             abstained=RunnableLambda(itemgetter("abstained")),
         )
         | RunnablePassthrough.assign(
+            abstained=RunnableLambda(
+                lambda result: (
+                    result["abstained"]
+                    or result["answer"].strip().casefold() == _NOT_FOUND.casefold()
+                )
+            ),
             citation_validation=RunnableLambda(
                 lambda result: validate_citations(result["answer"], result["sources"])
-            )
+            ),
         )
     )
 

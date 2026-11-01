@@ -11,14 +11,13 @@ from email.utils import parsedate_to_datetime
 from pathlib import Path
 from statistics import mean
 
-from dotenv import load_dotenv
-from groq import RateLimitError
+from groq import AsyncGroq, RateLimitError
 
 from policylens import rag
 from policylens.bm25 import retrieve_bm25
 from policylens.config import get_settings
 from policylens.llm import get_llm
-from policylens.privacy import redact_for_logging
+from policylens.privacy import redact_for_tracing
 from policylens.reranker import _get_reranker, decide_abstention, rerank
 from policylens.retrieval import retrieve
 
@@ -27,7 +26,7 @@ from .compare_prompts import _load_prompts
 
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 GROQ_MODEL = "openai/gpt-oss-120b"
-JUDGE_MODEL = "gemini-3.5-flash-lite"
+JUDGE_MODEL = GROQ_MODEL
 EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 METRICS = ("faithfulness", "answer_relevancy", "context_precision", "context_recall")
 
@@ -66,7 +65,6 @@ def _load_metrics():
     """Build the official collections metrics once, without HTTP interception."""
     os.environ.setdefault("RAGAS_DO_NOT_TRACK", "true")
     import instructor
-    from google import genai
     from ragas.embeddings import HuggingFaceEmbeddings
     from ragas.llms import InstructorLLM
     from ragas.metrics.collections import (
@@ -76,16 +74,15 @@ def _load_metrics():
         Faithfulness,
     )
 
-    load_dotenv(run_retrieval.ROOT / ".env", override=False)
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key or not api_key.strip():
-        raise ValueError("GOOGLE_API_KEY is required for the Gemini RAGAS judge")
-    client = genai.Client(api_key=api_key)
-    # RAGAS 0.4.3's factory defaults to a sync GenAI client; collections need async.
+    api_key = get_settings().groq_api_key
+    if api_key is None or not api_key.get_secret_value().strip():
+        raise ValueError("POLICYLENS_GROQ_API_KEY is required for the Groq RAGAS judge")
+    # Let the SDK handle transient failures, including 429s, with two retries.
+    client = AsyncGroq(api_key=api_key.get_secret_value(), timeout=60.0, max_retries=2)
     judge = InstructorLLM(
-        client=instructor.from_genai(client, use_async=True, mode=instructor.Mode.JSON),
+        client=instructor.from_groq(client, mode=instructor.Mode.JSON_SCHEMA),
         model=JUDGE_MODEL,
-        provider="google",
+        provider="groq",
         temperature=0,
         top_p=1,
         max_tokens=2048,
@@ -96,7 +93,7 @@ def _load_metrics():
         "answer_relevancy": AnswerRelevancy(llm=judge, embeddings=embeddings, strictness=3),
         "context_precision": ContextPrecision(llm=judge),
         "context_recall": ContextRecall(llm=judge),
-    }, client.aio
+    }, client
 
 
 async def _generate_answer(row, ranked, prompts, llm):
@@ -125,6 +122,7 @@ async def _generate_answer(row, ranked, prompts, llm):
 
 async def _score_metrics(metrics, row):
     for name, metric in metrics.items():
+        progress = f"{row['id']} {row['configuration']} {name}"
         inputs = {"user_input": row["question"]}
         if name in ("faithfulness", "answer_relevancy"):
             inputs["response"] = row["answer"]
@@ -133,6 +131,7 @@ async def _score_metrics(metrics, row):
         if name in ("context_precision", "context_recall"):
             inputs["reference"] = row["reference"]
         try:
+            print(f"Starting {progress}", flush=True)
             result = await metric.ascore(**inputs)
             value = result.value
             if value is None or isinstance(value, bool) or not math.isfinite(float(value)):
@@ -141,7 +140,10 @@ async def _score_metrics(metrics, row):
             if getattr(result, "reason", None):
                 row["judge_reasons"][name] = result.reason
         except Exception as error:
-            row["errors"][name] = redact_for_logging(f"{type(error).__name__}: {error}")
+            row["errors"][name] = redact_for_tracing(f"{type(error).__name__}: {error}")
+            print(f"Failed {progress}", flush=True)
+        else:
+            print(f"Succeeded {progress}", flush=True)
 
 
 async def evaluate(limit: int | None = None) -> dict:
@@ -171,7 +173,6 @@ async def evaluate(limit: int | None = None) -> dict:
     llm, reranker = get_llm(settings), _get_reranker()
     metrics, judge_client = _load_metrics()
     rows = []
-    has_scored = False
     async with judge_client:
         for record in selected:
             for configuration in ("baseline", "best"):
@@ -204,18 +205,11 @@ async def evaluate(limit: int | None = None) -> dict:
                     if row["status"] != "gate_refusal":
                         await _generate_answer(row, ranked, prompts, llm)
                     if row["status"] == "generated":
-                        if has_scored:
-                            print(
-                                "Waiting 60 seconds before the next Gemini scoring batch.",
-                                flush=True,
-                            )
-                            await asyncio.sleep(60)
-                        has_scored = True
                         await _score_metrics(metrics, row)
                 except Exception as error:
                     row.update(
                         status="error",
-                        errors={"pipeline": redact_for_logging(f"{type(error).__name__}: {error}")},
+                        errors={"pipeline": redact_for_tracing(f"{type(error).__name__}: {error}")},
                     )
                 rows.append(row)
             print(f"Completed {len(rows) // 2}/{len(selected)} development questions", flush=True)
@@ -241,6 +235,7 @@ async def evaluate(limit: int | None = None) -> dict:
             "prompt": "v1",
             "generation_model": settings.llm_model,
             "judge_model": JUDGE_MODEL,
+            "judge_provider": "groq",
             "temperature": 0,
             "embeddings": EMBEDDING_MODEL,
         },

@@ -9,6 +9,7 @@ import httpx
 import pytest
 from eval import run_ragas
 from groq import RateLimitError
+from pydantic import SecretStr
 
 
 @pytest.fixture
@@ -119,12 +120,14 @@ def test_development_selection_frozen_pipelines_and_metric_inputs(evaluation):
     )
     assert report["configuration"]["prompt"] == "v1"
     assert report["configuration"]["generation_model"] == run_ragas.GROQ_MODEL
-    assert report["configuration"]["judge_model"] == "gemini-3.5-flash-lite"
-    evaluation.judge.__aexit__.assert_awaited_once()
+    assert report["configuration"]["judge_model"] == "openai/gpt-oss-120b"
+    assert report["configuration"]["judge_provider"] == "groq"
+    evaluation.judge.__aenter__.assert_awaited_once_with()
+    evaluation.judge.__aexit__.assert_awaited_once_with(None, None, None)
     assert not run_ragas.RESULTS_DIR.exists()
 
 
-def test_pause_between_scoring_batches_across_configurations_and_questions(evaluation, capsys):
+def test_scoring_batches_run_without_fixed_pauses_and_report_progress(evaluation, capsys):
     observed = []
 
     async def score(**inputs):
@@ -134,9 +137,15 @@ def test_pause_between_scoring_batches_across_configurations_and_questions(evalu
     evaluation.metrics["faithfulness"].ascore.side_effect = score
     asyncio.run(run_ragas.evaluate(limit=2))
 
-    assert observed == [("Question 0", 0), ("Question 0", 1), ("Question 1", 2), ("Question 1", 3)]
-    assert evaluation.sleep.await_args_list == [call(60)] * 3
-    assert capsys.readouterr().out.count("Waiting 60 seconds") == 3
+    assert observed == [("Question 0", 0), ("Question 0", 0), ("Question 1", 0), ("Question 1", 0)]
+    evaluation.sleep.assert_not_awaited()
+    output = capsys.readouterr().out
+    assert "Waiting 60 seconds" not in output
+    for question_id in ("A0", "A1"):
+        for configuration in ("baseline", "best"):
+            for metric in run_ragas.METRICS:
+                assert f"Starting {question_id} {configuration} {metric}" in output
+                assert f"Succeeded {question_id} {configuration} {metric}" in output
 
 
 @pytest.mark.parametrize("case", ["gate", "empty", "not_found", "api_error"])
@@ -230,44 +239,70 @@ def test_rate_limit_retry_delays_bounds_and_unrelated_errors(monkeypatch):
 
 def test_ragas_adapter_setup_without_requests_or_model_downloads(monkeypatch):
     monkeypatch.setenv("RAGAS_DO_NOT_TRACK", "true")
-    monkeypatch.setenv("GOOGLE_API_KEY", "test-key")
-    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     pytest.importorskip("ragas")
     import sentence_transformers
-    from google.genai import models, types
+    from groq.resources.chat.completions import AsyncCompletions
+    from groq.types.chat import ChatCompletion
     from pydantic import BaseModel
 
+    settings = SimpleNamespace(groq_api_key=SecretStr("synthetic-groq-key"))
+    monkeypatch.setattr(run_ragas, "get_settings", lambda: settings)
     loader = Mock()
     monkeypatch.setattr(sentence_transformers, "SentenceTransformer", loader)
-    monkeypatch.setattr(run_ragas, "load_dotenv", Mock())
+    client_factory = Mock(wraps=run_ragas.AsyncGroq)
+    monkeypatch.setattr(run_ragas, "AsyncGroq", client_factory)
     generate = AsyncMock(
-        return_value=types.GenerateContentResponse(
-            candidates=[
-                types.Candidate(
-                    content=types.Content(role="model", parts=[types.Part(text='{"verdict": 1}')]),
-                    finish_reason="STOP",
-                )
-            ]
+        return_value=ChatCompletion(
+            id="mock-completion",
+            object="chat.completion",
+            created=0,
+            model="openai/gpt-oss-120b",
+            choices=[
+                {
+                    "index": 0,
+                    "finish_reason": "stop",
+                    "message": {"role": "assistant", "content": '{"verdict": 1}'},
+                }
+            ],
         )
     )
-    monkeypatch.setattr(models.AsyncModels, "generate_content", generate)
+    monkeypatch.setattr(AsyncCompletions, "create", generate)
 
     class Judgment(BaseModel):
         verdict: int
 
     async def check():
         metrics, client = run_ragas._load_metrics()
+        close = AsyncMock(wraps=client.close)
+        monkeypatch.setattr(client, "close", close)
         async with client:
             assert set(metrics) == set(run_ragas.METRICS)
             judge = metrics["faithfulness"].llm
             assert judge.is_async and judge.model == run_ragas.JUDGE_MODEL
+            assert judge.provider == "groq"
+            assert all(metric.llm is judge for metric in metrics.values())
             assert judge.model_args["temperature"] == 0
             assert (await judge.agenerate("Judge the supplied evidence.", Judgment)).verdict == 1
-            assert generate.call_args.kwargs["model"] == "gemini-3.5-flash-lite"
-            assert generate.call_args.kwargs["config"].temperature == 0
+            generate.assert_awaited_once()
+            assert generate.call_args.kwargs["model"] == "openai/gpt-oss-120b"
+            assert generate.call_args.kwargs["temperature"] == 0
+            assert generate.call_args.kwargs["max_tokens"] == 2048
+            assert generate.call_args.kwargs["response_format"]["type"] == "json_schema"
+            assert (
+                "verdict"
+                in generate.call_args.kwargs["response_format"]["json_schema"]["schema"][
+                    "properties"
+                ]
+            )
+            client_factory.assert_called_once_with(
+                api_key="synthetic-groq-key", timeout=60.0, max_retries=2
+            )
             loader.assert_called_once_with(run_ragas.EMBEDDING_MODEL, device=None)
+        close.assert_awaited_once_with()
 
     asyncio.run(check())
-    monkeypatch.delenv("GOOGLE_API_KEY")
-    with pytest.raises(ValueError, match="GOOGLE_API_KEY is required"):
-        run_ragas._load_metrics()
+    for missing_key in (None, SecretStr(" ")):
+        settings.groq_api_key = missing_key
+        with pytest.raises(ValueError, match="POLICYLENS_GROQ_API_KEY is required"):
+            run_ragas._load_metrics()
+    assert client_factory.call_count == loader.call_count == 1

@@ -28,6 +28,7 @@ def api_resources(monkeypatch):
     resources.settings = SimpleNamespace(
         qdrant_url="http://qdrant.invalid:6333",
         qdrant_api_key=SecretStr("synthetic-qdrant-key"),
+        cors_allowed_origins=["http://localhost:5173"],
     )
     resources.settings_factory = Mock(return_value=resources.settings)
     resources.engine_factory = Mock(return_value=resources.engine)
@@ -92,8 +93,9 @@ def test_openapi_contracts_do_not_initialize_resources(api_resources):
     assert ready_responses["503"]["content"]["application/json"]["schema"] == {
         "$ref": "#/components/schemas/ReadyResponse"
     }
+    # App creation reads settings for CORS, but must not initialize heavy resources.
+    api_resources.settings_factory.assert_called_once_with()
     for factory in (
-        api_resources.settings_factory,
         api_resources.engine_factory,
         api_resources.session_factory_factory,
         api_resources.qdrant_factory,

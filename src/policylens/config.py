@@ -101,7 +101,7 @@ class Settings(BaseSettings):
 
     def safe_repr(self) -> str:
         """Return a formatted, safe string representation of settings."""
-        return json.dumps(self.safe_dump(), indent=2)
+        return json.dumps(self.safe_dump(), indent=2, default=str)
 
 
 @lru_cache
