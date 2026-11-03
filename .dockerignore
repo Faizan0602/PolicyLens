@@ -1,0 +1,29 @@
+# Only backend code, packaging metadata, prompts and migrations enter the context.
+# This also excludes .git, .env*, virtualenvs, local PostgreSQL/Qdrant storage,
+# frontend/node_modules, data (including raw PDFs), benchmarks, tests and docs.
+**
+!Dockerfile
+!.dockerignore
+!pyproject.toml
+!README.md
+!src/
+!src/**
+!prompts/
+!prompts/**
+!alembic.ini
+!alembic/
+!alembic/**
+
+# Keep local artifacts and secrets out of the allowed directories as well.
+**/__pycache__
+**/*.py[cod]
+**/*.egg-info
+**/.env
+**/.env.*
+**/.git
+**/.venv
+**/.cache
+**/*.pdf
+**/*.log
+**/*.pem
+**/*.key
