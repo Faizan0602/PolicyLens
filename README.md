@@ -168,17 +168,6 @@ Full methodology and artifacts: [Final benchmark report](docs/benchmarks/FINAL_B
 | Authentication and isolation | Argon2id password hashing, JWT access tokens, and sessions scoped to their owner. | [RAG notes](docs/rag_notes.md) |
 | Latency and cost visibility | Each request logs per-stage latency, token counts and an estimated cost to PostgreSQL, which exposed reranking as the main latency contributor. | [Query-log report script](scripts/query_log_report.py) |
 
-## Limitations
-
-- **Citation validation is membership checking, not claim verification.** It confirms that cited tags refer to sources supplied to the model. It does not confirm that a cited page supports the claim, so a wrong or unsupported statement with a valid tag would pass.
-- Multi-page coverage, irrelevant evidence and incomplete or truncated answers remain failure modes. Metadata enrichment and page diversity are not production features.
-- The abstention gate still accepts some questions the corpus cannot answer, and scores are not calibrated confidence.
-- Evaluation samples are small and partly selected from development data. Full RAGAS evaluation is paused, and judge scores can reward faithful use of irrelevant evidence.
-- Argon2id/JWT authentication and owner-scoped sessions are implemented, but there is no refresh-token rotation or revocation, no complex RBAC and no persistent browser login (tokens stay in memory).
-- Rate limiting is 10 chat requests per user per 60 seconds; counters reset on restart and are not shared across workers.
-- No OCR and no response streaming. Prompt delimiters, citation checks and redaction do not guarantee security or factual correctness.
-- Feedback, document/PDF and admin endpoints return 501.
-- Latency figures come from a small sequential sample, not a concurrency test.
 
 ## Local Setup
 
