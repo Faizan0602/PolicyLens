@@ -1,0 +1,245 @@
+{
+  "timestamp_utc": "20261019T102352104373Z",
+  "configuration": {
+    "ragas_version": "0.4.3",
+    "prompt": "v1",
+    "generation_model": "openai/gpt-oss-120b",
+    "judge_model": "gemini-3.5-flash-lite",
+    "temperature": 0,
+    "embeddings": "BAAI/bge-small-en-v1.5"
+  },
+  "summary": {
+    "baseline": {
+      "questions": 1,
+      "refusals": 0,
+      "errors": 0,
+      "faithfulness": {
+        "mean": 0.8,
+        "scored": 1,
+        "unavailable": 0
+      },
+      "answer_relevancy": {
+        "mean": 0.7257847251471053,
+        "scored": 1,
+        "unavailable": 0
+      },
+      "context_precision": {
+        "mean": 0.9999999999,
+        "scored": 1,
+        "unavailable": 0
+      },
+      "context_recall": {
+        "mean": 1.0,
+        "scored": 1,
+        "unavailable": 0
+      }
+    },
+    "best": {
+      "questions": 1,
+      "refusals": 0,
+      "errors": 1,
+      "faithfulness": {
+        "mean": 1.0,
+        "scored": 1,
+        "unavailable": 0
+      },
+      "answer_relevancy": {
+        "mean": 0.7044842279141824,
+        "scored": 1,
+        "unavailable": 0
+      },
+      "context_precision": {
+        "mean": null,
+        "scored": 0,
+        "unavailable": 1
+      },
+      "context_recall": {
+        "mean": null,
+        "scored": 0,
+        "unavailable": 1
+      }
+    }
+  },
+  "per_question": [
+    {
+      "id": "G002",
+      "configuration": "baseline",
+      "question": "Under RBI/2026-27/279, who may approve internal guidelines for outward forex remittances based on online or physical Form A2 submission?",
+      "reference": "The Board, or a Board Committee or Management Committee to which the Board has delegated powers.",
+      "gold_sources": [
+        {
+          "doc_id": "ad30a12a41afa632d97786d24974653ca1c7ee026da7f3e9b2dbbe88835bbbcc",
+          "page": 1
+        }
+      ],
+      "answer": "Under RBI/2026‑27/279, authorised dealers must frame internal guidelines with the approval of their Board – or, where the Board has delegated authority, any Board Committee or Management Committee to which such powers have been assigned【ad30a12a41afa632d97786d24974653ca1c7ee026da7f3e9b2dbbe88835bbbcc p.1】.",
+      "status": "generated",
+      "contexts": [
+        "A.P. (DIR Series) Circular No. 23 October 01, 2026\nTo\nAll Authorised Dealers in Foreign Exchange\nMadam / Sir\n\nOnline submission of Form A2: Removal of limits on amount of remittance\nAttention of Authorised Dealers (ADs) Category I banks and AD – Category II entities\nis invited to paragraph 3 of A.P. (DIR Series) Circular No. 12 dated July 03, 2024, on\nthe captioned subject, in terms of which they were advised to frame appropriate\ninternal guidelines with the approval of their Board, for the purpose of facilitating\noutward forex remittances on the basis of online / physical submission of Form A2 and\nother related documents.\n\n2. On a review, it has now been decided that Authorised Dealers shall frame\nappropriate internal guidelines with the approval of their Board or any Board\nCommittee / Management Committee to which powers have been delegated by the\nBoard, for the purpose mentioned in the aforesaid circular.",
+        "In terms of Chapter IX on “Requirements/obligations under International Agreements -\nCommunications from International Agencies” of the Reserve Bank of India - Know Your\nCustomer, Directions, 2025 dated November 28, 2025 (amended as on September 18,\n2026) (“Directions”), as applicable, regulated entities shall strictly follow the procedure\nlaid down in the UAPA Order dated February 2, 2021 (Annex I of these Directions), and\nensure the meticulous compliance with the Order issued by the Government. Further,\nregulated entities shall report the details of accounts resembling any of the individuals /\nentities in the lists to FIU-IND in addition to advising the Ministry of Home Affairs (MHA)\nas required under UAPA notification dated February 2, 2021. In this regard, it is reiterated\nthat the UAPA Order in Annex I of the aforementioned Directions shall also apply to\namendments carried out in Schedule IV and I of the UAPA, 1967 apart from the UNSC\nlists mentioned in the Order.",
+        "5. All recognized Stock Exchanges and Clearing Corporations\n\nSubject: Acceptance of digitally signed Power of Attorney from FPIs\n1. SEBI vide “Master Circular for Foreign Portfolio Investors, Designated\nDepository\nParticipants\nand\nEligible\nForeign\nInvestors”\nNo.\nSEBI/HO/AFD/AFD-PoD2/P/CIR/P/2024/70 dated May 30, 2024 as amended\nfrom time to time (hereinafter referred to as the ‘FPI Master Circular’) has, inter\nalia, specified the KYC requirements for FPIs and the list of supporting\ndocuments admissible as Proof of Address.\n2. SEBI, over the years, has taken various measures to streamline and digitalise\nthe FPI registration process including introduction of Common Application Form\n(CAF) for the purpose of registration, PAN, bank and demat accounts,\npermitting the use of Indian digital signatures for executing CAF and other\nregistration documents, facilitating seamless digital signature functionality\nwithin the CAF portal and grant of registration based on scanned copies.",
+        "2\nͪ\nवदेशी मुद्रा ͪ वभाग, केंद्रȣय कायार्लय, केंद्रȣय कायार्लय भवन, शहȣद भगत ͧ संह मागर्, फोटर्, मुंबई-400 001, भारत\nForeign Exchange Department, Central Office ,Central Office Building., Shahid Bhagat Singh Road, Fort, Mumbai-400 001, India\nटेलȣफोन/Tel. No.022-22601000 फैक्स/Fax No. 022- 22665330 अमर भवन फोन 022-22603000 फैक्स 22694935, ईमेल: helpfed@rbi.org.in\nǑहंदȣ में काम करना आसान है, इसका प्रयोग बढ़ाइए ।\n\n6. The directions contained in this circular have been issued under section 10(4) and 11(1)\nof the Foreign Exchange Management Act (FEMA), 1999 (42 of 1999) and are without\nprejudice to permissions/ approvals, if any, required under any other law.\n\nYours faithfully,\n\n(N Senthil Kumar)\nChief General Manager",
+        "भारतीय įरज़वर् बैंक\n_________________________RESERVE BANK OF INDIA ______________________\nwww.rbi.org.in\nRBI/2026-27/266\nDOR.MRG.REC.No.230/00-00-001/2026-27 September 22, 2026\nReserve Bank of India (Small Finance Banks - Classification, Valuation, and\nOperation of Investment Portfolio) Second Amendment Directions, 2026\nPlease refer to Chapter – IX of Reserve Bank of India (Small Finance Banks -\nClassification, Valuation, and Operation of Investment Portfolio) Directions, 2025, dated\nNovember 28, 2025, on fair valuation of investments. In order to ensure clarity and uniform\npractices in the valuation of units of Infrastructure Investment Trust (InvIT) and Real Estate\nInvestment Trusts (REIT), there is a need to amend the extant instructions.\n2. Accordingly, in exercise of the powers conferred by Section 35A of the Banking\nRegulation Act, 1949 (hereinafter called the Act) and all other laws enabling the Reserve"
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "ad30a12a41afa632d97786d24974653ca1c7ee026da7f3e9b2dbbe88835bbbcc",
+          "chunk_index": 2,
+          "title": "Online submission of Form A2: Removal of limits on amount of remittance",
+          "source_file": "NT2796737482352AE4E488C0ECB304A05CDE1.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-27/279",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13724&Mode=0"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "a7520113d0959d49d8d821e77b925dbad5dd037aa68e6ba2d398204fa3c34f70",
+          "chunk_index": 3,
+          "title": "Designation of terrorist organisation under clause (a) of sub-section (1) of section 35 of the Unlawful Activities (Prevention) Act, 1967 and listed in the First Schedule of the Act",
+          "source_file": "NOTI27024092026B5163644F687458B97DB7E5AF0FF4FDD.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-2027/270",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13713&Mode=0"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "339331e1c6cb116ff230ea975fd7d4b747646252a28d01f53a0864e1b0f5d531",
+          "chunk_index": 3,
+          "title": "Acceptance of digitally signed Power of Attorney from FPIs",
+          "source_file": "1787224027885.pdf",
+          "page": 1,
+          "circular_no": "HO/19/34/14(8)2026-AFD-POD2/I/19251/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/acceptance-of-digitally-signed-power-of-attorney-from-fpis_103824.html"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "27b18c80bacc8846fbadbd072c4cca417ada08490d875fcac950eee3e0fe4b1a",
+          "chunk_index": 5,
+          "title": "Exim Bank’s GOI-supported Line of Credit (LOC) for ₹ 4,850 crores the Government of Maldives, for financing various developmental projects in Maldives",
+          "source_file": "NT269D2CF6DE13687460D8CFB6E8AD0CDEF4E.PDF",
+          "page": 2,
+          "circular_no": "RBI/2026-2027/269",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13712&Mode=0"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "09e453b319a00e40d04b49d4af3338aeab2f79fb8fcc8a8b244b44b0f29a0a88",
+          "chunk_index": 1,
+          "title": "Reserve Bank of India (Small Finance Banks - Classification, Valuation, and Operation of Investment Portfolio) Second Amendment Directions, 2026",
+          "source_file": "NT2663B9D47D9B0A147A5A2F0574A11554B97.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-27/266",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13709&Mode=0"
+        }
+      ],
+      "scores": {
+        "faithfulness": 0.8,
+        "answer_relevancy": 0.7257847251471053,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "A.P. (DIR Series) Circular No. 23 October 01, 2026\nTo\nAll Authorised Dealers in Foreign Exchange\nMadam / Sir\n\nOnline submission of Form A2: Removal of limits on amount of remittance\nAttention of Authorised Dealers (ADs) Category I banks and AD – Category II entities\nis invited to paragraph 3 of A.P. (DIR Series) Circular No. 12 dated July 03, 2024, on\nthe captioned subject, in terms of which they were advised to frame appropriate\ninternal guidelines with the approval of their Board, for the purpose of facilitating\noutward forex remittances on the basis of online / physical submission of Form A2 and\nother related documents.\n\n2. On a review, it has now been decided that Authorised Dealers shall frame\nappropriate internal guidelines with the approval of their Board or any Board\nCommittee / Management Committee to which powers have been delegated by the\nBoard, for the purpose mentioned in the aforesaid circular.",
+        "In terms of Chapter IX on “Requirements/obligations under International Agreements -\nCommunications from International Agencies” of the Reserve Bank of India - Know Your\nCustomer, Directions, 2025 dated November 28, 2025 (amended as on September 18,\n2026) (“Directions”), as applicable, regulated entities shall strictly follow the procedure\nlaid down in the UAPA Order dated February 2, 2021 (Annex I of these Directions), and\nensure the meticulous compliance with the Order issued by the Government. Further,\nregulated entities shall report the details of accounts resembling any of the individuals /\nentities in the lists to FIU-IND in addition to advising the Ministry of Home Affairs (MHA)\nas required under UAPA notification dated February 2, 2021. In this regard, it is reiterated\nthat the UAPA Order in Annex I of the aforementioned Directions shall also apply to\namendments carried out in Schedule IV and I of the UAPA, 1967 apart from the UNSC\nlists mentioned in the Order.",
+        "5. All recognized Stock Exchanges and Clearing Corporations\n\nSubject: Acceptance of digitally signed Power of Attorney from FPIs\n1. SEBI vide “Master Circular for Foreign Portfolio Investors, Designated\nDepository\nParticipants\nand\nEligible\nForeign\nInvestors”\nNo.\nSEBI/HO/AFD/AFD-PoD2/P/CIR/P/2024/70 dated May 30, 2024 as amended\nfrom time to time (hereinafter referred to as the ‘FPI Master Circular’) has, inter\nalia, specified the KYC requirements for FPIs and the list of supporting\ndocuments admissible as Proof of Address.\n2. SEBI, over the years, has taken various measures to streamline and digitalise\nthe FPI registration process including introduction of Common Application Form\n(CAF) for the purpose of registration, PAN, bank and demat accounts,\npermitting the use of Indian digital signatures for executing CAF and other\nregistration documents, facilitating seamless digital signature functionality\nwithin the CAF portal and grant of registration based on scanned copies.",
+        "2\nͪ\nवदेशी मुद्रा ͪ वभाग, केंद्रȣय कायार्लय, केंद्रȣय कायार्लय भवन, शहȣद भगत ͧ संह मागर्, फोटर्, मुंबई-400 001, भारत\nForeign Exchange Department, Central Office ,Central Office Building., Shahid Bhagat Singh Road, Fort, Mumbai-400 001, India\nटेलȣफोन/Tel. No.022-22601000 फैक्स/Fax No. 022- 22665330 अमर भवन फोन 022-22603000 फैक्स 22694935, ईमेल: helpfed@rbi.org.in\nǑहंदȣ में काम करना आसान है, इसका प्रयोग बढ़ाइए ।\n\n6. The directions contained in this circular have been issued under section 10(4) and 11(1)\nof the Foreign Exchange Management Act (FEMA), 1999 (42 of 1999) and are without\nprejudice to permissions/ approvals, if any, required under any other law.\n\nYours faithfully,\n\n(N Senthil Kumar)\nChief General Manager",
+        "भारतीय įरज़वर् बैंक\n_________________________RESERVE BANK OF INDIA ______________________\nwww.rbi.org.in\nRBI/2026-27/266\nDOR.MRG.REC.No.230/00-00-001/2026-27 September 22, 2026\nReserve Bank of India (Small Finance Banks - Classification, Valuation, and\nOperation of Investment Portfolio) Second Amendment Directions, 2026\nPlease refer to Chapter – IX of Reserve Bank of India (Small Finance Banks -\nClassification, Valuation, and Operation of Investment Portfolio) Directions, 2025, dated\nNovember 28, 2025, on fair valuation of investments. In order to ensure clarity and uniform\npractices in the valuation of units of Infrastructure Investment Trust (InvIT) and Real Estate\nInvestment Trusts (REIT), there is a need to amend the extant instructions.\n2. Accordingly, in exercise of the powers conferred by Section 35A of the Banking\nRegulation Act, 1949 (hereinafter called the Act) and all other laws enabling the Reserve"
+      ]
+    },
+    {
+      "id": "G002",
+      "configuration": "best",
+      "question": "Under RBI/2026-27/279, who may approve internal guidelines for outward forex remittances based on online or physical Form A2 submission?",
+      "reference": "The Board, or a Board Committee or Management Committee to which the Board has delegated powers.",
+      "gold_sources": [
+        {
+          "doc_id": "ad30a12a41afa632d97786d24974653ca1c7ee026da7f3e9b2dbbe88835bbbcc",
+          "page": 1
+        }
+      ],
+      "answer": "The internal guidelines may be approved by the authorised dealer’s **Board, or by any Board Committee or Management Committee to which the Board has delegated the requisite powers**【ad30a12a41afa632d97786d24974653ca1c7ee026da7f3e9b2dbbe88835bbbcc p.1】",
+      "status": "generated",
+      "contexts": [
+        "A.P. (DIR Series) Circular No. 23 October 01, 2026\nTo\nAll Authorised Dealers in Foreign Exchange\nMadam / Sir\n\nOnline submission of Form A2: Removal of limits on amount of remittance\nAttention of Authorised Dealers (ADs) Category I banks and AD – Category II entities\nis invited to paragraph 3 of A.P. (DIR Series) Circular No. 12 dated July 03, 2024, on\nthe captioned subject, in terms of which they were advised to frame appropriate\ninternal guidelines with the approval of their Board, for the purpose of facilitating\noutward forex remittances on the basis of online / physical submission of Form A2 and\nother related documents.\n\n2. On a review, it has now been decided that Authorised Dealers shall frame\nappropriate internal guidelines with the approval of their Board or any Board\nCommittee / Management Committee to which powers have been delegated by the\nBoard, for the purpose mentioned in the aforesaid circular.",
+        "2. Copy of the board resolution\n\nFORM A2\nDetails of issue of shares and aggregate holding\nName of the banking company:\n1) Details of issue of shares\nSr.\nNo\nDate of\nthe\nissue\nType of\nthe issue\nSize of the issue\nPaid up\ncapital\n\nNo. of\nshares\nFace value\nof each\nshare\nPremium on\neach share\nAmount\nraised\nPreissue\nPostissue\n\n2) Details of aggregate holding of five per cent or more of paid-up share capital or\nvoting rights post issue of shares\nSr.\nNo\nName of the\nMajor\nshareholder\nAggregate holding of\nthe Major Shareholder\nas a percentage of\npaid-up share capital\nor total voting rights\nprior to issue of\nshares12\n\nAggregate holding\nof the Major\nShareholder as a\npercentage of paidup share capital or\ntotal voting rights\npost issue of shares\n\nDate of RBI\napproval for\nmajor\nshareholding\n\nEncl:\n1) copy of the board / shareholder resolution\n2) Copy of the prospectus / offer document\nName of Authorised Signatory of the banking company\nSignature of Authorised Signatory\nDate:\nPlace:",
+        "बेटी बचाओ\nभारतीय įरज़वर् बैंक\n\nबेटी पढ़ाओ\nRESERVE BANK OF INDIA\nwww.rbi.org.in\n\nबैंक िहȽी में पत्राचार का sागत करता है।\nिवदेशी मुद्रा िवभाग, केंद्रीय कायार्लय भवन, शहीद भगत िसंह मागर्, पो.बॉ. सं. 1055, मुंबई - 400001\nफोन: कें.का.: (91-22) 22610589 फैƛ: कें.का.: (91-22) 22610623\nForeign Exchange Department, Central Office, Central Office Building, Shaheed Bhagat Singh Marg,\nP.B. No. 1055, Mumbai-400001\nRBI/2026-27/279\n\nA.P. (DIR Series) Circular No. 23 October 01, 2026\nTo\nAll Authorised Dealers in Foreign Exchange\nMadam / Sir",
+        "बेटी बचाओ\nभारतीय įरज़वर् बैंक\n\nबेटी पढ़ाओ\nRESERVE BANK OF INDIA\nwww.rbi.org.in\nͪ\nवदेशी मुद्रा ͪ वभाग, केन्द्रȣय कायार्लय, केन्द्रȣय कायार्लय भवन, शहȣद भगतͧ संह मागर्, फोटर्, मुंबई-400 001 भारत\nForeign Exchange Department, Central Office ,Central Office building, Shahid Bhagat Singh Road, Fort, Mumbai-400 001, India\nटेलȣफोन/Telephone No.022-22601000, ईमेल:fedcopcd@rbi.org.in\nǑहंदȣ में काम करना आसान है, इसका प्रयोग बढ़ाइए ।\n\nRBI/2026-27/280\nA.P. (DIR Series) Circular No. 24 October 01, 2026\n\nTo\nAll Authorised Dealers\nMadam / Sir,\n\nNon-Resident Deposits - Comprehensive Single Return (NRD-CSR)(R012):\nSubmission under CIMS Sankalan Portal\n\nAttention of banks maintaining Non-Resident Deposits (NRD) Accounts is invited to A.P.\n(DIR Series) Circular No. 19 dated August 07, 2013 on monthly NRD-CSR return\nsubmission through XBRL platform to the Reserve Bank.",
+        "2\n\nContents\n\nINTRODUCTION\n\nCHAPTER I\nPRELIMINARY\n\n1 Short title and commencement\n\n2 Applicability\n\n3 Definitions\n\nCHAPTER II\nPRIOR APPROVAL FOR ACQUISTION\n\n4 Procedure for prior approval\n\nCHAPTER III\nCONTINUOUS MONITORING ARRANGEMENTS\n\n5 Due diligence\n\n6\n7\n8\nDetecting violation of Section 12B (1) of the B R Act, 1949\nDiversified shareholding in the banking company\nReporting requirements\n\nCHAPTER IV REPEAL AND OTHER PROVISIONS\n\nFORMS\n\nForm A1\nComments of the banking company on “major shareholding”\n\nForm A2\nDetails of issue of shares and aggregate shareholding\n\nANNEX\n\nAnnex I\nIndirect acquisition of shares or voting rights\n\nAnnex II\nIllustrative criteria for determining “fit and proper” status of\napplicants/major shareholders\n\nWithdrawn"
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "ad30a12a41afa632d97786d24974653ca1c7ee026da7f3e9b2dbbe88835bbbcc",
+          "chunk_index": 2,
+          "title": "Online submission of Form A2: Removal of limits on amount of remittance",
+          "source_file": "NT2796737482352AE4E488C0ECB304A05CDE1.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-27/279",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13724&Mode=0"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "2f5a6355e40166f1e6e791794b07a142c382d081cc2eac168d0d1b9707566953",
+          "chunk_index": 32,
+          "title": "Master Direction - Reserve Bank of India (Acquisition and Holding of Shares or Voting Rights in Banking Companies) Directions, 2023",
+          "source_file": "94MDAHSVRBC80A53F9E5D324A948540B84F580DE15F.PDF",
+          "page": 12,
+          "circular_no": "DoR.HGG.GOV.REC.No.96/29.67.001/2022-23",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12439"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "ad30a12a41afa632d97786d24974653ca1c7ee026da7f3e9b2dbbe88835bbbcc",
+          "chunk_index": 1,
+          "title": "Online submission of Form A2: Removal of limits on amount of remittance",
+          "source_file": "NT2796737482352AE4E488C0ECB304A05CDE1.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-27/279",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13724&Mode=0"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "3f2b803865f5b0a77256c1626e6b1e0d9861637f39d59b808cfa6c982dd21cbc",
+          "chunk_index": 1,
+          "title": "Non-Resident Deposits - Comprehensive Single Return (NRD-CSR)(R012): Submission under CIMS Sankalan Portal",
+          "source_file": "NT2800AE75657FD144B8ABC111ECF504BCC06.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-27/280",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13725&Mode=0"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "2f5a6355e40166f1e6e791794b07a142c382d081cc2eac168d0d1b9707566953",
+          "chunk_index": 2,
+          "title": "Master Direction - Reserve Bank of India (Acquisition and Holding of Shares or Voting Rights in Banking Companies) Directions, 2023",
+          "source_file": "94MDAHSVRBC80A53F9E5D324A948540B84F580DE15F.PDF",
+          "page": 2,
+          "circular_no": "DoR.HGG.GOV.REC.No.96/29.67.001/2022-23",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12439"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.7044842279141824,
+        "context_precision": null,
+        "context_recall": null
+      },
+      "errors": {
+        "context_precision": "InstructorRetryException: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 15, model: gemini-3.5-flash-lite\\nPlease retry in 8.405819834s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.5-flash-lite'}, 'quotaValue': '15'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '8s'}]}}",
+        "context_recall": "InstructorRetryException: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 15, model: gemini-3.5-flash-lite\\nPlease retry in 7.989177918s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.5-flash-lite'}, 'quotaValue': '15'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '7s'}]}}"
+      },
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "A.P. (DIR Series) Circular No. 23 October 01, 2026\nTo\nAll Authorised Dealers in Foreign Exchange\nMadam / Sir\n\nOnline submission of Form A2: Removal of limits on amount of remittance\nAttention of Authorised Dealers (ADs) Category I banks and AD – Category II entities\nis invited to paragraph 3 of A.P. (DIR Series) Circular No. 12 dated July 03, 2024, on\nthe captioned subject, in terms of which they were advised to frame appropriate\ninternal guidelines with the approval of their Board, for the purpose of facilitating\noutward forex remittances on the basis of online / physical submission of Form A2 and\nother related documents.\n\n2. On a review, it has now been decided that Authorised Dealers shall frame\nappropriate internal guidelines with the approval of their Board or any Board\nCommittee / Management Committee to which powers have been delegated by the\nBoard, for the purpose mentioned in the aforesaid circular.",
+        "2. Copy of the board resolution\n\nFORM A2\nDetails of issue of shares and aggregate holding\nName of the banking company:\n1) Details of issue of shares\nSr.\nNo\nDate of\nthe\nissue\nType of\nthe issue\nSize of the issue\nPaid up\ncapital\n\nNo. of\nshares\nFace value\nof each\nshare\nPremium on\neach share\nAmount\nraised\nPreissue\nPostissue\n\n2) Details of aggregate holding of five per cent or more of paid-up share capital or\nvoting rights post issue of shares\nSr.\nNo\nName of the\nMajor\nshareholder\nAggregate holding of\nthe Major Shareholder\nas a percentage of\npaid-up share capital\nor total voting rights\nprior to issue of\nshares12\n\nAggregate holding\nof the Major\nShareholder as a\npercentage of paidup share capital or\ntotal voting rights\npost issue of shares\n\nDate of RBI\napproval for\nmajor\nshareholding\n\nEncl:\n1) copy of the board / shareholder resolution\n2) Copy of the prospectus / offer document\nName of Authorised Signatory of the banking company\nSignature of Authorised Signatory\nDate:\nPlace:",
+        "बेटी बचाओ\nभारतीय įरज़वर् बैंक\n\nबेटी पढ़ाओ\nRESERVE BANK OF INDIA\nwww.rbi.org.in\n\nबैंक िहȽी में पत्राचार का sागत करता है।\nिवदेशी मुद्रा िवभाग, केंद्रीय कायार्लय भवन, शहीद भगत िसंह मागर्, पो.बॉ. सं. 1055, मुंबई - 400001\nफोन: कें.का.: (91-22) 22610589 फैƛ: कें.का.: (91-22) 22610623\nForeign Exchange Department, Central Office, Central Office Building, Shaheed Bhagat Singh Marg,\nP.B. No. 1055, Mumbai-400001\nRBI/2026-27/279\n\nA.P. (DIR Series) Circular No. 23 October 01, 2026\nTo\nAll Authorised Dealers in Foreign Exchange\nMadam / Sir",
+        "बेटी बचाओ\nभारतीय įरज़वर् बैंक\n\nबेटी पढ़ाओ\nRESERVE BANK OF INDIA\nwww.rbi.org.in\nͪ\nवदेशी मुद्रा ͪ वभाग, केन्द्रȣय कायार्लय, केन्द्रȣय कायार्लय भवन, शहȣद भगतͧ संह मागर्, फोटर्, मुंबई-400 001 भारत\nForeign Exchange Department, Central Office ,Central Office building, Shahid Bhagat Singh Road, Fort, Mumbai-400 001, India\nटेलȣफोन/Telephone No.022-22601000, ईमेल:fedcopcd@rbi.org.in\nǑहंदȣ में काम करना आसान है, इसका प्रयोग बढ़ाइए ।\n\nRBI/2026-27/280\nA.P. (DIR Series) Circular No. 24 October 01, 2026\n\nTo\nAll Authorised Dealers\nMadam / Sir,\n\nNon-Resident Deposits - Comprehensive Single Return (NRD-CSR)(R012):\nSubmission under CIMS Sankalan Portal\n\nAttention of banks maintaining Non-Resident Deposits (NRD) Accounts is invited to A.P.\n(DIR Series) Circular No. 19 dated August 07, 2013 on monthly NRD-CSR return\nsubmission through XBRL platform to the Reserve Bank.",
+        "2\n\nContents\n\nINTRODUCTION\n\nCHAPTER I\nPRELIMINARY\n\n1 Short title and commencement\n\n2 Applicability\n\n3 Definitions\n\nCHAPTER II\nPRIOR APPROVAL FOR ACQUISTION\n\n4 Procedure for prior approval\n\nCHAPTER III\nCONTINUOUS MONITORING ARRANGEMENTS\n\n5 Due diligence\n\n6\n7\n8\nDetecting violation of Section 12B (1) of the B R Act, 1949\nDiversified shareholding in the banking company\nReporting requirements\n\nCHAPTER IV REPEAL AND OTHER PROVISIONS\n\nFORMS\n\nForm A1\nComments of the banking company on “major shareholding”\n\nForm A2\nDetails of issue of shares and aggregate shareholding\n\nANNEX\n\nAnnex I\nIndirect acquisition of shares or voting rights\n\nAnnex II\nIllustrative criteria for determining “fit and proper” status of\napplicants/major shareholders\n\nWithdrawn"
+      ]
+    }
+  ],
+  "review_note": "Review ten scored judgments using the saved question, answer, reference and context. Record a human verdict and evidence for any genuine judge error found. High faithfulness means context support, not a complete or correct answer: the context can be wrong or incomplete, and the judge can err. Reasons may be unavailable. Means exclude missing scores; compare coverage counts as well as averages."
+}

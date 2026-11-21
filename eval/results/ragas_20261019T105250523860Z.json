@@ -1,0 +1,946 @@
+{
+  "timestamp_utc": "20261019T105250523860Z",
+  "configuration": {
+    "ragas_version": "0.4.3",
+    "prompt": "v1",
+    "generation_model": "openai/gpt-oss-120b",
+    "judge_model": "gemini-3.5-flash-lite",
+    "temperature": 0,
+    "embeddings": "BAAI/bge-small-en-v1.5"
+  },
+  "summary": {
+    "baseline": {
+      "questions": 5,
+      "refusals": 0,
+      "errors": 0,
+      "faithfulness": {
+        "mean": 0.7333333333333333,
+        "scored": 5,
+        "unavailable": 0
+      },
+      "answer_relevancy": {
+        "mean": 0.8208037446736056,
+        "scored": 5,
+        "unavailable": 0
+      },
+      "context_precision": {
+        "mean": 0.86666666658,
+        "scored": 5,
+        "unavailable": 0
+      },
+      "context_recall": {
+        "mean": 1.0,
+        "scored": 5,
+        "unavailable": 0
+      }
+    },
+    "best": {
+      "questions": 5,
+      "refusals": 0,
+      "errors": 0,
+      "faithfulness": {
+        "mean": 0.975,
+        "scored": 5,
+        "unavailable": 0
+      },
+      "answer_relevancy": {
+        "mean": 0.8077717766505256,
+        "scored": 5,
+        "unavailable": 0
+      },
+      "context_precision": {
+        "mean": 0.79999999992,
+        "scored": 5,
+        "unavailable": 0
+      },
+      "context_recall": {
+        "mean": 0.8,
+        "scored": 5,
+        "unavailable": 0
+      }
+    }
+  },
+  "per_question": [
+    {
+      "id": "G002",
+      "configuration": "baseline",
+      "question": "Under RBI/2026-27/279, who may approve internal guidelines for outward forex remittances based on online or physical Form A2 submission?",
+      "reference": "The Board, or a Board Committee or Management Committee to which the Board has delegated powers.",
+      "gold_sources": [
+        {
+          "doc_id": "ad30a12a41afa632d97786d24974653ca1c7ee026da7f3e9b2dbbe88835bbbcc",
+          "page": 1
+        }
+      ],
+      "answer": "The circular states that authorised dealers must frame internal guidelines … with the approval of their Board **or** any Board Committee/Management Committee to which the Board has delegated such powers【ad30a12a41afa632d97786d24974653ca1c7ee026da7f3e9b2dbbe88835bbbcc p.1】.",
+      "status": "generated",
+      "contexts": [
+        "A.P. (DIR Series) Circular No. 23 October 01, 2026\nTo\nAll Authorised Dealers in Foreign Exchange\nMadam / Sir\n\nOnline submission of Form A2: Removal of limits on amount of remittance\nAttention of Authorised Dealers (ADs) Category I banks and AD – Category II entities\nis invited to paragraph 3 of A.P. (DIR Series) Circular No. 12 dated July 03, 2024, on\nthe captioned subject, in terms of which they were advised to frame appropriate\ninternal guidelines with the approval of their Board, for the purpose of facilitating\noutward forex remittances on the basis of online / physical submission of Form A2 and\nother related documents.\n\n2. On a review, it has now been decided that Authorised Dealers shall frame\nappropriate internal guidelines with the approval of their Board or any Board\nCommittee / Management Committee to which powers have been delegated by the\nBoard, for the purpose mentioned in the aforesaid circular.",
+        "In terms of Chapter IX on “Requirements/obligations under International Agreements -\nCommunications from International Agencies” of the Reserve Bank of India - Know Your\nCustomer, Directions, 2025 dated November 28, 2025 (amended as on September 18,\n2026) (“Directions”), as applicable, regulated entities shall strictly follow the procedure\nlaid down in the UAPA Order dated February 2, 2021 (Annex I of these Directions), and\nensure the meticulous compliance with the Order issued by the Government. Further,\nregulated entities shall report the details of accounts resembling any of the individuals /\nentities in the lists to FIU-IND in addition to advising the Ministry of Home Affairs (MHA)\nas required under UAPA notification dated February 2, 2021. In this regard, it is reiterated\nthat the UAPA Order in Annex I of the aforementioned Directions shall also apply to\namendments carried out in Schedule IV and I of the UAPA, 1967 apart from the UNSC\nlists mentioned in the Order.",
+        "5. All recognized Stock Exchanges and Clearing Corporations\n\nSubject: Acceptance of digitally signed Power of Attorney from FPIs\n1. SEBI vide “Master Circular for Foreign Portfolio Investors, Designated\nDepository\nParticipants\nand\nEligible\nForeign\nInvestors”\nNo.\nSEBI/HO/AFD/AFD-PoD2/P/CIR/P/2024/70 dated May 30, 2024 as amended\nfrom time to time (hereinafter referred to as the ‘FPI Master Circular’) has, inter\nalia, specified the KYC requirements for FPIs and the list of supporting\ndocuments admissible as Proof of Address.\n2. SEBI, over the years, has taken various measures to streamline and digitalise\nthe FPI registration process including introduction of Common Application Form\n(CAF) for the purpose of registration, PAN, bank and demat accounts,\npermitting the use of Indian digital signatures for executing CAF and other\nregistration documents, facilitating seamless digital signature functionality\nwithin the CAF portal and grant of registration based on scanned copies.",
+        "2\nͪ\nवदेशी मुद्रा ͪ वभाग, केंद्रȣय कायार्लय, केंद्रȣय कायार्लय भवन, शहȣद भगत ͧ संह मागर्, फोटर्, मुंबई-400 001, भारत\nForeign Exchange Department, Central Office ,Central Office Building., Shahid Bhagat Singh Road, Fort, Mumbai-400 001, India\nटेलȣफोन/Tel. No.022-22601000 फैक्स/Fax No. 022- 22665330 अमर भवन फोन 022-22603000 फैक्स 22694935, ईमेल: helpfed@rbi.org.in\nǑहंदȣ में काम करना आसान है, इसका प्रयोग बढ़ाइए ।\n\n6. The directions contained in this circular have been issued under section 10(4) and 11(1)\nof the Foreign Exchange Management Act (FEMA), 1999 (42 of 1999) and are without\nprejudice to permissions/ approvals, if any, required under any other law.\n\nYours faithfully,\n\n(N Senthil Kumar)\nChief General Manager",
+        "भारतीय įरज़वर् बैंक\n_________________________RESERVE BANK OF INDIA ______________________\nwww.rbi.org.in\nRBI/2026-27/266\nDOR.MRG.REC.No.230/00-00-001/2026-27 September 22, 2026\nReserve Bank of India (Small Finance Banks - Classification, Valuation, and\nOperation of Investment Portfolio) Second Amendment Directions, 2026\nPlease refer to Chapter – IX of Reserve Bank of India (Small Finance Banks -\nClassification, Valuation, and Operation of Investment Portfolio) Directions, 2025, dated\nNovember 28, 2025, on fair valuation of investments. In order to ensure clarity and uniform\npractices in the valuation of units of Infrastructure Investment Trust (InvIT) and Real Estate\nInvestment Trusts (REIT), there is a need to amend the extant instructions.\n2. Accordingly, in exercise of the powers conferred by Section 35A of the Banking\nRegulation Act, 1949 (hereinafter called the Act) and all other laws enabling the Reserve"
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "ad30a12a41afa632d97786d24974653ca1c7ee026da7f3e9b2dbbe88835bbbcc",
+          "chunk_index": 2,
+          "title": "Online submission of Form A2: Removal of limits on amount of remittance",
+          "source_file": "NT2796737482352AE4E488C0ECB304A05CDE1.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-27/279",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13724&Mode=0"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "a7520113d0959d49d8d821e77b925dbad5dd037aa68e6ba2d398204fa3c34f70",
+          "chunk_index": 3,
+          "title": "Designation of terrorist organisation under clause (a) of sub-section (1) of section 35 of the Unlawful Activities (Prevention) Act, 1967 and listed in the First Schedule of the Act",
+          "source_file": "NOTI27024092026B5163644F687458B97DB7E5AF0FF4FDD.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-2027/270",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13713&Mode=0"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "339331e1c6cb116ff230ea975fd7d4b747646252a28d01f53a0864e1b0f5d531",
+          "chunk_index": 3,
+          "title": "Acceptance of digitally signed Power of Attorney from FPIs",
+          "source_file": "1787224027885.pdf",
+          "page": 1,
+          "circular_no": "HO/19/34/14(8)2026-AFD-POD2/I/19251/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/acceptance-of-digitally-signed-power-of-attorney-from-fpis_103824.html"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "27b18c80bacc8846fbadbd072c4cca417ada08490d875fcac950eee3e0fe4b1a",
+          "chunk_index": 5,
+          "title": "Exim Bank’s GOI-supported Line of Credit (LOC) for ₹ 4,850 crores the Government of Maldives, for financing various developmental projects in Maldives",
+          "source_file": "NT269D2CF6DE13687460D8CFB6E8AD0CDEF4E.PDF",
+          "page": 2,
+          "circular_no": "RBI/2026-2027/269",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13712&Mode=0"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "09e453b319a00e40d04b49d4af3338aeab2f79fb8fcc8a8b244b44b0f29a0a88",
+          "chunk_index": 1,
+          "title": "Reserve Bank of India (Small Finance Banks - Classification, Valuation, and Operation of Investment Portfolio) Second Amendment Directions, 2026",
+          "source_file": "NT2663B9D47D9B0A147A5A2F0574A11554B97.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-27/266",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13709&Mode=0"
+        }
+      ],
+      "scores": {
+        "faithfulness": 0.5,
+        "answer_relevancy": 0.6791812358869093,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "A.P. (DIR Series) Circular No. 23 October 01, 2026\nTo\nAll Authorised Dealers in Foreign Exchange\nMadam / Sir\n\nOnline submission of Form A2: Removal of limits on amount of remittance\nAttention of Authorised Dealers (ADs) Category I banks and AD – Category II entities\nis invited to paragraph 3 of A.P. (DIR Series) Circular No. 12 dated July 03, 2024, on\nthe captioned subject, in terms of which they were advised to frame appropriate\ninternal guidelines with the approval of their Board, for the purpose of facilitating\noutward forex remittances on the basis of online / physical submission of Form A2 and\nother related documents.\n\n2. On a review, it has now been decided that Authorised Dealers shall frame\nappropriate internal guidelines with the approval of their Board or any Board\nCommittee / Management Committee to which powers have been delegated by the\nBoard, for the purpose mentioned in the aforesaid circular.",
+        "In terms of Chapter IX on “Requirements/obligations under International Agreements -\nCommunications from International Agencies” of the Reserve Bank of India - Know Your\nCustomer, Directions, 2025 dated November 28, 2025 (amended as on September 18,\n2026) (“Directions”), as applicable, regulated entities shall strictly follow the procedure\nlaid down in the UAPA Order dated February 2, 2021 (Annex I of these Directions), and\nensure the meticulous compliance with the Order issued by the Government. Further,\nregulated entities shall report the details of accounts resembling any of the individuals /\nentities in the lists to FIU-IND in addition to advising the Ministry of Home Affairs (MHA)\nas required under UAPA notification dated February 2, 2021. In this regard, it is reiterated\nthat the UAPA Order in Annex I of the aforementioned Directions shall also apply to\namendments carried out in Schedule IV and I of the UAPA, 1967 apart from the UNSC\nlists mentioned in the Order.",
+        "5. All recognized Stock Exchanges and Clearing Corporations\n\nSubject: Acceptance of digitally signed Power of Attorney from FPIs\n1. SEBI vide “Master Circular for Foreign Portfolio Investors, Designated\nDepository\nParticipants\nand\nEligible\nForeign\nInvestors”\nNo.\nSEBI/HO/AFD/AFD-PoD2/P/CIR/P/2024/70 dated May 30, 2024 as amended\nfrom time to time (hereinafter referred to as the ‘FPI Master Circular’) has, inter\nalia, specified the KYC requirements for FPIs and the list of supporting\ndocuments admissible as Proof of Address.\n2. SEBI, over the years, has taken various measures to streamline and digitalise\nthe FPI registration process including introduction of Common Application Form\n(CAF) for the purpose of registration, PAN, bank and demat accounts,\npermitting the use of Indian digital signatures for executing CAF and other\nregistration documents, facilitating seamless digital signature functionality\nwithin the CAF portal and grant of registration based on scanned copies.",
+        "2\nͪ\nवदेशी मुद्रा ͪ वभाग, केंद्रȣय कायार्लय, केंद्रȣय कायार्लय भवन, शहȣद भगत ͧ संह मागर्, फोटर्, मुंबई-400 001, भारत\nForeign Exchange Department, Central Office ,Central Office Building., Shahid Bhagat Singh Road, Fort, Mumbai-400 001, India\nटेलȣफोन/Tel. No.022-22601000 फैक्स/Fax No. 022- 22665330 अमर भवन फोन 022-22603000 फैक्स 22694935, ईमेल: helpfed@rbi.org.in\nǑहंदȣ में काम करना आसान है, इसका प्रयोग बढ़ाइए ।\n\n6. The directions contained in this circular have been issued under section 10(4) and 11(1)\nof the Foreign Exchange Management Act (FEMA), 1999 (42 of 1999) and are without\nprejudice to permissions/ approvals, if any, required under any other law.\n\nYours faithfully,\n\n(N Senthil Kumar)\nChief General Manager",
+        "भारतीय įरज़वर् बैंक\n_________________________RESERVE BANK OF INDIA ______________________\nwww.rbi.org.in\nRBI/2026-27/266\nDOR.MRG.REC.No.230/00-00-001/2026-27 September 22, 2026\nReserve Bank of India (Small Finance Banks - Classification, Valuation, and\nOperation of Investment Portfolio) Second Amendment Directions, 2026\nPlease refer to Chapter – IX of Reserve Bank of India (Small Finance Banks -\nClassification, Valuation, and Operation of Investment Portfolio) Directions, 2025, dated\nNovember 28, 2025, on fair valuation of investments. In order to ensure clarity and uniform\npractices in the valuation of units of Infrastructure Investment Trust (InvIT) and Real Estate\nInvestment Trusts (REIT), there is a need to amend the extant instructions.\n2. Accordingly, in exercise of the powers conferred by Section 35A of the Banking\nRegulation Act, 1949 (hereinafter called the Act) and all other laws enabling the Reserve"
+      ]
+    },
+    {
+      "id": "G002",
+      "configuration": "best",
+      "question": "Under RBI/2026-27/279, who may approve internal guidelines for outward forex remittances based on online or physical Form A2 submission?",
+      "reference": "The Board, or a Board Committee or Management Committee to which the Board has delegated powers.",
+      "gold_sources": [
+        {
+          "doc_id": "ad30a12a41afa632d97786d24974653ca1c7ee026da7f3e9b2dbbe88835bbbcc",
+          "page": 1
+        }
+      ],
+      "answer": "The internal guidelines must be approved by the authorised dealer’s Board – or, where the Board has delegated authority, by any Board Committee or Management Committee that has been given that power【ad30a12a41afa632d97786d24974653ca1c7ee026da7f3e9b2dbbe88835bbbcc p.1】.",
+      "status": "generated",
+      "contexts": [
+        "A.P. (DIR Series) Circular No. 23 October 01, 2026\nTo\nAll Authorised Dealers in Foreign Exchange\nMadam / Sir\n\nOnline submission of Form A2: Removal of limits on amount of remittance\nAttention of Authorised Dealers (ADs) Category I banks and AD – Category II entities\nis invited to paragraph 3 of A.P. (DIR Series) Circular No. 12 dated July 03, 2024, on\nthe captioned subject, in terms of which they were advised to frame appropriate\ninternal guidelines with the approval of their Board, for the purpose of facilitating\noutward forex remittances on the basis of online / physical submission of Form A2 and\nother related documents.\n\n2. On a review, it has now been decided that Authorised Dealers shall frame\nappropriate internal guidelines with the approval of their Board or any Board\nCommittee / Management Committee to which powers have been delegated by the\nBoard, for the purpose mentioned in the aforesaid circular.",
+        "2. Copy of the board resolution\n\nFORM A2\nDetails of issue of shares and aggregate holding\nName of the banking company:\n1) Details of issue of shares\nSr.\nNo\nDate of\nthe\nissue\nType of\nthe issue\nSize of the issue\nPaid up\ncapital\n\nNo. of\nshares\nFace value\nof each\nshare\nPremium on\neach share\nAmount\nraised\nPreissue\nPostissue\n\n2) Details of aggregate holding of five per cent or more of paid-up share capital or\nvoting rights post issue of shares\nSr.\nNo\nName of the\nMajor\nshareholder\nAggregate holding of\nthe Major Shareholder\nas a percentage of\npaid-up share capital\nor total voting rights\nprior to issue of\nshares12\n\nAggregate holding\nof the Major\nShareholder as a\npercentage of paidup share capital or\ntotal voting rights\npost issue of shares\n\nDate of RBI\napproval for\nmajor\nshareholding\n\nEncl:\n1) copy of the board / shareholder resolution\n2) Copy of the prospectus / offer document\nName of Authorised Signatory of the banking company\nSignature of Authorised Signatory\nDate:\nPlace:",
+        "बेटी बचाओ\nभारतीय įरज़वर् बैंक\n\nबेटी पढ़ाओ\nRESERVE BANK OF INDIA\nwww.rbi.org.in\n\nबैंक िहȽी में पत्राचार का sागत करता है।\nिवदेशी मुद्रा िवभाग, केंद्रीय कायार्लय भवन, शहीद भगत िसंह मागर्, पो.बॉ. सं. 1055, मुंबई - 400001\nफोन: कें.का.: (91-22) 22610589 फैƛ: कें.का.: (91-22) 22610623\nForeign Exchange Department, Central Office, Central Office Building, Shaheed Bhagat Singh Marg,\nP.B. No. 1055, Mumbai-400001\nRBI/2026-27/279\n\nA.P. (DIR Series) Circular No. 23 October 01, 2026\nTo\nAll Authorised Dealers in Foreign Exchange\nMadam / Sir",
+        "बेटी बचाओ\nभारतीय įरज़वर् बैंक\n\nबेटी पढ़ाओ\nRESERVE BANK OF INDIA\nwww.rbi.org.in\nͪ\nवदेशी मुद्रा ͪ वभाग, केन्द्रȣय कायार्लय, केन्द्रȣय कायार्लय भवन, शहȣद भगतͧ संह मागर्, फोटर्, मुंबई-400 001 भारत\nForeign Exchange Department, Central Office ,Central Office building, Shahid Bhagat Singh Road, Fort, Mumbai-400 001, India\nटेलȣफोन/Telephone No.022-22601000, ईमेल:fedcopcd@rbi.org.in\nǑहंदȣ में काम करना आसान है, इसका प्रयोग बढ़ाइए ।\n\nRBI/2026-27/280\nA.P. (DIR Series) Circular No. 24 October 01, 2026\n\nTo\nAll Authorised Dealers\nMadam / Sir,\n\nNon-Resident Deposits - Comprehensive Single Return (NRD-CSR)(R012):\nSubmission under CIMS Sankalan Portal\n\nAttention of banks maintaining Non-Resident Deposits (NRD) Accounts is invited to A.P.\n(DIR Series) Circular No. 19 dated August 07, 2013 on monthly NRD-CSR return\nsubmission through XBRL platform to the Reserve Bank.",
+        "2\n\nContents\n\nINTRODUCTION\n\nCHAPTER I\nPRELIMINARY\n\n1 Short title and commencement\n\n2 Applicability\n\n3 Definitions\n\nCHAPTER II\nPRIOR APPROVAL FOR ACQUISTION\n\n4 Procedure for prior approval\n\nCHAPTER III\nCONTINUOUS MONITORING ARRANGEMENTS\n\n5 Due diligence\n\n6\n7\n8\nDetecting violation of Section 12B (1) of the B R Act, 1949\nDiversified shareholding in the banking company\nReporting requirements\n\nCHAPTER IV REPEAL AND OTHER PROVISIONS\n\nFORMS\n\nForm A1\nComments of the banking company on “major shareholding”\n\nForm A2\nDetails of issue of shares and aggregate shareholding\n\nANNEX\n\nAnnex I\nIndirect acquisition of shares or voting rights\n\nAnnex II\nIllustrative criteria for determining “fit and proper” status of\napplicants/major shareholders\n\nWithdrawn"
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "ad30a12a41afa632d97786d24974653ca1c7ee026da7f3e9b2dbbe88835bbbcc",
+          "chunk_index": 2,
+          "title": "Online submission of Form A2: Removal of limits on amount of remittance",
+          "source_file": "NT2796737482352AE4E488C0ECB304A05CDE1.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-27/279",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13724&Mode=0"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "2f5a6355e40166f1e6e791794b07a142c382d081cc2eac168d0d1b9707566953",
+          "chunk_index": 32,
+          "title": "Master Direction - Reserve Bank of India (Acquisition and Holding of Shares or Voting Rights in Banking Companies) Directions, 2023",
+          "source_file": "94MDAHSVRBC80A53F9E5D324A948540B84F580DE15F.PDF",
+          "page": 12,
+          "circular_no": "DoR.HGG.GOV.REC.No.96/29.67.001/2022-23",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12439"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "ad30a12a41afa632d97786d24974653ca1c7ee026da7f3e9b2dbbe88835bbbcc",
+          "chunk_index": 1,
+          "title": "Online submission of Form A2: Removal of limits on amount of remittance",
+          "source_file": "NT2796737482352AE4E488C0ECB304A05CDE1.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-27/279",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13724&Mode=0"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "3f2b803865f5b0a77256c1626e6b1e0d9861637f39d59b808cfa6c982dd21cbc",
+          "chunk_index": 1,
+          "title": "Non-Resident Deposits - Comprehensive Single Return (NRD-CSR)(R012): Submission under CIMS Sankalan Portal",
+          "source_file": "NT2800AE75657FD144B8ABC111ECF504BCC06.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-27/280",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13725&Mode=0"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "2f5a6355e40166f1e6e791794b07a142c382d081cc2eac168d0d1b9707566953",
+          "chunk_index": 2,
+          "title": "Master Direction - Reserve Bank of India (Acquisition and Holding of Shares or Voting Rights in Banking Companies) Directions, 2023",
+          "source_file": "94MDAHSVRBC80A53F9E5D324A948540B84F580DE15F.PDF",
+          "page": 2,
+          "circular_no": "DoR.HGG.GOV.REC.No.96/29.67.001/2022-23",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12439"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.6960938382999178,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "A.P. (DIR Series) Circular No. 23 October 01, 2026\nTo\nAll Authorised Dealers in Foreign Exchange\nMadam / Sir\n\nOnline submission of Form A2: Removal of limits on amount of remittance\nAttention of Authorised Dealers (ADs) Category I banks and AD – Category II entities\nis invited to paragraph 3 of A.P. (DIR Series) Circular No. 12 dated July 03, 2024, on\nthe captioned subject, in terms of which they were advised to frame appropriate\ninternal guidelines with the approval of their Board, for the purpose of facilitating\noutward forex remittances on the basis of online / physical submission of Form A2 and\nother related documents.\n\n2. On a review, it has now been decided that Authorised Dealers shall frame\nappropriate internal guidelines with the approval of their Board or any Board\nCommittee / Management Committee to which powers have been delegated by the\nBoard, for the purpose mentioned in the aforesaid circular.",
+        "2. Copy of the board resolution\n\nFORM A2\nDetails of issue of shares and aggregate holding\nName of the banking company:\n1) Details of issue of shares\nSr.\nNo\nDate of\nthe\nissue\nType of\nthe issue\nSize of the issue\nPaid up\ncapital\n\nNo. of\nshares\nFace value\nof each\nshare\nPremium on\neach share\nAmount\nraised\nPreissue\nPostissue\n\n2) Details of aggregate holding of five per cent or more of paid-up share capital or\nvoting rights post issue of shares\nSr.\nNo\nName of the\nMajor\nshareholder\nAggregate holding of\nthe Major Shareholder\nas a percentage of\npaid-up share capital\nor total voting rights\nprior to issue of\nshares12\n\nAggregate holding\nof the Major\nShareholder as a\npercentage of paidup share capital or\ntotal voting rights\npost issue of shares\n\nDate of RBI\napproval for\nmajor\nshareholding\n\nEncl:\n1) copy of the board / shareholder resolution\n2) Copy of the prospectus / offer document\nName of Authorised Signatory of the banking company\nSignature of Authorised Signatory\nDate:\nPlace:",
+        "बेटी बचाओ\nभारतीय įरज़वर् बैंक\n\nबेटी पढ़ाओ\nRESERVE BANK OF INDIA\nwww.rbi.org.in\n\nबैंक िहȽी में पत्राचार का sागत करता है।\nिवदेशी मुद्रा िवभाग, केंद्रीय कायार्लय भवन, शहीद भगत िसंह मागर्, पो.बॉ. सं. 1055, मुंबई - 400001\nफोन: कें.का.: (91-22) 22610589 फैƛ: कें.का.: (91-22) 22610623\nForeign Exchange Department, Central Office, Central Office Building, Shaheed Bhagat Singh Marg,\nP.B. No. 1055, Mumbai-400001\nRBI/2026-27/279\n\nA.P. (DIR Series) Circular No. 23 October 01, 2026\nTo\nAll Authorised Dealers in Foreign Exchange\nMadam / Sir",
+        "बेटी बचाओ\nभारतीय įरज़वर् बैंक\n\nबेटी पढ़ाओ\nRESERVE BANK OF INDIA\nwww.rbi.org.in\nͪ\nवदेशी मुद्रा ͪ वभाग, केन्द्रȣय कायार्लय, केन्द्रȣय कायार्लय भवन, शहȣद भगतͧ संह मागर्, फोटर्, मुंबई-400 001 भारत\nForeign Exchange Department, Central Office ,Central Office building, Shahid Bhagat Singh Road, Fort, Mumbai-400 001, India\nटेलȣफोन/Telephone No.022-22601000, ईमेल:fedcopcd@rbi.org.in\nǑहंदȣ में काम करना आसान है, इसका प्रयोग बढ़ाइए ।\n\nRBI/2026-27/280\nA.P. (DIR Series) Circular No. 24 October 01, 2026\n\nTo\nAll Authorised Dealers\nMadam / Sir,\n\nNon-Resident Deposits - Comprehensive Single Return (NRD-CSR)(R012):\nSubmission under CIMS Sankalan Portal\n\nAttention of banks maintaining Non-Resident Deposits (NRD) Accounts is invited to A.P.\n(DIR Series) Circular No. 19 dated August 07, 2013 on monthly NRD-CSR return\nsubmission through XBRL platform to the Reserve Bank.",
+        "2\n\nContents\n\nINTRODUCTION\n\nCHAPTER I\nPRELIMINARY\n\n1 Short title and commencement\n\n2 Applicability\n\n3 Definitions\n\nCHAPTER II\nPRIOR APPROVAL FOR ACQUISTION\n\n4 Procedure for prior approval\n\nCHAPTER III\nCONTINUOUS MONITORING ARRANGEMENTS\n\n5 Due diligence\n\n6\n7\n8\nDetecting violation of Section 12B (1) of the B R Act, 1949\nDiversified shareholding in the banking company\nReporting requirements\n\nCHAPTER IV REPEAL AND OTHER PROVISIONS\n\nFORMS\n\nForm A1\nComments of the banking company on “major shareholding”\n\nForm A2\nDetails of issue of shares and aggregate shareholding\n\nANNEX\n\nAnnex I\nIndirect acquisition of shares or voting rights\n\nAnnex II\nIllustrative criteria for determining “fit and proper” status of\napplicants/major shareholders\n\nWithdrawn"
+      ]
+    },
+    {
+      "id": "G003",
+      "configuration": "baseline",
+      "question": "Under the October 1, 2026 Payments Banks shareholding amendment, which entities qualify as a qualifying person and what promoter-group restriction applies?",
+      "reference": "A SEBI-registered mutual fund, a PFRDA-registered pension fund, or an IRDAI-registered insurance company qualifies only if it does not belong to the promoter group of the investee banking company.",
+      "gold_sources": [
+        {
+          "doc_id": "052f30d9733ff5ef33aeca2d4bc74d83a8292dc829eee8e2f1c27a045917b8a9",
+          "page": 2
+        }
+      ],
+      "answer": "A “qualifying person” is limited to:\n\n* a mutual‑fund that is registered with the Securities and Exchange Board of India,  \n* a pension fund that is registered with the Pension Fund Regulatory and Development Authority, or  \n* an insurance company that is registered with the Insurance Regulatory and Development Authority of India  \n\nprovided that the entity **does not belong to the promoter group or the group of the investee payments‑bank** [1cfe1bb4953d4e8cbe3256d369eab11c3bef637bf5c05d7cdcb75cf1d885c0ed p.2].  \n\nThe amendment for payments banks therefore permits only such qualifying persons, and they may not be members of the bank’s promoter group or its promoter’s group. [052f30d9733ff5ef33aeca2d4bc74d83a8292dc829eee8e2f1c27a045917b8a9 p.4]",
+      "status": "generated",
+      "contexts": [
+        "“(6A) ‘qualifying person’ in respect of an investee banking company means a person\nsatisfying all the following conditions:\n(i) the person is a mutual fund registered with the Securities and Exchange\nBoard of India, or a pension fund registered with the Pension Fund\nRegulatory and Development Authority, or an insurance company\nregistered with the Insurance Regulatory and Development Authority of\nIndia; and\n(ii) the person does not belong to the promoter group or group of the investee\nbanking company.\nExplanation: For the purpose of this definition, the ‘group of a banking company’\nshall be determined as per definition of ‘group entity’ in the Reserve Bank of India\n(Commercial Banks – Undertaking of Financial Services) Directions, 2025.\n(6B) ‘qualifying person with one-time approval’ in respect of an investee banking\ncompany means a qualifying person, which has obtained one-time approval\nas detailed in paragraph 14 of these directions but does not have major",
+        "behalf of a qualifying person belonging to the promoter group or group of\nthe bank.\n(2) The one-time approval shall be subject to conditions specified in the\napproval and all other applicable provisions of these directions.\n(3) Such one-time approval granted to a qualifying person may be revoked by\nthe Reserve Bank in the event of non-compliance with the terms and\nconditions of the approval, or if the qualifying person or any person\nassociated with them is subsequently found to be not ‘fit and proper’.\n(4) The computation of major shareholding limit of up to 10 per cent of the paidup share capital or voting rights under the one-time approval shall be on an\n‘aggregate basis’ as per paragraph 4(2) of the directions.”\n(9) In Annex I - Guidelines on Acquisition and Holding of Shares or Voting Rights in\nBanking Companies, Paragraph 9 shall be amended by insertion of “or qualifying\npersons with one-time approval, as defined at paragraph 6B of the directions,”\nafter “prior approval”.",
+        "8. Reporting requirements\n\n10 A banking company has general permission for issue of shares subject to various conditions such as FEMA,\n1999, SEBI regulations, provisions of Companies Act and rules made thereunder, etc.\n11 “promoter and promoter group” has the same meaning as stated in Annex I of Guidelines for ‘on tap’ Licensing\nof Small Finance Banks in the Private Sector dated December 5, 2019, amended from time to time.\nWithdrawn",
+        "(8) In Annex I - Guidelines on Acquisition and Holding of Shares or Voting Rights in\nBanking Companies, Paragraph 5A shall be inserted as under:\n“5A. However, qualifying persons, as defined at paragraph 6A of the directions,\ncan seek one-time approval, either individually or collectively, from the\nReserve Bank for subsequent acquisitions of major shareholding up to 10 per\ncent of the paid-up share capital or voting rights of a banking company as per\nthe following guidelines:\n(1) Qualifying persons are required to make an application, through\nPRAVAAH, to the Reserve Bank along with the declaration in Form A.\nApplication for such one-time approval can also be made by a bank on\nbehalf of a qualifying person belonging to the promoter group or group of\nthe bank.\n(2) The one-time approval shall be subject to conditions specified in the\napproval and all other applicable provisions of these directions.\n(3) Such one-time approval granted to a qualifying person may be revoked by",
+        "(8) In Annex I - Guidelines on Acquisition and Holding of Shares or Voting Rights in\nBanking Companies, Paragraph 5A shall be inserted as under:\n“5A. However, qualifying persons, as defined at paragraph 6A of the directions,\ncan seek one-time approval, either individually or collectively, from the\nReserve Bank for subsequent acquisitions of major shareholding up to 10 per\ncent of the paid-up share capital or voting rights of a banking company as per\nthe following guidelines:\n(1) Qualifying persons are required to make an application, through\nPRAVAAH, to the Reserve Bank along with the declaration in Form A.\nApplication for such one-time approval can also be made by a bank on\nbehalf of a qualifying person belonging to the promoter group or group of\nthe bank.\n(2) The one-time approval shall be subject to conditions specified in the\napproval and all other applicable provisions of these directions.\n(3) Such one-time approval granted to a qualifying person may be revoked by"
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "1cfe1bb4953d4e8cbe3256d369eab11c3bef637bf5c05d7cdcb75cf1d885c0ed",
+          "chunk_index": 5,
+          "title": "Reserve Bank of India (Commercial Banks - Acquisition and Holding of Shares or Voting Rights) Amendment Directions, 2026",
+          "source_file": "NT27591A82040B28E448E9C6F66A9C2855D70.PDF",
+          "page": 2,
+          "circular_no": "RBI/2026-27/275",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13719&Mode=0"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "1cfe1bb4953d4e8cbe3256d369eab11c3bef637bf5c05d7cdcb75cf1d885c0ed",
+          "chunk_index": 11,
+          "title": "Reserve Bank of India (Commercial Banks - Acquisition and Holding of Shares or Voting Rights) Amendment Directions, 2026",
+          "source_file": "NT27591A82040B28E448E9C6F66A9C2855D70.PDF",
+          "page": 4,
+          "circular_no": "RBI/2026-27/275",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13719&Mode=0"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "2f5a6355e40166f1e6e791794b07a142c382d081cc2eac168d0d1b9707566953",
+          "chunk_index": 22,
+          "title": "Master Direction - Reserve Bank of India (Acquisition and Holding of Shares or Voting Rights in Banking Companies) Directions, 2023",
+          "source_file": "94MDAHSVRBC80A53F9E5D324A948540B84F580DE15F.PDF",
+          "page": 8,
+          "circular_no": "DoR.HGG.GOV.REC.No.96/29.67.001/2022-23",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12439"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "f26df08254bac9ea340aec82a1da50150c8ec8fd0a8a446bcb6ea5da9e6b3a93",
+          "chunk_index": 10,
+          "title": "Reserve Bank of India (Local Area Banks - Acquisition and Holding of Shares or Voting Rights) Amendment Directions, 2026",
+          "source_file": "NT278A39F641BB3C5485194734D495C3B914E.PDF",
+          "page": 4,
+          "circular_no": "RBI/2026-27/278",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13722&Mode=0"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "052f30d9733ff5ef33aeca2d4bc74d83a8292dc829eee8e2f1c27a045917b8a9",
+          "chunk_index": 10,
+          "title": "Reserve Bank of India (Payments Banks - Acquisition and Holding of Shares or Voting Rights) Amendment Directions, 2026",
+          "source_file": "NT277F3970CD9E76046B0870FB310FEAC22D9.PDF",
+          "page": 4,
+          "circular_no": "RBI/2026-27/277",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13721&Mode=0"
+        }
+      ],
+      "scores": {
+        "faithfulness": 0.16666666666666666,
+        "answer_relevancy": 0.7786945248268845,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "“(6A) ‘qualifying person’ in respect of an investee banking company means a person\nsatisfying all the following conditions:\n(i) the person is a mutual fund registered with the Securities and Exchange\nBoard of India, or a pension fund registered with the Pension Fund\nRegulatory and Development Authority, or an insurance company\nregistered with the Insurance Regulatory and Development Authority of\nIndia; and\n(ii) the person does not belong to the promoter group or group of the investee\nbanking company.\nExplanation: For the purpose of this definition, the ‘group of a banking company’\nshall be determined as per definition of ‘group entity’ in the Reserve Bank of India\n(Commercial Banks – Undertaking of Financial Services) Directions, 2025.\n(6B) ‘qualifying person with one-time approval’ in respect of an investee banking\ncompany means a qualifying person, which has obtained one-time approval\nas detailed in paragraph 14 of these directions but does not have major",
+        "behalf of a qualifying person belonging to the promoter group or group of\nthe bank.\n(2) The one-time approval shall be subject to conditions specified in the\napproval and all other applicable provisions of these directions.\n(3) Such one-time approval granted to a qualifying person may be revoked by\nthe Reserve Bank in the event of non-compliance with the terms and\nconditions of the approval, or if the qualifying person or any person\nassociated with them is subsequently found to be not ‘fit and proper’.\n(4) The computation of major shareholding limit of up to 10 per cent of the paidup share capital or voting rights under the one-time approval shall be on an\n‘aggregate basis’ as per paragraph 4(2) of the directions.”\n(9) In Annex I - Guidelines on Acquisition and Holding of Shares or Voting Rights in\nBanking Companies, Paragraph 9 shall be amended by insertion of “or qualifying\npersons with one-time approval, as defined at paragraph 6B of the directions,”\nafter “prior approval”.",
+        "8. Reporting requirements\n\n10 A banking company has general permission for issue of shares subject to various conditions such as FEMA,\n1999, SEBI regulations, provisions of Companies Act and rules made thereunder, etc.\n11 “promoter and promoter group” has the same meaning as stated in Annex I of Guidelines for ‘on tap’ Licensing\nof Small Finance Banks in the Private Sector dated December 5, 2019, amended from time to time.\nWithdrawn",
+        "(8) In Annex I - Guidelines on Acquisition and Holding of Shares or Voting Rights in\nBanking Companies, Paragraph 5A shall be inserted as under:\n“5A. However, qualifying persons, as defined at paragraph 6A of the directions,\ncan seek one-time approval, either individually or collectively, from the\nReserve Bank for subsequent acquisitions of major shareholding up to 10 per\ncent of the paid-up share capital or voting rights of a banking company as per\nthe following guidelines:\n(1) Qualifying persons are required to make an application, through\nPRAVAAH, to the Reserve Bank along with the declaration in Form A.\nApplication for such one-time approval can also be made by a bank on\nbehalf of a qualifying person belonging to the promoter group or group of\nthe bank.\n(2) The one-time approval shall be subject to conditions specified in the\napproval and all other applicable provisions of these directions.\n(3) Such one-time approval granted to a qualifying person may be revoked by",
+        "(8) In Annex I - Guidelines on Acquisition and Holding of Shares or Voting Rights in\nBanking Companies, Paragraph 5A shall be inserted as under:\n“5A. However, qualifying persons, as defined at paragraph 6A of the directions,\ncan seek one-time approval, either individually or collectively, from the\nReserve Bank for subsequent acquisitions of major shareholding up to 10 per\ncent of the paid-up share capital or voting rights of a banking company as per\nthe following guidelines:\n(1) Qualifying persons are required to make an application, through\nPRAVAAH, to the Reserve Bank along with the declaration in Form A.\nApplication for such one-time approval can also be made by a bank on\nbehalf of a qualifying person belonging to the promoter group or group of\nthe bank.\n(2) The one-time approval shall be subject to conditions specified in the\napproval and all other applicable provisions of these directions.\n(3) Such one-time approval granted to a qualifying person may be revoked by"
+      ]
+    },
+    {
+      "id": "G003",
+      "configuration": "best",
+      "question": "Under the October 1, 2026 Payments Banks shareholding amendment, which entities qualify as a qualifying person and what promoter-group restriction applies?",
+      "reference": "A SEBI-registered mutual fund, a PFRDA-registered pension fund, or an IRDAI-registered insurance company qualifies only if it does not belong to the promoter group of the investee banking company.",
+      "gold_sources": [
+        {
+          "doc_id": "052f30d9733ff5ef33aeca2d4bc74d83a8292dc829eee8e2f1c27a045917b8a9",
+          "page": 2
+        }
+      ],
+      "answer": "The amendment defines a **qualifying person** to include entities that manage funds for one or more investors – for example private‑equity funds, their general partners and limited partners, investment managers or any other person that performs a similar fund‑management activity [2f5a6355e40166f1e6e791794b07a142c382d081cc2eac168d0d1b9707566953 p.13].\n\nFor a one‑time approval, the qualifying person must be **within the promoter group (or the group of the bank)** – i.e., the bank may apply on behalf of a qualifying person that belongs to the promoter group of the bank [052f30d9733ff5ef33aeca2d4bc74d83a8292dc829eee8e2f1c27a045917b8a9 p.3].",
+      "status": "generated",
+      "contexts": [
+        "Annex I\n\n13 Illustratively, entities related to one or more other entities because they all have the same shareholder structure\nwithout a single controlling shareholder or because they are managed on a unified basis.\n14 For the purpose of these directions, the recognition norms for recognizing the promoter group of a banking\ncompany shall be applied to recognize the promoter and promoter group of the person.\n15 This shall also include Private Equity funds, its General Partners and Limited Partners, investment manager or\nany other person doing similar activity of managing funds of one or more persons.\n16 Control as defined in Section 2(27) of Companies Act, 2013 - Control shall include the right to appoint majority\nof the directors or to control the management or to control policy decisions exercisable by a person or persons\nacting individually or in concert, directly or indirectly, including by virtue of their shareholding or management rights",
+        "behalf of a qualifying person belonging to the promoter group or group of\nthe bank.\n(2) The one-time approval shall be subject to conditions specified in the\napproval and all other applicable provisions of these directions.\n(3) Such one-time approval granted to a qualifying person may be revoked by\nthe Reserve Bank in the event of non-compliance with the terms and\nconditions of the approval, or if the qualifying person or any person\nassociated with them is subsequently found to be not ‘fit and proper’.\n(4) The computation of major shareholding limit of up to 10 per cent of the paidup share capital or voting rights under the one-time approval shall be on an\n‘aggregate basis’ as per paragraph 4(2) of the directions.”\n(9) In Annex I - Guidelines on Acquisition and Holding of Shares or Voting Rights in\nBanking Companies, Paragraph 9 shall be amended by insertion of “or qualifying\npersons with one-time approval, as defined at paragraph 6B of the directions,”\nafter “prior approval”.",
+        "of the approval, or if the qualifying person or any person associated with them\nis subsequently found to be not ‘fit and proper’.\nExplanation (1) The computation of major shareholding limit of up to 10 per cent of\nthe paid-up share capital or voting rights under the one-time approval shall be on\nan ‘aggregate basis’ as per paragraph 4(2) of these directions.\nExplanation (2) Application for such one-time approval can also be made by a bank\non behalf of a qualifying person belonging to the promoter group or group of the\nbank.”\n(5) In Chapter III – Continuous Monitoring Arrangements, Paragraph 17(4) shall be\ninserted as under:\n“17(4) qualifying persons with one-time approval”\n(6) In Chapter III – Continuous Monitoring Arrangements, Paragraph 18 shall be\namended by substitution of all the references to “major shareholders / applicants”\nwith “major shareholders / applicants / qualifying persons with one-time approval”.",
+        "of the approval, or if the qualifying person or any person associated with them\nis subsequently found to be not ‘fit and proper’.\nExplanation (1) The computation of major shareholding limit of up to 10 per cent of\nthe paid-up share capital or voting rights under the one-time approval shall be on\nan ‘aggregate basis’ as per paragraph 4(2) of these directions.\nExplanation (2) Application for such one-time approval can also be made by a bank\non behalf of a qualifying person belonging to the promoter group or group of the\nbank.”\n(5) In Chapter III – Continuous Monitoring Arrangements, Paragraph 17(4) shall be\ninserted as under:\n“17(4) qualifying persons with one-time approval”\n(6) In Chapter III – Continuous Monitoring Arrangements, Paragraph 18 shall be\namended by substitution of all the references to “major shareholders / applicants”\nwith “major shareholders / applicants / qualifying persons with one-time approval”.",
+        "of the approval, or if the qualifying person or any person associated with them\nis subsequently found to be not ‘fit and proper’.\nExplanation (1) The computation of major shareholding limit of up to 10 per cent of\nthe paid-up share capital or voting rights under the one-time approval shall be on\nan ‘aggregate basis’ as per paragraph 4(2) of these directions.\nExplanation (2) Application for such one-time approval can also be made by a bank\non behalf of a qualifying person belonging to the promoter group or group of the\nbank.”\n(5) In Chapter III – Continuous Monitoring Arrangements, Paragraph 17(4) shall be\ninserted as under:\n“17(4) qualifying persons with one-time approval”\n(6) In Chapter III – Continuous Monitoring Arrangements, Paragraph 18 shall be\namended by substitution of all the references to “major shareholders / applicants”\nwith “major shareholders / applicants / qualifying persons with one-time approval”."
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "2f5a6355e40166f1e6e791794b07a142c382d081cc2eac168d0d1b9707566953",
+          "chunk_index": 37,
+          "title": "Master Direction - Reserve Bank of India (Acquisition and Holding of Shares or Voting Rights in Banking Companies) Directions, 2023",
+          "source_file": "94MDAHSVRBC80A53F9E5D324A948540B84F580DE15F.PDF",
+          "page": 13,
+          "circular_no": "DoR.HGG.GOV.REC.No.96/29.67.001/2022-23",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12439"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "1cfe1bb4953d4e8cbe3256d369eab11c3bef637bf5c05d7cdcb75cf1d885c0ed",
+          "chunk_index": 11,
+          "title": "Reserve Bank of India (Commercial Banks - Acquisition and Holding of Shares or Voting Rights) Amendment Directions, 2026",
+          "source_file": "NT27591A82040B28E448E9C6F66A9C2855D70.PDF",
+          "page": 4,
+          "circular_no": "RBI/2026-27/275",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13719&Mode=0"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "052f30d9733ff5ef33aeca2d4bc74d83a8292dc829eee8e2f1c27a045917b8a9",
+          "chunk_index": 8,
+          "title": "Reserve Bank of India (Payments Banks - Acquisition and Holding of Shares or Voting Rights) Amendment Directions, 2026",
+          "source_file": "NT277F3970CD9E76046B0870FB310FEAC22D9.PDF",
+          "page": 3,
+          "circular_no": "RBI/2026-27/277",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13721&Mode=0"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "f26df08254bac9ea340aec82a1da50150c8ec8fd0a8a446bcb6ea5da9e6b3a93",
+          "chunk_index": 8,
+          "title": "Reserve Bank of India (Local Area Banks - Acquisition and Holding of Shares or Voting Rights) Amendment Directions, 2026",
+          "source_file": "NT278A39F641BB3C5485194734D495C3B914E.PDF",
+          "page": 3,
+          "circular_no": "RBI/2026-27/278",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13722&Mode=0"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "e4d278e5630631098b573b339f368408443dc785dd4838ffb297c244663d9a94",
+          "chunk_index": 8,
+          "title": "Reserve Bank of India (Small Finance Banks - Acquisition and Holding of Shares or Voting Rights) Amendment Directions, 2026",
+          "source_file": "NT276B283340355CB4606A0E114A0985D9349.PDF",
+          "page": 3,
+          "circular_no": "RBI/2026-27/276",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13720&Mode=0"
+        }
+      ],
+      "scores": {
+        "faithfulness": 0.875,
+        "answer_relevancy": 0.6976092893273581,
+        "context_precision": 0.0,
+        "context_recall": 0.0
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "Annex I\n\n13 Illustratively, entities related to one or more other entities because they all have the same shareholder structure\nwithout a single controlling shareholder or because they are managed on a unified basis.\n14 For the purpose of these directions, the recognition norms for recognizing the promoter group of a banking\ncompany shall be applied to recognize the promoter and promoter group of the person.\n15 This shall also include Private Equity funds, its General Partners and Limited Partners, investment manager or\nany other person doing similar activity of managing funds of one or more persons.\n16 Control as defined in Section 2(27) of Companies Act, 2013 - Control shall include the right to appoint majority\nof the directors or to control the management or to control policy decisions exercisable by a person or persons\nacting individually or in concert, directly or indirectly, including by virtue of their shareholding or management rights",
+        "behalf of a qualifying person belonging to the promoter group or group of\nthe bank.\n(2) The one-time approval shall be subject to conditions specified in the\napproval and all other applicable provisions of these directions.\n(3) Such one-time approval granted to a qualifying person may be revoked by\nthe Reserve Bank in the event of non-compliance with the terms and\nconditions of the approval, or if the qualifying person or any person\nassociated with them is subsequently found to be not ‘fit and proper’.\n(4) The computation of major shareholding limit of up to 10 per cent of the paidup share capital or voting rights under the one-time approval shall be on an\n‘aggregate basis’ as per paragraph 4(2) of the directions.”\n(9) In Annex I - Guidelines on Acquisition and Holding of Shares or Voting Rights in\nBanking Companies, Paragraph 9 shall be amended by insertion of “or qualifying\npersons with one-time approval, as defined at paragraph 6B of the directions,”\nafter “prior approval”.",
+        "of the approval, or if the qualifying person or any person associated with them\nis subsequently found to be not ‘fit and proper’.\nExplanation (1) The computation of major shareholding limit of up to 10 per cent of\nthe paid-up share capital or voting rights under the one-time approval shall be on\nan ‘aggregate basis’ as per paragraph 4(2) of these directions.\nExplanation (2) Application for such one-time approval can also be made by a bank\non behalf of a qualifying person belonging to the promoter group or group of the\nbank.”\n(5) In Chapter III – Continuous Monitoring Arrangements, Paragraph 17(4) shall be\ninserted as under:\n“17(4) qualifying persons with one-time approval”\n(6) In Chapter III – Continuous Monitoring Arrangements, Paragraph 18 shall be\namended by substitution of all the references to “major shareholders / applicants”\nwith “major shareholders / applicants / qualifying persons with one-time approval”.",
+        "of the approval, or if the qualifying person or any person associated with them\nis subsequently found to be not ‘fit and proper’.\nExplanation (1) The computation of major shareholding limit of up to 10 per cent of\nthe paid-up share capital or voting rights under the one-time approval shall be on\nan ‘aggregate basis’ as per paragraph 4(2) of these directions.\nExplanation (2) Application for such one-time approval can also be made by a bank\non behalf of a qualifying person belonging to the promoter group or group of the\nbank.”\n(5) In Chapter III – Continuous Monitoring Arrangements, Paragraph 17(4) shall be\ninserted as under:\n“17(4) qualifying persons with one-time approval”\n(6) In Chapter III – Continuous Monitoring Arrangements, Paragraph 18 shall be\namended by substitution of all the references to “major shareholders / applicants”\nwith “major shareholders / applicants / qualifying persons with one-time approval”.",
+        "of the approval, or if the qualifying person or any person associated with them\nis subsequently found to be not ‘fit and proper’.\nExplanation (1) The computation of major shareholding limit of up to 10 per cent of\nthe paid-up share capital or voting rights under the one-time approval shall be on\nan ‘aggregate basis’ as per paragraph 4(2) of these directions.\nExplanation (2) Application for such one-time approval can also be made by a bank\non behalf of a qualifying person belonging to the promoter group or group of the\nbank.”\n(5) In Chapter III – Continuous Monitoring Arrangements, Paragraph 17(4) shall be\ninserted as under:\n“17(4) qualifying persons with one-time approval”\n(6) In Chapter III – Continuous Monitoring Arrangements, Paragraph 18 shall be\namended by substitution of all the references to “major shareholders / applicants”\nwith “major shareholders / applicants / qualifying persons with one-time approval”."
+      ]
+    },
+    {
+      "id": "G004",
+      "configuration": "baseline",
+      "question": "Under SEBI's June 15, 2026 ETF circular, what base price is used if there is no trade in the ETF on T-1 day?",
+      "reference": "The latest available closing NAV of the ETF.",
+      "gold_sources": [
+        {
+          "doc_id": "717dcc7a29ae7bc33f6e649eec0001f0b7cca5eecb925569a42a2dcb29402e86",
+          "page": 2
+        }
+      ],
+      "answer": "If there is no trade on the T‑1 day, the base price shall be the latest available closing NAV of the ETF [717dcc7a29ae7bc33f6e649eec0001f0b7cca5eecb925569a42a2dcb29402e86 p.2].",
+      "status": "generated",
+      "contexts": [
+        "4. Base Price for ETFs\n\n4.1. Considering the operational challenges in usage of T-1 day closing NAV of the ETFs as\nbase price, to start with, the base price for determination of price bands of ETFs shall be\nT-1 day Closing Price i.e. last 30 minutes of Volume Weighted Average Price (VWAP) of\nthe ETF.\n\n4.2. In case there is no trading in the ETF during the last 30 minutes of T-1 day, then base\nprice shall be the Last Traded Price (LTP) of the day. Further, in case there is no trade\non T-1 day, then base price shall be the latest available closing NAV of the ETF.\n\n4.3. The Base price shall be adjusted for corporate action(s), if any.\n\n4.4. However, the Stock Exchanges and Asset Management Companies of Mutual Funds\nshall jointly address the operational challenges to implement the use of T-1 day closing\nNAV of the ETFs as the base price w.e.f. April 01, 2027.",
+        "Page 1 of 2\n\nCIRCULAR\n\nHO/47/11/11(1)2026-MRD-POD3/I/19839/2026\n\nAugust 28, 2026\n\nTo\nAll Recognized Stock Exchanges\nAll Recognized Clearing Corporations\nAll Asset Management Companies of Mutual Funds\nAssociation of Mutual Funds in India\n\nSir/Madam,\n\nSubject: Extension of timeline for implementation of provisions of SEBI Circular dated\nJune 15, 2026 on norms for base price, price bands, call auction in pre-open session\nand close-out procedure for Exchange Traded Funds (ETFs)\n\n1. SEBI vide Circular No. HO/47/11/11(1)2026-MRD-POD3/I/13804/2026 dated June 15,\n2026 has provided for various norms related to base price, price bands, call auction in preopen session and Close-out procedure for Exchange Traded Funds (ETFs).\n\n2. As per paragraph 8 of the aforesaid circular, the provisions of the circular were to come\ninto effect from 1st September 2026.",
+        "Page 1 of 6\n\nCIRCULAR\n\nHO/47/11/11(1)2026-MRD-POD3/I/13804/2026 June 15, 2026\n\nTo\n\nAll Recognized Stock Exchanges\nAll Recognized Clearing Corporations\nAll Asset Management Companies of Mutual Funds\nAssociation of Mutual Funds in India\n\nSir/Madam,\n\nSubject: Norms for Base Price, Price Bands, Call Auction in pre-open session and\nClose-out procedure for Exchange Traded Funds (ETFs)\n\n1. In terms of Paragraph 2.3.1 of Chapter 1 of SEBI Master Circular for “Stock Exchanges\nand Clearing Corporations” dated December 30, 2024 (hereinafter referred to as “Master\nCircular”), individual scrip wise price bands up to 20% either way for all scrips in the rolling\nsettlement except for the scrips on which derivatives products are available, has been\nprescribed. Further, in terms of Paragraph 2.5 of Chapter 1 of the Master Circular, dynamic\nprice bands (operating range) have been prescribed for scrips on which derivative\nproducts are available. These price bands are applied on the T-1 day closing price.",
+        "2. Currently, for Exchange Traded Funds (ETFs) (based on Equity, Debt and Commodities),\na fixed price band of +20% (except for Overnight ETFs, for which the price band is +5%)\nis applicable on the base price, which is T-2 day Net Asset Value (NAV) of the ETFs.\n\n3. In order to address the issues involved due to lag of 1 trading day in base price of ETFs\nand the fixed price band of ETFs not being commensurate with the price range of the\nunderlying; and based on the recommendations of the Working Group of Stock\nExchanges, the matter was discussed in the Secondary Market Advisory Committee of",
+        "7. Call Auction in Pre-open Session for Commodity ETFs (Gold/Silver)\n\nPage 6 of 6\n\nto protect the interests of investors in securities and to promote the development of, and\nto regulate the securities market.\n\n11. This circular is available on SEBI website at www.sebi.gov.in at “Legal Framework -\nCirculars.”\n\nYours faithfully,\n\nHruda Ranjan Sahoo\nGeneral Manager\nTel. No. 022-26449586\nEmail: hrsahoo@sebi.gov.in"
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "717dcc7a29ae7bc33f6e649eec0001f0b7cca5eecb925569a42a2dcb29402e86",
+          "chunk_index": 4,
+          "title": "Norms for Base Price, Price Bands, Call Auction in pre-open session and Close-out procedure for Exchange Traded Funds (ETFs)",
+          "source_file": "1781524158363.pdf",
+          "page": 2,
+          "circular_no": "HO/47/11/11(1)2026-MRD-POD3/I/13804/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jun-2026/norms-for-base-price-price-bands-call-auction-in-pre-open-session-and-close-out-procedure-for-exchange-traded-funds-etfs-_102121.html"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "d59e9a89f4f552910e560c29f042c0921b7aa69677d47323abd22713c0dbfa27",
+          "chunk_index": 1,
+          "title": "Extension of timeline for implementation of provisions of SEBI Circular dated June 15, 2026 on norms for base price, price bands, call auction in pre-open session and Close-out procedure for Exchange Traded Funds (ETFs)",
+          "source_file": "1787914585756.pdf",
+          "page": 1,
+          "circular_no": "HO/47/11/11(1)2026-MRD-POD3/I/19839/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/extension-of-timeline-for-implementation-of-provisions-of-sebi-circular-dated-june-15-2026-on-norms-for-base-price-price-bands-call-auction-in-pre-open-session-and-close-out-procedure-for-exchange-_104094.html"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "717dcc7a29ae7bc33f6e649eec0001f0b7cca5eecb925569a42a2dcb29402e86",
+          "chunk_index": 1,
+          "title": "Norms for Base Price, Price Bands, Call Auction in pre-open session and Close-out procedure for Exchange Traded Funds (ETFs)",
+          "source_file": "1781524158363.pdf",
+          "page": 1,
+          "circular_no": "HO/47/11/11(1)2026-MRD-POD3/I/13804/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jun-2026/norms-for-base-price-price-bands-call-auction-in-pre-open-session-and-close-out-procedure-for-exchange-traded-funds-etfs-_102121.html"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "717dcc7a29ae7bc33f6e649eec0001f0b7cca5eecb925569a42a2dcb29402e86",
+          "chunk_index": 2,
+          "title": "Norms for Base Price, Price Bands, Call Auction in pre-open session and Close-out procedure for Exchange Traded Funds (ETFs)",
+          "source_file": "1781524158363.pdf",
+          "page": 1,
+          "circular_no": "HO/47/11/11(1)2026-MRD-POD3/I/13804/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jun-2026/norms-for-base-price-price-bands-call-auction-in-pre-open-session-and-close-out-procedure-for-exchange-traded-funds-etfs-_102121.html"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "717dcc7a29ae7bc33f6e649eec0001f0b7cca5eecb925569a42a2dcb29402e86",
+          "chunk_index": 14,
+          "title": "Norms for Base Price, Price Bands, Call Auction in pre-open session and Close-out procedure for Exchange Traded Funds (ETFs)",
+          "source_file": "1781524158363.pdf",
+          "page": 6,
+          "circular_no": "HO/47/11/11(1)2026-MRD-POD3/I/13804/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jun-2026/norms-for-base-price-price-bands-call-auction-in-pre-open-session-and-close-out-procedure-for-exchange-traded-funds-etfs-_102121.html"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.821040910628002,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "4. Base Price for ETFs\n\n4.1. Considering the operational challenges in usage of T-1 day closing NAV of the ETFs as\nbase price, to start with, the base price for determination of price bands of ETFs shall be\nT-1 day Closing Price i.e. last 30 minutes of Volume Weighted Average Price (VWAP) of\nthe ETF.\n\n4.2. In case there is no trading in the ETF during the last 30 minutes of T-1 day, then base\nprice shall be the Last Traded Price (LTP) of the day. Further, in case there is no trade\non T-1 day, then base price shall be the latest available closing NAV of the ETF.\n\n4.3. The Base price shall be adjusted for corporate action(s), if any.\n\n4.4. However, the Stock Exchanges and Asset Management Companies of Mutual Funds\nshall jointly address the operational challenges to implement the use of T-1 day closing\nNAV of the ETFs as the base price w.e.f. April 01, 2027.",
+        "Page 1 of 2\n\nCIRCULAR\n\nHO/47/11/11(1)2026-MRD-POD3/I/19839/2026\n\nAugust 28, 2026\n\nTo\nAll Recognized Stock Exchanges\nAll Recognized Clearing Corporations\nAll Asset Management Companies of Mutual Funds\nAssociation of Mutual Funds in India\n\nSir/Madam,\n\nSubject: Extension of timeline for implementation of provisions of SEBI Circular dated\nJune 15, 2026 on norms for base price, price bands, call auction in pre-open session\nand close-out procedure for Exchange Traded Funds (ETFs)\n\n1. SEBI vide Circular No. HO/47/11/11(1)2026-MRD-POD3/I/13804/2026 dated June 15,\n2026 has provided for various norms related to base price, price bands, call auction in preopen session and Close-out procedure for Exchange Traded Funds (ETFs).\n\n2. As per paragraph 8 of the aforesaid circular, the provisions of the circular were to come\ninto effect from 1st September 2026.",
+        "Page 1 of 6\n\nCIRCULAR\n\nHO/47/11/11(1)2026-MRD-POD3/I/13804/2026 June 15, 2026\n\nTo\n\nAll Recognized Stock Exchanges\nAll Recognized Clearing Corporations\nAll Asset Management Companies of Mutual Funds\nAssociation of Mutual Funds in India\n\nSir/Madam,\n\nSubject: Norms for Base Price, Price Bands, Call Auction in pre-open session and\nClose-out procedure for Exchange Traded Funds (ETFs)\n\n1. In terms of Paragraph 2.3.1 of Chapter 1 of SEBI Master Circular for “Stock Exchanges\nand Clearing Corporations” dated December 30, 2024 (hereinafter referred to as “Master\nCircular”), individual scrip wise price bands up to 20% either way for all scrips in the rolling\nsettlement except for the scrips on which derivatives products are available, has been\nprescribed. Further, in terms of Paragraph 2.5 of Chapter 1 of the Master Circular, dynamic\nprice bands (operating range) have been prescribed for scrips on which derivative\nproducts are available. These price bands are applied on the T-1 day closing price.",
+        "2. Currently, for Exchange Traded Funds (ETFs) (based on Equity, Debt and Commodities),\na fixed price band of +20% (except for Overnight ETFs, for which the price band is +5%)\nis applicable on the base price, which is T-2 day Net Asset Value (NAV) of the ETFs.\n\n3. In order to address the issues involved due to lag of 1 trading day in base price of ETFs\nand the fixed price band of ETFs not being commensurate with the price range of the\nunderlying; and based on the recommendations of the Working Group of Stock\nExchanges, the matter was discussed in the Secondary Market Advisory Committee of",
+        "7. Call Auction in Pre-open Session for Commodity ETFs (Gold/Silver)\n\nPage 6 of 6\n\nto protect the interests of investors in securities and to promote the development of, and\nto regulate the securities market.\n\n11. This circular is available on SEBI website at www.sebi.gov.in at “Legal Framework -\nCirculars.”\n\nYours faithfully,\n\nHruda Ranjan Sahoo\nGeneral Manager\nTel. No. 022-26449586\nEmail: hrsahoo@sebi.gov.in"
+      ]
+    },
+    {
+      "id": "G004",
+      "configuration": "best",
+      "question": "Under SEBI's June 15, 2026 ETF circular, what base price is used if there is no trade in the ETF on T-1 day?",
+      "reference": "The latest available closing NAV of the ETF.",
+      "gold_sources": [
+        {
+          "doc_id": "717dcc7a29ae7bc33f6e649eec0001f0b7cca5eecb925569a42a2dcb29402e86",
+          "page": 2
+        }
+      ],
+      "answer": "If there is no trade on the T‑1 day, the base price shall be the latest available closing NAV of the ETF [717dcc7a29ae7bc33f6e649eec0001f0b7cca5eecb925569a42a2dcb29402e86 p.2].",
+      "status": "generated",
+      "contexts": [
+        "4. Base Price for ETFs\n\n4.1. Considering the operational challenges in usage of T-1 day closing NAV of the ETFs as\nbase price, to start with, the base price for determination of price bands of ETFs shall be\nT-1 day Closing Price i.e. last 30 minutes of Volume Weighted Average Price (VWAP) of\nthe ETF.\n\n4.2. In case there is no trading in the ETF during the last 30 minutes of T-1 day, then base\nprice shall be the Last Traded Price (LTP) of the day. Further, in case there is no trade\non T-1 day, then base price shall be the latest available closing NAV of the ETF.\n\n4.3. The Base price shall be adjusted for corporate action(s), if any.\n\n4.4. However, the Stock Exchanges and Asset Management Companies of Mutual Funds\nshall jointly address the operational challenges to implement the use of T-1 day closing\nNAV of the ETFs as the base price w.e.f. April 01, 2027.",
+        "Page 1 of 6\n\nCIRCULAR\n\nHO/47/11/11(1)2026-MRD-POD3/I/13804/2026 June 15, 2026\n\nTo\n\nAll Recognized Stock Exchanges\nAll Recognized Clearing Corporations\nAll Asset Management Companies of Mutual Funds\nAssociation of Mutual Funds in India\n\nSir/Madam,\n\nSubject: Norms for Base Price, Price Bands, Call Auction in pre-open session and\nClose-out procedure for Exchange Traded Funds (ETFs)\n\n1. In terms of Paragraph 2.3.1 of Chapter 1 of SEBI Master Circular for “Stock Exchanges\nand Clearing Corporations” dated December 30, 2024 (hereinafter referred to as “Master\nCircular”), individual scrip wise price bands up to 20% either way for all scrips in the rolling\nsettlement except for the scrips on which derivatives products are available, has been\nprescribed. Further, in terms of Paragraph 2.5 of Chapter 1 of the Master Circular, dynamic\nprice bands (operating range) have been prescribed for scrips on which derivative\nproducts are available. These price bands are applied on the T-1 day closing price.",
+        "Page 1 of 2\n\nCIRCULAR\n\nHO/47/11/11(1)2026-MRD-POD3/I/19839/2026\n\nAugust 28, 2026\n\nTo\nAll Recognized Stock Exchanges\nAll Recognized Clearing Corporations\nAll Asset Management Companies of Mutual Funds\nAssociation of Mutual Funds in India\n\nSir/Madam,\n\nSubject: Extension of timeline for implementation of provisions of SEBI Circular dated\nJune 15, 2026 on norms for base price, price bands, call auction in pre-open session\nand close-out procedure for Exchange Traded Funds (ETFs)\n\n1. SEBI vide Circular No. HO/47/11/11(1)2026-MRD-POD3/I/13804/2026 dated June 15,\n2026 has provided for various norms related to base price, price bands, call auction in preopen session and Close-out procedure for Exchange Traded Funds (ETFs).\n\n2. As per paragraph 8 of the aforesaid circular, the provisions of the circular were to come\ninto effect from 1st September 2026.",
+        "2. Currently, for Exchange Traded Funds (ETFs) (based on Equity, Debt and Commodities),\na fixed price band of +20% (except for Overnight ETFs, for which the price band is +5%)\nis applicable on the base price, which is T-2 day Net Asset Value (NAV) of the ETFs.\n\n3. In order to address the issues involved due to lag of 1 trading day in base price of ETFs\nand the fixed price band of ETFs not being commensurate with the price range of the\nunderlying; and based on the recommendations of the Working Group of Stock\nExchanges, the matter was discussed in the Secondary Market Advisory Committee of",
+        "2. As per paragraph 8 of the aforesaid circular, the provisions of the circular were to come\ninto effect from 1st September 2026.\n\n3. Based on the feedback received from Stock Exchanges; and in order to ensure smooth\nimplementation of the provisions of the aforementioned circular, it has been decided to\nextend the timeline for implementation of the said circular. The circular shall now come\ninto effect from 7th September 2026.\n\n4. All other provisions of SEBI Circular dated June 15, 2026 shall remain unchanged.\n\n5. All MIIs are advised to:"
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "717dcc7a29ae7bc33f6e649eec0001f0b7cca5eecb925569a42a2dcb29402e86",
+          "chunk_index": 4,
+          "title": "Norms for Base Price, Price Bands, Call Auction in pre-open session and Close-out procedure for Exchange Traded Funds (ETFs)",
+          "source_file": "1781524158363.pdf",
+          "page": 2,
+          "circular_no": "HO/47/11/11(1)2026-MRD-POD3/I/13804/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jun-2026/norms-for-base-price-price-bands-call-auction-in-pre-open-session-and-close-out-procedure-for-exchange-traded-funds-etfs-_102121.html"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "717dcc7a29ae7bc33f6e649eec0001f0b7cca5eecb925569a42a2dcb29402e86",
+          "chunk_index": 1,
+          "title": "Norms for Base Price, Price Bands, Call Auction in pre-open session and Close-out procedure for Exchange Traded Funds (ETFs)",
+          "source_file": "1781524158363.pdf",
+          "page": 1,
+          "circular_no": "HO/47/11/11(1)2026-MRD-POD3/I/13804/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jun-2026/norms-for-base-price-price-bands-call-auction-in-pre-open-session-and-close-out-procedure-for-exchange-traded-funds-etfs-_102121.html"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "d59e9a89f4f552910e560c29f042c0921b7aa69677d47323abd22713c0dbfa27",
+          "chunk_index": 1,
+          "title": "Extension of timeline for implementation of provisions of SEBI Circular dated June 15, 2026 on norms for base price, price bands, call auction in pre-open session and Close-out procedure for Exchange Traded Funds (ETFs)",
+          "source_file": "1787914585756.pdf",
+          "page": 1,
+          "circular_no": "HO/47/11/11(1)2026-MRD-POD3/I/19839/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/extension-of-timeline-for-implementation-of-provisions-of-sebi-circular-dated-june-15-2026-on-norms-for-base-price-price-bands-call-auction-in-pre-open-session-and-close-out-procedure-for-exchange-_104094.html"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "717dcc7a29ae7bc33f6e649eec0001f0b7cca5eecb925569a42a2dcb29402e86",
+          "chunk_index": 2,
+          "title": "Norms for Base Price, Price Bands, Call Auction in pre-open session and Close-out procedure for Exchange Traded Funds (ETFs)",
+          "source_file": "1781524158363.pdf",
+          "page": 1,
+          "circular_no": "HO/47/11/11(1)2026-MRD-POD3/I/13804/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jun-2026/norms-for-base-price-price-bands-call-auction-in-pre-open-session-and-close-out-procedure-for-exchange-traded-funds-etfs-_102121.html"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "d59e9a89f4f552910e560c29f042c0921b7aa69677d47323abd22713c0dbfa27",
+          "chunk_index": 2,
+          "title": "Extension of timeline for implementation of provisions of SEBI Circular dated June 15, 2026 on norms for base price, price bands, call auction in pre-open session and Close-out procedure for Exchange Traded Funds (ETFs)",
+          "source_file": "1787914585756.pdf",
+          "page": 1,
+          "circular_no": "HO/47/11/11(1)2026-MRD-POD3/I/19839/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/extension-of-timeline-for-implementation-of-provisions-of-sebi-circular-dated-june-15-2026-on-norms-for-base-price-price-bands-call-auction-in-pre-open-session-and-close-out-procedure-for-exchange-_104094.html"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.831611052376143,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "4. Base Price for ETFs\n\n4.1. Considering the operational challenges in usage of T-1 day closing NAV of the ETFs as\nbase price, to start with, the base price for determination of price bands of ETFs shall be\nT-1 day Closing Price i.e. last 30 minutes of Volume Weighted Average Price (VWAP) of\nthe ETF.\n\n4.2. In case there is no trading in the ETF during the last 30 minutes of T-1 day, then base\nprice shall be the Last Traded Price (LTP) of the day. Further, in case there is no trade\non T-1 day, then base price shall be the latest available closing NAV of the ETF.\n\n4.3. The Base price shall be adjusted for corporate action(s), if any.\n\n4.4. However, the Stock Exchanges and Asset Management Companies of Mutual Funds\nshall jointly address the operational challenges to implement the use of T-1 day closing\nNAV of the ETFs as the base price w.e.f. April 01, 2027.",
+        "Page 1 of 6\n\nCIRCULAR\n\nHO/47/11/11(1)2026-MRD-POD3/I/13804/2026 June 15, 2026\n\nTo\n\nAll Recognized Stock Exchanges\nAll Recognized Clearing Corporations\nAll Asset Management Companies of Mutual Funds\nAssociation of Mutual Funds in India\n\nSir/Madam,\n\nSubject: Norms for Base Price, Price Bands, Call Auction in pre-open session and\nClose-out procedure for Exchange Traded Funds (ETFs)\n\n1. In terms of Paragraph 2.3.1 of Chapter 1 of SEBI Master Circular for “Stock Exchanges\nand Clearing Corporations” dated December 30, 2024 (hereinafter referred to as “Master\nCircular”), individual scrip wise price bands up to 20% either way for all scrips in the rolling\nsettlement except for the scrips on which derivatives products are available, has been\nprescribed. Further, in terms of Paragraph 2.5 of Chapter 1 of the Master Circular, dynamic\nprice bands (operating range) have been prescribed for scrips on which derivative\nproducts are available. These price bands are applied on the T-1 day closing price.",
+        "Page 1 of 2\n\nCIRCULAR\n\nHO/47/11/11(1)2026-MRD-POD3/I/19839/2026\n\nAugust 28, 2026\n\nTo\nAll Recognized Stock Exchanges\nAll Recognized Clearing Corporations\nAll Asset Management Companies of Mutual Funds\nAssociation of Mutual Funds in India\n\nSir/Madam,\n\nSubject: Extension of timeline for implementation of provisions of SEBI Circular dated\nJune 15, 2026 on norms for base price, price bands, call auction in pre-open session\nand close-out procedure for Exchange Traded Funds (ETFs)\n\n1. SEBI vide Circular No. HO/47/11/11(1)2026-MRD-POD3/I/13804/2026 dated June 15,\n2026 has provided for various norms related to base price, price bands, call auction in preopen session and Close-out procedure for Exchange Traded Funds (ETFs).\n\n2. As per paragraph 8 of the aforesaid circular, the provisions of the circular were to come\ninto effect from 1st September 2026.",
+        "2. Currently, for Exchange Traded Funds (ETFs) (based on Equity, Debt and Commodities),\na fixed price band of +20% (except for Overnight ETFs, for which the price band is +5%)\nis applicable on the base price, which is T-2 day Net Asset Value (NAV) of the ETFs.\n\n3. In order to address the issues involved due to lag of 1 trading day in base price of ETFs\nand the fixed price band of ETFs not being commensurate with the price range of the\nunderlying; and based on the recommendations of the Working Group of Stock\nExchanges, the matter was discussed in the Secondary Market Advisory Committee of",
+        "2. As per paragraph 8 of the aforesaid circular, the provisions of the circular were to come\ninto effect from 1st September 2026.\n\n3. Based on the feedback received from Stock Exchanges; and in order to ensure smooth\nimplementation of the provisions of the aforementioned circular, it has been decided to\nextend the timeline for implementation of the said circular. The circular shall now come\ninto effect from 7th September 2026.\n\n4. All other provisions of SEBI Circular dated June 15, 2026 shall remain unchanged.\n\n5. All MIIs are advised to:"
+      ]
+    },
+    {
+      "id": "G005",
+      "configuration": "baseline",
+      "question": "Under Project Jagrook, what must stock brokers display on their trading apps from November 1, 2026, and where must the investor awareness messages appear?",
+      "reference": "Stock brokers must display the specified investor awareness messages and risk disclosures on alternate days on their trading apps, if any. The investor awareness messages must appear on the app landing page.",
+      "gold_sources": [
+        {
+          "doc_id": "1d0f3b013a6c8a309e5fc206a87d8be1025e2b9f8663d0700659b2e68856df6c",
+          "page": 2
+        }
+      ],
+      "answer": "From 1 Nov 2026, stock brokers must **mandatorily display the specified “investor awareness message(s)” together with the “Risk disclosures” on alternate days, and the investor‑awareness messages must appear on the **landing page of their trading apps**【1d0f3b013a6c8a309e5fc206a87d8be1025e2b9f8663d0700659b2e68856df6c p.2】.",
+      "status": "generated",
+      "contexts": [
+        "4.1 Websites of Stock Brokers\n\na. During October 5, 2026 to October 31, 2026, all stock brokers shall display\nthe “investor awareness message(s)” shared by SEBI and the ‘Risk\ndisclosures’ on their websites.\n\nb. From November 1, 2026 onwards, the stock brokers shall display the\nspecified “investor awareness message(s)” on the landing page of their\nwebsites.\n\n4.2 Trading apps of Stock Brokers:\na. During October 5, 2026 to October 31, 2026, all stock brokers may display\nthe “investor awareness message(s)” shared by SEBI, on their trading apps,\nif any, on a voluntary basis. During the said time period, if on any day, the\nstock broker chooses to display the specified “investor awareness\nmessage(s)” on its trading app, display of the ‘Risk disclosures’ shall be\noptional.",
+        "Page 1 of 3\n\nCIRCULAR\n\nHO/38/24/(15)2026-MIRSD-PODMMC/I/22872/2026\nOctober 01, 2026\n\nAll Recognized Stock Exchanges,\nDepositories,\nStock Brokers through Recognized Stock Exchanges\n\nDear Madam/ Sir,\n\nSubject: Display of “investor awareness message(s)” by stock brokers on their\ntrading apps and websites, under Project Jagrook\n\n1. SEBI vide circular no. SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/73 dated May\n19, 2023, inter-alia, mandated all stock brokers to display ‘Risk disclosures’ (given\nat Annexure-I of the said circular) to all their clients in the manner as specified\ntherein (herein after referred to as ‘Risk disclosures’).\n\n2. In continuation to the aforementioned circular, as part of Project Jagrook- SEBI's\nnationwide investor awareness initiative and the upcoming World Investor Week\n2026, SEBI has decided to introduce display of investor-centric messages by stock\nbrokers, for the benefit, safety, and education of investors.",
+        "4.1 Websites of Stock Brokers\n\nb. From November 1, 2026 onwards, the stock brokers shall mandatorily\ndisplay the specified “investor awareness message(s)” and ‘Risk\ndisclosures’, on alternate days, on their trading apps, if any. The display of\nsuch “investor awareness message(s)” should be on the landing page of\nsuch trading app of the stock broker.\n\n4.3 The “investor awareness message(s)” shared by SEBI may be modified from\ntime to time.\n\n5. Stock Exchanges and Depositories are directed to:\n\n5.1 . bring the provisions of this circular to the notice of their members/ participants,\nas applicable, and disseminate the same on their websites.\n\n5.2 . display the “investor awareness message(s)” shared by SEBI, as it is, on their",
+        "3. Accordingly, all stock brokers shall be required to prominently display the “investor\nawareness message(s)”, as shared by SEBI, on their websites and trading apps,\nin the manner prescribed.\n\n4. The display of such messages shall be undertaken by stock brokers, as given\nbelow:",
+        "Page 1 of 4\n\nCIRCULAR\n\nHO/17/11/(2)2026-DDHS-POD1/I/18769/2026 August 14, 2026\n\nTo,\nAll Entities operating as online bond platform providers;\nAll Recognized Stock Exchanges\nAll Stock Brokers\n\nMadam/ Sir,\n\nSubject: Modification in the regulatory framework for Online Bond Platform Providers\n(OBPPs) including measures for promoting ease of doing business\n\n1. SEBI, vide notification dated November 09, 2022, prescribed a regulatory framework for\nentities operating or desirous of operating as OBPPs under Regulation 51A of the SEBI\n(Issue and Listing of Non-Convertible Securities) Regulations, 2021 (“SEBI NCS\nRegulations”). This framework was further streamlined through subsequent circulars to\nprovide for registration, specify the permissible list of products/services and other\noperational requirements."
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "1d0f3b013a6c8a309e5fc206a87d8be1025e2b9f8663d0700659b2e68856df6c",
+          "chunk_index": 3,
+          "title": "Display of “investor awareness message(s)” by stock brokers on their trading apps and websites, under Project Jagrook",
+          "source_file": "1790852162769.pdf",
+          "page": 2,
+          "circular_no": "HO/38/24/(15)2026-MIRSD-PODMMC/I/22872/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/oct-2026/display-of-investor-awareness-message-s-by-stock-brokers-on-their-trading-apps-and-websites-under-project-jagrook_104858.html"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "1d0f3b013a6c8a309e5fc206a87d8be1025e2b9f8663d0700659b2e68856df6c",
+          "chunk_index": 1,
+          "title": "Display of “investor awareness message(s)” by stock brokers on their trading apps and websites, under Project Jagrook",
+          "source_file": "1790852162769.pdf",
+          "page": 1,
+          "circular_no": "HO/38/24/(15)2026-MIRSD-PODMMC/I/22872/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/oct-2026/display-of-investor-awareness-message-s-by-stock-brokers-on-their-trading-apps-and-websites-under-project-jagrook_104858.html"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "1d0f3b013a6c8a309e5fc206a87d8be1025e2b9f8663d0700659b2e68856df6c",
+          "chunk_index": 4,
+          "title": "Display of “investor awareness message(s)” by stock brokers on their trading apps and websites, under Project Jagrook",
+          "source_file": "1790852162769.pdf",
+          "page": 2,
+          "circular_no": "HO/38/24/(15)2026-MIRSD-PODMMC/I/22872/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/oct-2026/display-of-investor-awareness-message-s-by-stock-brokers-on-their-trading-apps-and-websites-under-project-jagrook_104858.html"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "1d0f3b013a6c8a309e5fc206a87d8be1025e2b9f8663d0700659b2e68856df6c",
+          "chunk_index": 2,
+          "title": "Display of “investor awareness message(s)” by stock brokers on their trading apps and websites, under Project Jagrook",
+          "source_file": "1790852162769.pdf",
+          "page": 1,
+          "circular_no": "HO/38/24/(15)2026-MIRSD-PODMMC/I/22872/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/oct-2026/display-of-investor-awareness-message-s-by-stock-brokers-on-their-trading-apps-and-websites-under-project-jagrook_104858.html"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "4d7cc17425cff96fb2c6bf1898ebe9ff2fc9f0e293edbe196d33192a8e96dd79",
+          "chunk_index": 1,
+          "title": "Modification in the regulatory framework for Online Bond Platform Providers (OBPPs) including measures for promoting ease of doing business",
+          "source_file": "1786705729757.pdf",
+          "page": 1,
+          "circular_no": "HO/17/11/(2)2026-DDHS-POD1/I/18769/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/modification-in-the-regulatory-framework-for-online-bond-platform-providers-obpps-including-measures-for-promoting-ease-of-doing-business_103647.html"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.8539833253338411,
+        "context_precision": 0.3333333333,
+        "context_recall": 1.0
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "4.1 Websites of Stock Brokers\n\na. During October 5, 2026 to October 31, 2026, all stock brokers shall display\nthe “investor awareness message(s)” shared by SEBI and the ‘Risk\ndisclosures’ on their websites.\n\nb. From November 1, 2026 onwards, the stock brokers shall display the\nspecified “investor awareness message(s)” on the landing page of their\nwebsites.\n\n4.2 Trading apps of Stock Brokers:\na. During October 5, 2026 to October 31, 2026, all stock brokers may display\nthe “investor awareness message(s)” shared by SEBI, on their trading apps,\nif any, on a voluntary basis. During the said time period, if on any day, the\nstock broker chooses to display the specified “investor awareness\nmessage(s)” on its trading app, display of the ‘Risk disclosures’ shall be\noptional.",
+        "Page 1 of 3\n\nCIRCULAR\n\nHO/38/24/(15)2026-MIRSD-PODMMC/I/22872/2026\nOctober 01, 2026\n\nAll Recognized Stock Exchanges,\nDepositories,\nStock Brokers through Recognized Stock Exchanges\n\nDear Madam/ Sir,\n\nSubject: Display of “investor awareness message(s)” by stock brokers on their\ntrading apps and websites, under Project Jagrook\n\n1. SEBI vide circular no. SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/73 dated May\n19, 2023, inter-alia, mandated all stock brokers to display ‘Risk disclosures’ (given\nat Annexure-I of the said circular) to all their clients in the manner as specified\ntherein (herein after referred to as ‘Risk disclosures’).\n\n2. In continuation to the aforementioned circular, as part of Project Jagrook- SEBI's\nnationwide investor awareness initiative and the upcoming World Investor Week\n2026, SEBI has decided to introduce display of investor-centric messages by stock\nbrokers, for the benefit, safety, and education of investors.",
+        "4.1 Websites of Stock Brokers\n\nb. From November 1, 2026 onwards, the stock brokers shall mandatorily\ndisplay the specified “investor awareness message(s)” and ‘Risk\ndisclosures’, on alternate days, on their trading apps, if any. The display of\nsuch “investor awareness message(s)” should be on the landing page of\nsuch trading app of the stock broker.\n\n4.3 The “investor awareness message(s)” shared by SEBI may be modified from\ntime to time.\n\n5. Stock Exchanges and Depositories are directed to:\n\n5.1 . bring the provisions of this circular to the notice of their members/ participants,\nas applicable, and disseminate the same on their websites.\n\n5.2 . display the “investor awareness message(s)” shared by SEBI, as it is, on their",
+        "3. Accordingly, all stock brokers shall be required to prominently display the “investor\nawareness message(s)”, as shared by SEBI, on their websites and trading apps,\nin the manner prescribed.\n\n4. The display of such messages shall be undertaken by stock brokers, as given\nbelow:",
+        "Page 1 of 4\n\nCIRCULAR\n\nHO/17/11/(2)2026-DDHS-POD1/I/18769/2026 August 14, 2026\n\nTo,\nAll Entities operating as online bond platform providers;\nAll Recognized Stock Exchanges\nAll Stock Brokers\n\nMadam/ Sir,\n\nSubject: Modification in the regulatory framework for Online Bond Platform Providers\n(OBPPs) including measures for promoting ease of doing business\n\n1. SEBI, vide notification dated November 09, 2022, prescribed a regulatory framework for\nentities operating or desirous of operating as OBPPs under Regulation 51A of the SEBI\n(Issue and Listing of Non-Convertible Securities) Regulations, 2021 (“SEBI NCS\nRegulations”). This framework was further streamlined through subsequent circulars to\nprovide for registration, specify the permissible list of products/services and other\noperational requirements."
+      ]
+    },
+    {
+      "id": "G005",
+      "configuration": "best",
+      "question": "Under Project Jagrook, what must stock brokers display on their trading apps from November 1, 2026, and where must the investor awareness messages appear?",
+      "reference": "Stock brokers must display the specified investor awareness messages and risk disclosures on alternate days on their trading apps, if any. The investor awareness messages must appear on the app landing page.",
+      "gold_sources": [
+        {
+          "doc_id": "1d0f3b013a6c8a309e5fc206a87d8be1025e2b9f8663d0700659b2e68856df6c",
+          "page": 2
+        }
+      ],
+      "answer": "From 1 November 2026, stock brokers must **display the specified “investor‑awareness message(s)” together with the “Risk disclosures” on alternate days on their trading apps**. The investor‑awareness message(s) must be shown **on the landing page of the broker’s trading app**【1d0f3b013a6c8a309e5fc206a87d8be1025e2b9f8663d0700659b2e68856df6c p.2】.",
+      "status": "generated",
+      "contexts": [
+        "4.1 Websites of Stock Brokers\n\nb. From November 1, 2026 onwards, the stock brokers shall mandatorily\ndisplay the specified “investor awareness message(s)” and ‘Risk\ndisclosures’, on alternate days, on their trading apps, if any. The display of\nsuch “investor awareness message(s)” should be on the landing page of\nsuch trading app of the stock broker.\n\n4.3 The “investor awareness message(s)” shared by SEBI may be modified from\ntime to time.\n\n5. Stock Exchanges and Depositories are directed to:\n\n5.1 . bring the provisions of this circular to the notice of their members/ participants,\nas applicable, and disseminate the same on their websites.\n\n5.2 . display the “investor awareness message(s)” shared by SEBI, as it is, on their",
+        "4.1 Websites of Stock Brokers\n\na. During October 5, 2026 to October 31, 2026, all stock brokers shall display\nthe “investor awareness message(s)” shared by SEBI and the ‘Risk\ndisclosures’ on their websites.\n\nb. From November 1, 2026 onwards, the stock brokers shall display the\nspecified “investor awareness message(s)” on the landing page of their\nwebsites.\n\n4.2 Trading apps of Stock Brokers:\na. During October 5, 2026 to October 31, 2026, all stock brokers may display\nthe “investor awareness message(s)” shared by SEBI, on their trading apps,\nif any, on a voluntary basis. During the said time period, if on any day, the\nstock broker chooses to display the specified “investor awareness\nmessage(s)” on its trading app, display of the ‘Risk disclosures’ shall be\noptional.",
+        "Page 1 of 3\n\nCIRCULAR\n\nHO/38/24/(15)2026-MIRSD-PODMMC/I/22872/2026\nOctober 01, 2026\n\nAll Recognized Stock Exchanges,\nDepositories,\nStock Brokers through Recognized Stock Exchanges\n\nDear Madam/ Sir,\n\nSubject: Display of “investor awareness message(s)” by stock brokers on their\ntrading apps and websites, under Project Jagrook\n\n1. SEBI vide circular no. SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/73 dated May\n19, 2023, inter-alia, mandated all stock brokers to display ‘Risk disclosures’ (given\nat Annexure-I of the said circular) to all their clients in the manner as specified\ntherein (herein after referred to as ‘Risk disclosures’).\n\n2. In continuation to the aforementioned circular, as part of Project Jagrook- SEBI's\nnationwide investor awareness initiative and the upcoming World Investor Week\n2026, SEBI has decided to introduce display of investor-centric messages by stock\nbrokers, for the benefit, safety, and education of investors.",
+        "3. Accordingly, all stock brokers shall be required to prominently display the “investor\nawareness message(s)”, as shared by SEBI, on their websites and trading apps,\nin the manner prescribed.\n\n4. The display of such messages shall be undertaken by stock brokers, as given\nbelow:",
+        "1. Roles and obligations\n\n1.1. The entity has appointed a Compliance officer as per SEBI (Stock Brokers)\nRegulations, 2026, who shall comply with certification requirements (i.e. NISMSeries-III-A: Securities Intermediaries Compliance (Non-Fund) Certification\nExamination) for stock brokers, as prescribed from time to time 1\n\n4. All other provisions of the NCS Master Circular shall remain unchanged.\n\n5. The circular shall come into force with immediate effect.\n\n6. The Stock Exchanges are directed to:\na. take necessary steps and put in place necessary systems for the implementation of\nthe above;\nb. make necessary amendments to the relevant bye-laws, rules and regulations,\nwherever applicable, for the implementation of the above; and\nc. bring the provisions of this circular to the notice of the Stock Brokers and also\ndisseminate the same on their website\n\n1 The earlier provision read as follows: 1.1.The entity has appointed a Company Secretary as a compliance\nofficer."
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "1d0f3b013a6c8a309e5fc206a87d8be1025e2b9f8663d0700659b2e68856df6c",
+          "chunk_index": 4,
+          "title": "Display of “investor awareness message(s)” by stock brokers on their trading apps and websites, under Project Jagrook",
+          "source_file": "1790852162769.pdf",
+          "page": 2,
+          "circular_no": "HO/38/24/(15)2026-MIRSD-PODMMC/I/22872/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/oct-2026/display-of-investor-awareness-message-s-by-stock-brokers-on-their-trading-apps-and-websites-under-project-jagrook_104858.html"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "1d0f3b013a6c8a309e5fc206a87d8be1025e2b9f8663d0700659b2e68856df6c",
+          "chunk_index": 3,
+          "title": "Display of “investor awareness message(s)” by stock brokers on their trading apps and websites, under Project Jagrook",
+          "source_file": "1790852162769.pdf",
+          "page": 2,
+          "circular_no": "HO/38/24/(15)2026-MIRSD-PODMMC/I/22872/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/oct-2026/display-of-investor-awareness-message-s-by-stock-brokers-on-their-trading-apps-and-websites-under-project-jagrook_104858.html"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "1d0f3b013a6c8a309e5fc206a87d8be1025e2b9f8663d0700659b2e68856df6c",
+          "chunk_index": 1,
+          "title": "Display of “investor awareness message(s)” by stock brokers on their trading apps and websites, under Project Jagrook",
+          "source_file": "1790852162769.pdf",
+          "page": 1,
+          "circular_no": "HO/38/24/(15)2026-MIRSD-PODMMC/I/22872/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/oct-2026/display-of-investor-awareness-message-s-by-stock-brokers-on-their-trading-apps-and-websites-under-project-jagrook_104858.html"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "1d0f3b013a6c8a309e5fc206a87d8be1025e2b9f8663d0700659b2e68856df6c",
+          "chunk_index": 2,
+          "title": "Display of “investor awareness message(s)” by stock brokers on their trading apps and websites, under Project Jagrook",
+          "source_file": "1790852162769.pdf",
+          "page": 1,
+          "circular_no": "HO/38/24/(15)2026-MIRSD-PODMMC/I/22872/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/oct-2026/display-of-investor-awareness-message-s-by-stock-brokers-on-their-trading-apps-and-websites-under-project-jagrook_104858.html"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "4d7cc17425cff96fb2c6bf1898ebe9ff2fc9f0e293edbe196d33192a8e96dd79",
+          "chunk_index": 8,
+          "title": "Modification in the regulatory framework for Online Bond Platform Providers (OBPPs) including measures for promoting ease of doing business",
+          "source_file": "1786705729757.pdf",
+          "page": 3,
+          "circular_no": "HO/17/11/(2)2026-DDHS-POD1/I/18769/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/modification-in-the-regulatory-framework-for-online-bond-platform-providers-obpps-including-measures-for-promoting-ease-of-doing-business_103647.html"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.8554274236150347,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "4.1 Websites of Stock Brokers\n\nb. From November 1, 2026 onwards, the stock brokers shall mandatorily\ndisplay the specified “investor awareness message(s)” and ‘Risk\ndisclosures’, on alternate days, on their trading apps, if any. The display of\nsuch “investor awareness message(s)” should be on the landing page of\nsuch trading app of the stock broker.\n\n4.3 The “investor awareness message(s)” shared by SEBI may be modified from\ntime to time.\n\n5. Stock Exchanges and Depositories are directed to:\n\n5.1 . bring the provisions of this circular to the notice of their members/ participants,\nas applicable, and disseminate the same on their websites.\n\n5.2 . display the “investor awareness message(s)” shared by SEBI, as it is, on their",
+        "4.1 Websites of Stock Brokers\n\na. During October 5, 2026 to October 31, 2026, all stock brokers shall display\nthe “investor awareness message(s)” shared by SEBI and the ‘Risk\ndisclosures’ on their websites.\n\nb. From November 1, 2026 onwards, the stock brokers shall display the\nspecified “investor awareness message(s)” on the landing page of their\nwebsites.\n\n4.2 Trading apps of Stock Brokers:\na. During October 5, 2026 to October 31, 2026, all stock brokers may display\nthe “investor awareness message(s)” shared by SEBI, on their trading apps,\nif any, on a voluntary basis. During the said time period, if on any day, the\nstock broker chooses to display the specified “investor awareness\nmessage(s)” on its trading app, display of the ‘Risk disclosures’ shall be\noptional.",
+        "Page 1 of 3\n\nCIRCULAR\n\nHO/38/24/(15)2026-MIRSD-PODMMC/I/22872/2026\nOctober 01, 2026\n\nAll Recognized Stock Exchanges,\nDepositories,\nStock Brokers through Recognized Stock Exchanges\n\nDear Madam/ Sir,\n\nSubject: Display of “investor awareness message(s)” by stock brokers on their\ntrading apps and websites, under Project Jagrook\n\n1. SEBI vide circular no. SEBI/HO/MIRSD/MIRSD-PoD-1/P/CIR/2023/73 dated May\n19, 2023, inter-alia, mandated all stock brokers to display ‘Risk disclosures’ (given\nat Annexure-I of the said circular) to all their clients in the manner as specified\ntherein (herein after referred to as ‘Risk disclosures’).\n\n2. In continuation to the aforementioned circular, as part of Project Jagrook- SEBI's\nnationwide investor awareness initiative and the upcoming World Investor Week\n2026, SEBI has decided to introduce display of investor-centric messages by stock\nbrokers, for the benefit, safety, and education of investors.",
+        "3. Accordingly, all stock brokers shall be required to prominently display the “investor\nawareness message(s)”, as shared by SEBI, on their websites and trading apps,\nin the manner prescribed.\n\n4. The display of such messages shall be undertaken by stock brokers, as given\nbelow:",
+        "1. Roles and obligations\n\n1.1. The entity has appointed a Compliance officer as per SEBI (Stock Brokers)\nRegulations, 2026, who shall comply with certification requirements (i.e. NISMSeries-III-A: Securities Intermediaries Compliance (Non-Fund) Certification\nExamination) for stock brokers, as prescribed from time to time 1\n\n4. All other provisions of the NCS Master Circular shall remain unchanged.\n\n5. The circular shall come into force with immediate effect.\n\n6. The Stock Exchanges are directed to:\na. take necessary steps and put in place necessary systems for the implementation of\nthe above;\nb. make necessary amendments to the relevant bye-laws, rules and regulations,\nwherever applicable, for the implementation of the above; and\nc. bring the provisions of this circular to the notice of the Stock Brokers and also\ndisseminate the same on their website\n\n1 The earlier provision read as follows: 1.1.The entity has appointed a Company Secretary as a compliance\nofficer."
+      ]
+    },
+    {
+      "id": "G006",
+      "configuration": "baseline",
+      "question": "Which institution is designated as the nodal agency to issue guarantee cover under the Credit Enhancement Guarantee Scheme for Scheduled Castes (CEGSSC)?",
+      "reference": "IFCI Ltd. is the nodal agency that issues guarantee cover in favour of Member Lending Institutions financing SC entrepreneurs.",
+      "gold_sources": [
+        {
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "page": 5
+        }
+      ],
+      "answer": "IFCI Ltd. is designated as the nodal agency to issue the guarantee cover under the Credit Enhancement Guarantee Scheme for Scheduled Castes (CEGSSC) [e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77 p.5].",
+      "status": "generated",
+      "contexts": [
+        "5. Credit Enhancement Guarantee Scheme for Scheduled Castes (CEGSSC)\n\nThe CEGSSC was launched by Ministry of Social Justice & Empowerment on May 6,\n2015 with the objective of promoting entrepreneurship amongst the Scheduled Castes\n(SCs), by providing credit enhancement guarantee to Member Lending Institutions\n(MLIs), which extend financial assistance to these entrepreneurs. IFCI Ltd. has been\ndesignated as the Nodal Agency under the scheme, to issue the guarantee cover in\nfavour of MLIs for financing SC entrepreneurs.\n\nIndividual SC entrepreneurs/Registered Companies and Societies/Registered\nPartnership Firms/Sole Proprietorship firms having more than 51% shareholding and\nmanagement control for the previous 6 months by SC entrepreneurs/ promoters/\nmembers are eligible for guarantee from IFCI Ltd. against the loans extended by MLIs.\n\nThe amount of guarantee cover under CEGSSC ranges from a minimum of ₹0.15 cr\nto a maximum of ₹5.00 cr.\n\nThe tenure of guarantee is up to a maximum of 7 years or repayment period, whichever\nis earlier.",
+        "1\n\nभारतीय įरज़वर् बैंक\n_________________________ RESERVE BANK OF INDIA___________________________\nwww.rbi.org.in\n\nRBI/2026-27/272\nFIDD.CO.GSSD.BC.No.11/09.09.001/2026-27 October 01, 2026\n\nThe Chairman/ Managing Director / Chief Executive Officer\nAll Scheduled Commercial Banks (including Small Finance Banks)\n\nMadam/ Dear Sir,\n\nMaster Circular - Credit facilities to Scheduled Castes (SCs) & Scheduled Tribes\n(STs)\n\nThe Reserve Bank of India has, from time to time, issued a number of\nguidelines/instructions to banks on credit facilities to Scheduled Castes (SCs) & Scheduled\nTribes (STs). The enclosed Master Circular consolidates the circulars issued by Reserve\nBank on the subject till date, as listed in the Appendix.\n\nYours faithfully,\n\n(R. Giridharan)\nChief General Manager",
+        "4. Reservations for SC/ST beneficiaries under major Centrally Sponsored\n\nSchemes.\nThere are several major centrally sponsored schemes under which credit is provided\nby banks and subsidy is received through Government Agencies. Credit flow under\nthese schemes is monitored by RBI. Under each of these, there is a significant\nreservation/relaxation for the members of the SC/ST communities.\n4.1 Deendayal Antyodaya Yojana - National Rural Livelihoods Mission (DAY-NRLM)\n\nDAY-NRLM (previously known as NRLM) was launched by the Ministry of Rural\nDevelopment, Government of India by restructuring the erstwhile Swarnajayanti Gram\nSwarozgar Yojana, effective from April 1, 2013. DAY-NRLM would ensure adequate\ncoverage of vulnerable sections of the society such that 50% of these beneficiaries\nare SCs/STs. Details of the scheme are available in the Master Circular on DAY-NRLM\nas updated from time to time.",
+        "197. 28-Nov-16\n\nDCM(Plg)No.1438/10.27.00/2\n016-17\nChest Guarantee Scheme for Specified\nBank Notes (SBNs) – CGSS",
+        "195. 27-Nov-16\n\nDCM(Plg)\nNo.1430/10.27.00/2016-17\nChest Guarantee Scheme for Specified\nBank Notes (SBNs) – CGSS\nhttps://www.rbi.org.in/scripts/FS_Notifica\ntion.aspx?Id=10745&fn=2753&Mode=0"
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 14,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 5,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 1,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 11,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 4,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "96261961dcb62cc2937b217719777042adfd7666a68e1e58070d3d5ac6de3f23",
+          "chunk_index": 130,
+          "title": "Consolidation/ Review of instructions issued on currency management matters – Withdrawal of Circulars/ Guidelines",
+          "source_file": "NOTI27401102026AA16BFEFF59341BF97FD2930B1A4A63C.PDF",
+          "page": 17,
+          "circular_no": "RBI/2026-27/274",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13718&Mode=0"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "96261961dcb62cc2937b217719777042adfd7666a68e1e58070d3d5ac6de3f23",
+          "chunk_index": 128,
+          "title": "Consolidation/ Review of instructions issued on currency management matters – Withdrawal of Circulars/ Guidelines",
+          "source_file": "NOTI27401102026AA16BFEFF59341BF97FD2930B1A4A63C.PDF",
+          "page": 17,
+          "circular_no": "RBI/2026-27/274",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13718&Mode=0"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.9711187266923914,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "5. Credit Enhancement Guarantee Scheme for Scheduled Castes (CEGSSC)\n\nThe CEGSSC was launched by Ministry of Social Justice & Empowerment on May 6,\n2015 with the objective of promoting entrepreneurship amongst the Scheduled Castes\n(SCs), by providing credit enhancement guarantee to Member Lending Institutions\n(MLIs), which extend financial assistance to these entrepreneurs. IFCI Ltd. has been\ndesignated as the Nodal Agency under the scheme, to issue the guarantee cover in\nfavour of MLIs for financing SC entrepreneurs.\n\nIndividual SC entrepreneurs/Registered Companies and Societies/Registered\nPartnership Firms/Sole Proprietorship firms having more than 51% shareholding and\nmanagement control for the previous 6 months by SC entrepreneurs/ promoters/\nmembers are eligible for guarantee from IFCI Ltd. against the loans extended by MLIs.\n\nThe amount of guarantee cover under CEGSSC ranges from a minimum of ₹0.15 cr\nto a maximum of ₹5.00 cr.\n\nThe tenure of guarantee is up to a maximum of 7 years or repayment period, whichever\nis earlier.",
+        "1\n\nभारतीय įरज़वर् बैंक\n_________________________ RESERVE BANK OF INDIA___________________________\nwww.rbi.org.in\n\nRBI/2026-27/272\nFIDD.CO.GSSD.BC.No.11/09.09.001/2026-27 October 01, 2026\n\nThe Chairman/ Managing Director / Chief Executive Officer\nAll Scheduled Commercial Banks (including Small Finance Banks)\n\nMadam/ Dear Sir,\n\nMaster Circular - Credit facilities to Scheduled Castes (SCs) & Scheduled Tribes\n(STs)\n\nThe Reserve Bank of India has, from time to time, issued a number of\nguidelines/instructions to banks on credit facilities to Scheduled Castes (SCs) & Scheduled\nTribes (STs). The enclosed Master Circular consolidates the circulars issued by Reserve\nBank on the subject till date, as listed in the Appendix.\n\nYours faithfully,\n\n(R. Giridharan)\nChief General Manager",
+        "4. Reservations for SC/ST beneficiaries under major Centrally Sponsored\n\nSchemes.\nThere are several major centrally sponsored schemes under which credit is provided\nby banks and subsidy is received through Government Agencies. Credit flow under\nthese schemes is monitored by RBI. Under each of these, there is a significant\nreservation/relaxation for the members of the SC/ST communities.\n4.1 Deendayal Antyodaya Yojana - National Rural Livelihoods Mission (DAY-NRLM)\n\nDAY-NRLM (previously known as NRLM) was launched by the Ministry of Rural\nDevelopment, Government of India by restructuring the erstwhile Swarnajayanti Gram\nSwarozgar Yojana, effective from April 1, 2013. DAY-NRLM would ensure adequate\ncoverage of vulnerable sections of the society such that 50% of these beneficiaries\nare SCs/STs. Details of the scheme are available in the Master Circular on DAY-NRLM\nas updated from time to time.",
+        "197. 28-Nov-16\n\nDCM(Plg)No.1438/10.27.00/2\n016-17\nChest Guarantee Scheme for Specified\nBank Notes (SBNs) – CGSS",
+        "195. 27-Nov-16\n\nDCM(Plg)\nNo.1430/10.27.00/2016-17\nChest Guarantee Scheme for Specified\nBank Notes (SBNs) – CGSS\nhttps://www.rbi.org.in/scripts/FS_Notifica\ntion.aspx?Id=10745&fn=2753&Mode=0"
+      ]
+    },
+    {
+      "id": "G006",
+      "configuration": "best",
+      "question": "Which institution is designated as the nodal agency to issue guarantee cover under the Credit Enhancement Guarantee Scheme for Scheduled Castes (CEGSSC)?",
+      "reference": "IFCI Ltd. is the nodal agency that issues guarantee cover in favour of Member Lending Institutions financing SC entrepreneurs.",
+      "gold_sources": [
+        {
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "page": 5
+        }
+      ],
+      "answer": "IFCI Ltd. is designated as the nodal agency to issue the guarantee cover under the Credit Enhancement Guarantee Scheme for Scheduled Castes (CEGSSC) [e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77 p.5].",
+      "status": "generated",
+      "contexts": [
+        "5. Credit Enhancement Guarantee Scheme for Scheduled Castes (CEGSSC)\n\nThe CEGSSC was launched by Ministry of Social Justice & Empowerment on May 6,\n2015 with the objective of promoting entrepreneurship amongst the Scheduled Castes\n(SCs), by providing credit enhancement guarantee to Member Lending Institutions\n(MLIs), which extend financial assistance to these entrepreneurs. IFCI Ltd. has been\ndesignated as the Nodal Agency under the scheme, to issue the guarantee cover in\nfavour of MLIs for financing SC entrepreneurs.\n\nIndividual SC entrepreneurs/Registered Companies and Societies/Registered\nPartnership Firms/Sole Proprietorship firms having more than 51% shareholding and\nmanagement control for the previous 6 months by SC entrepreneurs/ promoters/\nmembers are eligible for guarantee from IFCI Ltd. against the loans extended by MLIs.\n\nThe amount of guarantee cover under CEGSSC ranges from a minimum of ₹0.15 cr\nto a maximum of ₹5.00 cr.\n\nThe tenure of guarantee is up to a maximum of 7 years or repayment period, whichever\nis earlier.",
+        "1\n\nभारतीय įरज़वर् बैंक\n_________________________ RESERVE BANK OF INDIA___________________________\nwww.rbi.org.in\n\nRBI/2026-27/272\nFIDD.CO.GSSD.BC.No.11/09.09.001/2026-27 October 01, 2026\n\nThe Chairman/ Managing Director / Chief Executive Officer\nAll Scheduled Commercial Banks (including Small Finance Banks)\n\nMadam/ Dear Sir,\n\nMaster Circular - Credit facilities to Scheduled Castes (SCs) & Scheduled Tribes\n(STs)\n\nThe Reserve Bank of India has, from time to time, issued a number of\nguidelines/instructions to banks on credit facilities to Scheduled Castes (SCs) & Scheduled\nTribes (STs). The enclosed Master Circular consolidates the circulars issued by Reserve\nBank on the subject till date, as listed in the Appendix.\n\nYours faithfully,\n\n(R. Giridharan)\nChief General Manager",
+        "2\n\nMaster Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes\n(STs)\n\nBanks should take the measures indicated below to step up their advances to\nSCs/STs.",
+        "2. Face value of municipal debt securities\n\n4.1.6. The SPV/pooled finance vehicle may include following forms of credit\nenhancement to enhance credit rating and provide greater protection to\ninvestors:\n\ni.\nAdditional cash collateral\nii.\nProgram equity by the state government\niii.\nAccess to state finance commission devolutions to ULBs\niv.\nFull or partial credit guarantee from a high rated development\nfinance institution (DFI) or multilateral institution”\nv.\nAny other appropriate credit enhancement structure\n\n4. Timelines for submission of financial results to the stock exchange(s):\n\n4.1. The said Circular also specifies the following timelines in respect of submission of\nfinancial results to the stock exchange(s) by the municipalities:",
+        "2. Role of Banks\n\n2.3 Circulars issued by RBI/NABARD should be circulated among the staff for\ncompliance.\n\n2.4 Banks should not insist on deposits while considering loan applications under\nGovernment sponsored poverty alleviation schemes/self-employment programmes\nfrom borrowers belonging to SCs/STs. It should also be ensured that applicable\nsubsidy is not held back while releasing the loan component till the full repayment of\nbank dues. Non-release of subsidy upfront amounts to under-financing and hampers\nasset creation/income generation.\n\n2.5 The National Scheduled Tribes Finance & Development Corporation and National\nScheduled Castes Finance & Development Corporation have been set up under the\nadministrative control of Ministry of Tribal Affairs and Ministry of Social Justice &\nEmpowerment, respectively. Banks should advise their branches/controlling offices to\nrender all the necessary institutional support to enable these institutions to achieve\nthe desired objectives."
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 14,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 5,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 1,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 3,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 2,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "a2fb91352a00efd45a9f394624e1a484303a59b5b992cab5f84dcb7ae2adc0c3",
+          "chunk_index": 7,
+          "title": "Amendment to SEBI (Issue and Listing of Municipal Debt Securities) Regulations, 2015 (“ILMDS Regulations”)",
+          "source_file": "1786447511614.pdf",
+          "page": 3,
+          "circular_no": "HO/17/11/24(1)2026-DDHS-POD1/I/18526/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/amendment-to-sebi-issue-and-listing-of-municipal-debt-securities-regulations-2015-ilmds-regulations-_103488.html"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 7,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 3,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.9581172796341743,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "5. Credit Enhancement Guarantee Scheme for Scheduled Castes (CEGSSC)\n\nThe CEGSSC was launched by Ministry of Social Justice & Empowerment on May 6,\n2015 with the objective of promoting entrepreneurship amongst the Scheduled Castes\n(SCs), by providing credit enhancement guarantee to Member Lending Institutions\n(MLIs), which extend financial assistance to these entrepreneurs. IFCI Ltd. has been\ndesignated as the Nodal Agency under the scheme, to issue the guarantee cover in\nfavour of MLIs for financing SC entrepreneurs.\n\nIndividual SC entrepreneurs/Registered Companies and Societies/Registered\nPartnership Firms/Sole Proprietorship firms having more than 51% shareholding and\nmanagement control for the previous 6 months by SC entrepreneurs/ promoters/\nmembers are eligible for guarantee from IFCI Ltd. against the loans extended by MLIs.\n\nThe amount of guarantee cover under CEGSSC ranges from a minimum of ₹0.15 cr\nto a maximum of ₹5.00 cr.\n\nThe tenure of guarantee is up to a maximum of 7 years or repayment period, whichever\nis earlier.",
+        "1\n\nभारतीय įरज़वर् बैंक\n_________________________ RESERVE BANK OF INDIA___________________________\nwww.rbi.org.in\n\nRBI/2026-27/272\nFIDD.CO.GSSD.BC.No.11/09.09.001/2026-27 October 01, 2026\n\nThe Chairman/ Managing Director / Chief Executive Officer\nAll Scheduled Commercial Banks (including Small Finance Banks)\n\nMadam/ Dear Sir,\n\nMaster Circular - Credit facilities to Scheduled Castes (SCs) & Scheduled Tribes\n(STs)\n\nThe Reserve Bank of India has, from time to time, issued a number of\nguidelines/instructions to banks on credit facilities to Scheduled Castes (SCs) & Scheduled\nTribes (STs). The enclosed Master Circular consolidates the circulars issued by Reserve\nBank on the subject till date, as listed in the Appendix.\n\nYours faithfully,\n\n(R. Giridharan)\nChief General Manager",
+        "2\n\nMaster Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes\n(STs)\n\nBanks should take the measures indicated below to step up their advances to\nSCs/STs.",
+        "2. Face value of municipal debt securities\n\n4.1.6. The SPV/pooled finance vehicle may include following forms of credit\nenhancement to enhance credit rating and provide greater protection to\ninvestors:\n\ni.\nAdditional cash collateral\nii.\nProgram equity by the state government\niii.\nAccess to state finance commission devolutions to ULBs\niv.\nFull or partial credit guarantee from a high rated development\nfinance institution (DFI) or multilateral institution”\nv.\nAny other appropriate credit enhancement structure\n\n4. Timelines for submission of financial results to the stock exchange(s):\n\n4.1. The said Circular also specifies the following timelines in respect of submission of\nfinancial results to the stock exchange(s) by the municipalities:",
+        "2. Role of Banks\n\n2.3 Circulars issued by RBI/NABARD should be circulated among the staff for\ncompliance.\n\n2.4 Banks should not insist on deposits while considering loan applications under\nGovernment sponsored poverty alleviation schemes/self-employment programmes\nfrom borrowers belonging to SCs/STs. It should also be ensured that applicable\nsubsidy is not held back while releasing the loan component till the full repayment of\nbank dues. Non-release of subsidy upfront amounts to under-financing and hampers\nasset creation/income generation.\n\n2.5 The National Scheduled Tribes Finance & Development Corporation and National\nScheduled Castes Finance & Development Corporation have been set up under the\nadministrative control of Ministry of Tribal Affairs and Ministry of Social Justice &\nEmpowerment, respectively. Banks should advise their branches/controlling offices to\nrender all the necessary institutional support to enable these institutions to achieve\nthe desired objectives."
+      ]
+    }
+  ],
+  "review_note": "Review ten scored judgments using the saved question, answer, reference and context. Record a human verdict and evidence for any genuine judge error found. High faithfulness means context support, not a complete or correct answer: the context can be wrong or incomplete, and the judge can err. Reasons may be unavailable. Means exclude missing scores; compare coverage counts as well as averages."
+}

@@ -1,0 +1,1008 @@
+{
+  "timestamp_utc": "20261101T105804471994Z",
+  "configuration": {
+    "ragas_version": "0.4.3",
+    "prompt": "v1",
+    "generation_model": "openai/gpt-oss-120b",
+    "judge_model": "openai/gpt-oss-120b",
+    "judge_provider": "groq",
+    "temperature": 0,
+    "embeddings": "BAAI/bge-small-en-v1.5",
+    "selected_question_ids": [
+      "G007",
+      "G008",
+      "G009",
+      "G010",
+      "G011"
+    ]
+  },
+  "summary": {
+    "baseline": {
+      "questions": 5,
+      "refusals": 1,
+      "errors": 0,
+      "faithfulness": {
+        "mean": 1.0,
+        "scored": 4,
+        "unavailable": 1
+      },
+      "answer_relevancy": {
+        "mean": 0.8427003136346904,
+        "scored": 4,
+        "unavailable": 1
+      },
+      "context_precision": {
+        "mean": 0.9718749999194531,
+        "scored": 4,
+        "unavailable": 1
+      },
+      "context_recall": {
+        "mean": 0.875,
+        "scored": 4,
+        "unavailable": 1
+      }
+    },
+    "best": {
+      "questions": 5,
+      "refusals": 0,
+      "errors": 2,
+      "faithfulness": {
+        "mean": 1.0,
+        "scored": 5,
+        "unavailable": 0
+      },
+      "answer_relevancy": {
+        "mean": 0.8452799112190911,
+        "scored": 3,
+        "unavailable": 2
+      },
+      "context_precision": {
+        "mean": 0.8208333332690625,
+        "scored": 4,
+        "unavailable": 1
+      },
+      "context_recall": {
+        "mean": 0.9375,
+        "scored": 4,
+        "unavailable": 1
+      }
+    }
+  },
+  "per_question": [
+    {
+      "id": "G007",
+      "configuration": "baseline",
+      "question": "Under RBI's Note Sorting Machines Master Direction, how often must banks test their machines, what testing certificate must they retain, and what minimum test-deck size and tolerances apply?",
+      "reference": "Banks must test accuracy and consistency quarterly, recalibrate if required, and retain a certificate signed by bank officials. Each quarter, the test deck must contain at least 2,000 pieces of soiled notes, including mutilated notes, FICNs and reissuables. The acceptable tolerance for fitness checks is 5%; tolerance for FICNs is zero. Discrepancies require advising the machine supplier to recalibrate.",
+      "gold_sources": [
+        {
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "page": 8
+        },
+        {
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "page": 9
+        }
+      ],
+      "answer": "not found in the provided documents",
+      "status": "prompt_refusal",
+      "contexts": [
+        "7. Calibration and Periodic Testing of Machines\n\nBanks shall ensure that the Note Sorting machines are tested for accuracy and\nconsistency on a quarterly basis and recalibrated, if required. A certificate (signed by\nBank Officials) to this effect shall be maintained for records. A periodicity of quarterly\ntesting as per the Format attached, may be followed.\n\n8. Standards issued by the Bureau of Indian Standards (BIS) for Note Sorting\nMachines (NSMs)\n\n8.1 The Bureau of Indian Standards (BIS) after due consultation with Reserve Bank\nof India and other stakeholders, published the standards for Note Sorting Machines\n(NSM) - ‘IS 18663: 2024’ in the ‘Gazette of India’ on March 19, 2024. The standards\nare available at BIS website (https://standards.bis.gov.in/website)\nThe list of BIS certified models of NSMs can be accessed at following links:\nFor domestic manufacturers:\nhttps://manakonline.in/MANAK/ApplicationLicenceRelatedrpt\nFor foreign manufacturers:\nhttps://www.bis.gov.in/fmcs/licensee/",
+        "भारतीय ǐरज़वर् बैंक\nRESERVE BANK OF INDIA\nwww.rbi.org.in\nRBI/DCM/2026-27/473\nDCM(NPD) No.S2154/18.00.014/2026-27 October 02, 2026\n\nThe Chairman / Managing Director / Chief Executive Officer\nAll Banks\n\nMadam / Dear Sir,\n\nMaster Direction on Note Sorting Machines\n\nIn exercise of the powers conferred under Section 35A and Section 56 of the\nBanking Regulation Act, 1949, Reserve Bank of India (RBI), from time-to-time\nissues guidelines / circulars / directives to the banks on Note Sorting Machines.\n\n2. A Master Direction incorporating and updating the extant guidelines / circulars /\ndirectives on the subject has been prepared to enable banks to have all current\ninstructions on Note Sorting Machines at one place for reference and the same is\nenclosed.\n\n3. The previous circulars issued on the subject (Annexed) stand withdrawn from the\ndate of issuance of this Master Direction.\n\nYours faithfully,\n\n(Sanjeev Prakash)\nChief General Manager-in-Charge\n\nEncl: As above",
+        "7. Calibration and Periodic Testing of Machines\n\n10\n\nAnnex\n\nList of Circulars withdrawn\n\nSr.\nNo.\nCircular / Notification\nNo.\nDate\nSubject\n1\nDCM. No. Cir. NPD .\n3161/09.39.00\n(Policy)/2009-2010\n19.11.2009\nSorting / Processing of Notes -\nInstallation of Note Sorting Machines\n2\nDCM(R&D)No.G-\n26/18.00.14/2009-10\n11.05.2010\nInstallation of Note Sorting Machines\n- Note Authentication and Fitness\nSorting Parameters\n3\nDCM(NPD)No.S488/18.\n00.14/2022-23\n01.07.2022\nNote Sorting Machines -\nAuthentication and Fitness Sorting\nParameters\n4\nDCM (NPD)\nNo.S2193/09.45.000/20\n24-25\n30.10.2024\nNote Sorting Machines: Standards\nissued by the Bureau of Indian\nStandards\n5\nDCM (NPD)\nNo.S287/18.00.014/202\n5-26\n24.04.2025\nNote Sorting Machines: Standards\nissued by the Bureau of Indian\nStandards - Revised Timeline for\nImplementation",
+        "3\n\nMaster Direction on Note Sorting Machines\n\nIn exercise of the powers conferred under Section 35A and Section 56 of the Banking\nRegulation Act, 1949, Reserve Bank of India (RBI) being satisfied that it is necessary\nand expedient in the public interest to do so, hereby, issues the Directions hereinafter\nspecified.",
+        "1. Introduction\n\nGuidelines on installation of Note Sorting Machines (NSMs) for sorting / processing\nof notes were issued vide circular DCM. No. Cir. NPD.3161/09.39.00 (Policy)/2009-\n2010 dated November 19, 2009, advising banks that these machines should conform\nto the standards / parameters prescribed by Reserve Bank of India from time to time.\nFurther, with reference to the draft guidelines on ''Note Authentication and Fitness\nSorting Parameters'' published during 2009 (December 23, 2009) and comments\nreceived from various stakeholders including banks, equipment manufacturers and\nmembers of public in this regard, the final guidelines on ''Note Authentication and\nFitness Sorting Parameters'' were issued vide circular DCM(R&D) No.G-\n26/18.00.14/2009-10 dated May 11, 2010. Subsequently, in the backdrop of\nintroduction of the new series banknotes, these parameters were reviewed, and a\nrevised set of guidelines were issued to banks vide circular DCM(NPD)No.\nS488/18.00.14/2022-23 dated July 01, 2022."
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 20,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 8,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 1,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 1,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 24,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 10,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 5,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 3,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 6,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 3,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        }
+      ],
+      "scores": {
+        "faithfulness": null,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "7. Calibration and Periodic Testing of Machines\n\nBanks shall ensure that the Note Sorting machines are tested for accuracy and\nconsistency on a quarterly basis and recalibrated, if required. A certificate (signed by\nBank Officials) to this effect shall be maintained for records. A periodicity of quarterly\ntesting as per the Format attached, may be followed.\n\n8. Standards issued by the Bureau of Indian Standards (BIS) for Note Sorting\nMachines (NSMs)\n\n8.1 The Bureau of Indian Standards (BIS) after due consultation with Reserve Bank\nof India and other stakeholders, published the standards for Note Sorting Machines\n(NSM) - ‘IS 18663: 2024’ in the ‘Gazette of India’ on March 19, 2024. The standards\nare available at BIS website (https://standards.bis.gov.in/website)\nThe list of BIS certified models of NSMs can be accessed at following links:\nFor domestic manufacturers:\nhttps://manakonline.in/MANAK/ApplicationLicenceRelatedrpt\nFor foreign manufacturers:\nhttps://www.bis.gov.in/fmcs/licensee/",
+        "भारतीय ǐरज़वर् बैंक\nRESERVE BANK OF INDIA\nwww.rbi.org.in\nRBI/DCM/2026-27/473\nDCM(NPD) No.S2154/18.00.014/2026-27 October 02, 2026\n\nThe Chairman / Managing Director / Chief Executive Officer\nAll Banks\n\nMadam / Dear Sir,\n\nMaster Direction on Note Sorting Machines\n\nIn exercise of the powers conferred under Section 35A and Section 56 of the\nBanking Regulation Act, 1949, Reserve Bank of India (RBI), from time-to-time\nissues guidelines / circulars / directives to the banks on Note Sorting Machines.\n\n2. A Master Direction incorporating and updating the extant guidelines / circulars /\ndirectives on the subject has been prepared to enable banks to have all current\ninstructions on Note Sorting Machines at one place for reference and the same is\nenclosed.\n\n3. The previous circulars issued on the subject (Annexed) stand withdrawn from the\ndate of issuance of this Master Direction.\n\nYours faithfully,\n\n(Sanjeev Prakash)\nChief General Manager-in-Charge\n\nEncl: As above",
+        "7. Calibration and Periodic Testing of Machines\n\n10\n\nAnnex\n\nList of Circulars withdrawn\n\nSr.\nNo.\nCircular / Notification\nNo.\nDate\nSubject\n1\nDCM. No. Cir. NPD .\n3161/09.39.00\n(Policy)/2009-2010\n19.11.2009\nSorting / Processing of Notes -\nInstallation of Note Sorting Machines\n2\nDCM(R&D)No.G-\n26/18.00.14/2009-10\n11.05.2010\nInstallation of Note Sorting Machines\n- Note Authentication and Fitness\nSorting Parameters\n3\nDCM(NPD)No.S488/18.\n00.14/2022-23\n01.07.2022\nNote Sorting Machines -\nAuthentication and Fitness Sorting\nParameters\n4\nDCM (NPD)\nNo.S2193/09.45.000/20\n24-25\n30.10.2024\nNote Sorting Machines: Standards\nissued by the Bureau of Indian\nStandards\n5\nDCM (NPD)\nNo.S287/18.00.014/202\n5-26\n24.04.2025\nNote Sorting Machines: Standards\nissued by the Bureau of Indian\nStandards - Revised Timeline for\nImplementation",
+        "3\n\nMaster Direction on Note Sorting Machines\n\nIn exercise of the powers conferred under Section 35A and Section 56 of the Banking\nRegulation Act, 1949, Reserve Bank of India (RBI) being satisfied that it is necessary\nand expedient in the public interest to do so, hereby, issues the Directions hereinafter\nspecified.",
+        "1. Introduction\n\nGuidelines on installation of Note Sorting Machines (NSMs) for sorting / processing\nof notes were issued vide circular DCM. No. Cir. NPD.3161/09.39.00 (Policy)/2009-\n2010 dated November 19, 2009, advising banks that these machines should conform\nto the standards / parameters prescribed by Reserve Bank of India from time to time.\nFurther, with reference to the draft guidelines on ''Note Authentication and Fitness\nSorting Parameters'' published during 2009 (December 23, 2009) and comments\nreceived from various stakeholders including banks, equipment manufacturers and\nmembers of public in this regard, the final guidelines on ''Note Authentication and\nFitness Sorting Parameters'' were issued vide circular DCM(R&D) No.G-\n26/18.00.14/2009-10 dated May 11, 2010. Subsequently, in the backdrop of\nintroduction of the new series banknotes, these parameters were reviewed, and a\nrevised set of guidelines were issued to banks vide circular DCM(NPD)No.\nS488/18.00.14/2022-23 dated July 01, 2022."
+      ]
+    },
+    {
+      "id": "G007",
+      "configuration": "best",
+      "question": "Under RBI's Note Sorting Machines Master Direction, how often must banks test their machines, what testing certificate must they retain, and what minimum test-deck size and tolerances apply?",
+      "reference": "Banks must test accuracy and consistency quarterly, recalibrate if required, and retain a certificate signed by bank officials. Each quarter, the test deck must contain at least 2,000 pieces of soiled notes, including mutilated notes, FICNs and reissuables. The acceptable tolerance for fitness checks is 5%; tolerance for FICNs is zero. Discrepancies require advising the machine supplier to recalibrate.",
+      "gold_sources": [
+        {
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "page": 8
+        },
+        {
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "page": 9
+        }
+      ],
+      "answer": "Banks must test their note‑sorting machines **quarterly** and keep a **certificate signed by the bank officials** as evidence of the test [564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638 p.8].  \n\nFor each test the bank must prepare a **test deck of at least 2,000 notes** (including soiled, mutilated notes, FICNs and re‑issuables) [564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638 p.9].  \n\nThe results must be within an **acceptable tolerance of 5 % for fitness checks**, with **zero tolerance for FICNs** [564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638 p.9].",
+      "status": "generated",
+      "contexts": [
+        "7. Calibration and Periodic Testing of Machines\n\nBanks shall ensure that the Note Sorting machines are tested for accuracy and\nconsistency on a quarterly basis and recalibrated, if required. A certificate (signed by\nBank Officials) to this effect shall be maintained for records. A periodicity of quarterly\ntesting as per the Format attached, may be followed.\n\n8. Standards issued by the Bureau of Indian Standards (BIS) for Note Sorting\nMachines (NSMs)\n\n8.1 The Bureau of Indian Standards (BIS) after due consultation with Reserve Bank\nof India and other stakeholders, published the standards for Note Sorting Machines\n(NSM) - ‘IS 18663: 2024’ in the ‘Gazette of India’ on March 19, 2024. The standards\nare available at BIS website (https://standards.bis.gov.in/website)\nThe list of BIS certified models of NSMs can be accessed at following links:\nFor domestic manufacturers:\nhttps://manakonline.in/MANAK/ApplicationLicenceRelatedrpt\nFor foreign manufacturers:\nhttps://www.bis.gov.in/fmcs/licensee/",
+        "भारतीय ǐरज़वर् बैंक\nRESERVE BANK OF INDIA\nwww.rbi.org.in\nRBI/DCM/2026-27/473\nDCM(NPD) No.S2154/18.00.014/2026-27 October 02, 2026\n\nThe Chairman / Managing Director / Chief Executive Officer\nAll Banks\n\nMadam / Dear Sir,\n\nMaster Direction on Note Sorting Machines\n\nIn exercise of the powers conferred under Section 35A and Section 56 of the\nBanking Regulation Act, 1949, Reserve Bank of India (RBI), from time-to-time\nissues guidelines / circulars / directives to the banks on Note Sorting Machines.\n\n2. A Master Direction incorporating and updating the extant guidelines / circulars /\ndirectives on the subject has been prepared to enable banks to have all current\ninstructions on Note Sorting Machines at one place for reference and the same is\nenclosed.\n\n3. The previous circulars issued on the subject (Annexed) stand withdrawn from the\ndate of issuance of this Master Direction.\n\nYours faithfully,\n\n(Sanjeev Prakash)\nChief General Manager-in-Charge\n\nEncl: As above",
+        "7. Calibration and Periodic Testing of Machines\n\n(Signature)\n(Signature)\n(Signature)\nMachine Supplier\nNSM Operator\nBank Official\nTesting Procedure\n•\nA test deck of minimum 2000 pieces of soiled notes including mutilated notes, FICNs, Reissuables shall be prepared every\nquarter.\n•\nThese notes may be comprised of following denominations - ₹100 - old series (25%), ₹100 - new series (25%), ₹200 (25%) and\n₹500 (25%) as per availability i.e., if notes in any denomination is not available, same may be replaced with other available\ndenominations, and shall be run separately.\n•\nIn case of discrepancies, machine supplier shall be advised to re-calibrate the machines. The acceptable tolerance level for\nfitness checks is 5%, however, there is zero tolerance for FICNs.",
+        "7. Calibration and Periodic Testing of Machines\n\n8.2 NSM models deployed at banks which have been discontinued from production,\nshall be phased out on or before June 30, 2027. The timeline may be strictly adhered\nto, failing which penalties would be levied for non-adherence in terms of Master\nDirection on “Incentives for Currency Distribution and Exchange and Penalties / Penal\nProvisions for Bank Branches and Currency Chests for Deficiency in Rendering\nCustomer Service and Reporting of Transactions / Balances” (Updated as on May\n27, 2026). Going forward, banks shall only procure the BIS certified Note Sorting\nMachines (NSMs).\n\n***************************",
+        "3\n\nMaster Direction on Note Sorting Machines\n\nIn exercise of the powers conferred under Section 35A and Section 56 of the Banking\nRegulation Act, 1949, Reserve Bank of India (RBI) being satisfied that it is necessary\nand expedient in the public interest to do so, hereby, issues the Directions hereinafter\nspecified."
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 20,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 8,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 1,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 1,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 23,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 9,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 21,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 8,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 5,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 3,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": null,
+        "context_precision": 0.3333333333,
+        "context_recall": 1.0
+      },
+      "errors": {
+        "answer_relevancy": "InstructorRetryException: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m0fq8m5tesft62a90b4kneq7` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6450, Requested 1710. Please try again in 1.2s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+      },
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "7. Calibration and Periodic Testing of Machines\n\nBanks shall ensure that the Note Sorting machines are tested for accuracy and\nconsistency on a quarterly basis and recalibrated, if required. A certificate (signed by\nBank Officials) to this effect shall be maintained for records. A periodicity of quarterly\ntesting as per the Format attached, may be followed.\n\n8. Standards issued by the Bureau of Indian Standards (BIS) for Note Sorting\nMachines (NSMs)\n\n8.1 The Bureau of Indian Standards (BIS) after due consultation with Reserve Bank\nof India and other stakeholders, published the standards for Note Sorting Machines\n(NSM) - ‘IS 18663: 2024’ in the ‘Gazette of India’ on March 19, 2024. The standards\nare available at BIS website (https://standards.bis.gov.in/website)\nThe list of BIS certified models of NSMs can be accessed at following links:\nFor domestic manufacturers:\nhttps://manakonline.in/MANAK/ApplicationLicenceRelatedrpt\nFor foreign manufacturers:\nhttps://www.bis.gov.in/fmcs/licensee/",
+        "भारतीय ǐरज़वर् बैंक\nRESERVE BANK OF INDIA\nwww.rbi.org.in\nRBI/DCM/2026-27/473\nDCM(NPD) No.S2154/18.00.014/2026-27 October 02, 2026\n\nThe Chairman / Managing Director / Chief Executive Officer\nAll Banks\n\nMadam / Dear Sir,\n\nMaster Direction on Note Sorting Machines\n\nIn exercise of the powers conferred under Section 35A and Section 56 of the\nBanking Regulation Act, 1949, Reserve Bank of India (RBI), from time-to-time\nissues guidelines / circulars / directives to the banks on Note Sorting Machines.\n\n2. A Master Direction incorporating and updating the extant guidelines / circulars /\ndirectives on the subject has been prepared to enable banks to have all current\ninstructions on Note Sorting Machines at one place for reference and the same is\nenclosed.\n\n3. The previous circulars issued on the subject (Annexed) stand withdrawn from the\ndate of issuance of this Master Direction.\n\nYours faithfully,\n\n(Sanjeev Prakash)\nChief General Manager-in-Charge\n\nEncl: As above",
+        "7. Calibration and Periodic Testing of Machines\n\n(Signature)\n(Signature)\n(Signature)\nMachine Supplier\nNSM Operator\nBank Official\nTesting Procedure\n•\nA test deck of minimum 2000 pieces of soiled notes including mutilated notes, FICNs, Reissuables shall be prepared every\nquarter.\n•\nThese notes may be comprised of following denominations - ₹100 - old series (25%), ₹100 - new series (25%), ₹200 (25%) and\n₹500 (25%) as per availability i.e., if notes in any denomination is not available, same may be replaced with other available\ndenominations, and shall be run separately.\n•\nIn case of discrepancies, machine supplier shall be advised to re-calibrate the machines. The acceptable tolerance level for\nfitness checks is 5%, however, there is zero tolerance for FICNs.",
+        "7. Calibration and Periodic Testing of Machines\n\n8.2 NSM models deployed at banks which have been discontinued from production,\nshall be phased out on or before June 30, 2027. The timeline may be strictly adhered\nto, failing which penalties would be levied for non-adherence in terms of Master\nDirection on “Incentives for Currency Distribution and Exchange and Penalties / Penal\nProvisions for Bank Branches and Currency Chests for Deficiency in Rendering\nCustomer Service and Reporting of Transactions / Balances” (Updated as on May\n27, 2026). Going forward, banks shall only procure the BIS certified Note Sorting\nMachines (NSMs).\n\n***************************",
+        "3\n\nMaster Direction on Note Sorting Machines\n\nIn exercise of the powers conferred under Section 35A and Section 56 of the Banking\nRegulation Act, 1949, Reserve Bank of India (RBI) being satisfied that it is necessary\nand expedient in the public interest to do so, hereby, issues the Directions hereinafter\nspecified."
+      ]
+    },
+    {
+      "id": "G008",
+      "configuration": "baseline",
+      "question": "For a low-value transmission claim involving dematerialised securities with no nomination, what is the QTP threshold, which relatives are eligible, and what documents must the claimant submit?",
+      "reference": "The dematerialised-securities QTP threshold is Rs 30,000 per beneficial owner. QTP concerns transmission following the death of the sole holder or all joint holders, without disputed or competing claims. QTP is permitted only for parents, spouse, children and parents-in-law of the deceased holder. The claimant must submit the Annexure-2 transmission request form-cum-undertaking on plain paper, a document establishing the relationship, the latest client master list of the claimant's demat account, a verifiable death certificate, and the original security certificate or copy of statement of account, as applicable.",
+      "gold_sources": [
+        {
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "page": 2
+        },
+        {
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "page": 5
+        },
+        {
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "page": 6
+        },
+        {
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "page": 7
+        },
+        {
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "page": 8
+        }
+      ],
+      "answer": "- **QTP threshold for dematerialised securities:** ₹ 30 thousand (30 ₹ in Thousands) [9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411 p.2]  \n\n- **Relatives eligible to claim under QTP:** Immediate relatives of the deceased holder – parents, spouse, children and parents‑in‑law [9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411 p.8]  \n\n- **Documents the claimant must submit:** 1) Transmission request form‑cum‑undertaking in the format of Annexure‑2 on plain paper, and 2) a document establishing the relationship between the claimant(s) and the deceased security holder(s) [9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411 p.8]",
+      "status": "generated",
+      "contexts": [
+        "4. Documentation requirements for transmission\n\nNote: Transmission of securities under QTP shall be permitted only\nin favour of immediate relatives of the deceased security holder(s)\nviz. parents, spouse, children and parents-in-law.\n4.2.2.2 Requirements under simplified documentation category\nThe claimant(s) shall submit the following additional documents for\nprocessing of claim:\n(a) Notarized indemnity bond indemnifying the processing entity\n(format specified at Annexure-4); and\n(b) Notarised affidavit-cum-NOC from all legal heirs confirming\nidentification and claim of legal ownership to the securities and\nno objection (format specified at Annexure-5);\nOR\nCopy of family settlement deed executed by all legal heirs, duly\nattested by a Notary Public, Gazetted Officer, or accepted and\napproved by a Magistrate, Judge or Civil Court.",
+        "Annexure 1 - Simplified Grid for Documentation Requirement for Transmission of\n\nSecurities\nApplicability of Documentation Categories\nCategory\nApplicability\nQTP\nQuick Transmission Processing — very low-value claims\nby immediate relatives (parents, spouse, children,\nparents-in-law)\nSimplified\nSimplified documentation cases other than QTP, within\nthe prescribed threshold\nAbove Threshold\nClaims exceeding the simplified documentation threshold\nDocumentation Grid\nItem Document required from\nclaimant (duly signed / executed)\nQTP\nSimplified\nAbove\nThreshold\nA\nCommon documents (mandatory\nin all cases)\n\n1\nTransmission request form\n✔\n✔\n✔\n2\nLatest Client Master List (CML) of\nthe claimant's demat account\n✔\n✔\n✔\n3\nVerifiable death certificate of the\ndeceased security holder\n✔\n✔\n✔\n4\nOriginal\nsecurity\ncertificate/statement of SOA\n✔\n✔\n✔\n5\nCopy of Birth Certificate or School\nleaving\ncertificate/\nPassport\nor\nAadhaar attested by guardian (in\ncase\nthe\nnominee/claimant/legal\nheir is a minor)\n✔\n✔\n✔\n6\nKYC of the Guardian (in case of\nnominee /claimant being a minor / of\nunsound mind)\n✔\n✔\n✔",
+        "4. Documentation requirements for transmission\n\n4.2 Cases where there is no nomination\nIn cases where there is no nomination, the transmission of securities of the\ndeceased holder(s) shall be made in favour of claimant(s)/legal heir(s). In\nsuch cases, the following documents shall be required to be submitted:",
+        "3. Key features of the revised framework\n\nPage 2 of 38\n\n3.2. New category for low value claims, namely, Quick Transmission Processing\n(“QTP”) and revision of monetary threshold limits for transmission of securities\nunder the simplified documentation framework, as under:\nType of holding\nClaims threshold under\nQuick Transmission\nProcessing (QTP)1\n(₹ in Thousands)\nClaims threshold\nunder simplified\ndocumentation\n(₹ in Lakhs)\nSecurities in physical\nmode 2\n10\n103\nSecurities\nin\ndematerialised mode4\n30\n30",
+        "4. Documentation requirements for transmission\n\nPage 8 of 38\n\n4.2.2 Additional requirements\n4.2.2.1 Requirements QTP for low value cases\n\nThe claimant(s) shall submit the transmission request form-cumundertaking as per format specified at Annexure-2 on a plain paper\nalong with a document establishing relationship between the\nclaimant(s) and the deceased security holder(s)."
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "chunk_index": 21,
+          "title": "Ease of Doing Investment and Ease of Doing Business – Simplification and standardisation of the framework for transmission of securities",
+          "source_file": "1784869499027.pdf",
+          "page": 8,
+          "circular_no": "HO/38/13/11(14)2026-MIRSD-POD/I/17111/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jul-2026/ease-of-doing-investment-and-ease-of-doing-business-simplification-and-standardisation-of-the-framework-for-transmission-of-securities_103030.html"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "chunk_index": 38,
+          "title": "Ease of Doing Investment and Ease of Doing Business – Simplification and standardisation of the framework for transmission of securities",
+          "source_file": "1784869499027.pdf",
+          "page": 14,
+          "circular_no": "HO/38/13/11(14)2026-MIRSD-POD/I/17111/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jul-2026/ease-of-doing-investment-and-ease-of-doing-business-simplification-and-standardisation-of-the-framework-for-transmission-of-securities_103030.html"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "chunk_index": 18,
+          "title": "Ease of Doing Investment and Ease of Doing Business – Simplification and standardisation of the framework for transmission of securities",
+          "source_file": "1784869499027.pdf",
+          "page": 7,
+          "circular_no": "HO/38/13/11(14)2026-MIRSD-POD/I/17111/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jul-2026/ease-of-doing-investment-and-ease-of-doing-business-simplification-and-standardisation-of-the-framework-for-transmission-of-securities_103030.html"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "chunk_index": 4,
+          "title": "Ease of Doing Investment and Ease of Doing Business – Simplification and standardisation of the framework for transmission of securities",
+          "source_file": "1784869499027.pdf",
+          "page": 2,
+          "circular_no": "HO/38/13/11(14)2026-MIRSD-POD/I/17111/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jul-2026/ease-of-doing-investment-and-ease-of-doing-business-simplification-and-standardisation-of-the-framework-for-transmission-of-securities_103030.html"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "chunk_index": 20,
+          "title": "Ease of Doing Investment and Ease of Doing Business – Simplification and standardisation of the framework for transmission of securities",
+          "source_file": "1784869499027.pdf",
+          "page": 8,
+          "circular_no": "HO/38/13/11(14)2026-MIRSD-POD/I/17111/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jul-2026/ease-of-doing-investment-and-ease-of-doing-business-simplification-and-standardisation-of-the-framework-for-transmission-of-securities_103030.html"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.8655868241650954,
+        "context_precision": 0.8874999999778125,
+        "context_recall": 0.75
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "4. Documentation requirements for transmission\n\nNote: Transmission of securities under QTP shall be permitted only\nin favour of immediate relatives of the deceased security holder(s)\nviz. parents, spouse, children and parents-in-law.\n4.2.2.2 Requirements under simplified documentation category\nThe claimant(s) shall submit the following additional documents for\nprocessing of claim:\n(a) Notarized indemnity bond indemnifying the processing entity\n(format specified at Annexure-4); and\n(b) Notarised affidavit-cum-NOC from all legal heirs confirming\nidentification and claim of legal ownership to the securities and\nno objection (format specified at Annexure-5);\nOR\nCopy of family settlement deed executed by all legal heirs, duly\nattested by a Notary Public, Gazetted Officer, or accepted and\napproved by a Magistrate, Judge or Civil Court.",
+        "Annexure 1 - Simplified Grid for Documentation Requirement for Transmission of\n\nSecurities\nApplicability of Documentation Categories\nCategory\nApplicability\nQTP\nQuick Transmission Processing — very low-value claims\nby immediate relatives (parents, spouse, children,\nparents-in-law)\nSimplified\nSimplified documentation cases other than QTP, within\nthe prescribed threshold\nAbove Threshold\nClaims exceeding the simplified documentation threshold\nDocumentation Grid\nItem Document required from\nclaimant (duly signed / executed)\nQTP\nSimplified\nAbove\nThreshold\nA\nCommon documents (mandatory\nin all cases)\n\n1\nTransmission request form\n✔\n✔\n✔\n2\nLatest Client Master List (CML) of\nthe claimant's demat account\n✔\n✔\n✔\n3\nVerifiable death certificate of the\ndeceased security holder\n✔\n✔\n✔\n4\nOriginal\nsecurity\ncertificate/statement of SOA\n✔\n✔\n✔\n5\nCopy of Birth Certificate or School\nleaving\ncertificate/\nPassport\nor\nAadhaar attested by guardian (in\ncase\nthe\nnominee/claimant/legal\nheir is a minor)\n✔\n✔\n✔\n6\nKYC of the Guardian (in case of\nnominee /claimant being a minor / of\nunsound mind)\n✔\n✔\n✔",
+        "4. Documentation requirements for transmission\n\n4.2 Cases where there is no nomination\nIn cases where there is no nomination, the transmission of securities of the\ndeceased holder(s) shall be made in favour of claimant(s)/legal heir(s). In\nsuch cases, the following documents shall be required to be submitted:",
+        "3. Key features of the revised framework\n\nPage 2 of 38\n\n3.2. New category for low value claims, namely, Quick Transmission Processing\n(“QTP”) and revision of monetary threshold limits for transmission of securities\nunder the simplified documentation framework, as under:\nType of holding\nClaims threshold under\nQuick Transmission\nProcessing (QTP)1\n(₹ in Thousands)\nClaims threshold\nunder simplified\ndocumentation\n(₹ in Lakhs)\nSecurities in physical\nmode 2\n10\n103\nSecurities\nin\ndematerialised mode4\n30\n30",
+        "4. Documentation requirements for transmission\n\nPage 8 of 38\n\n4.2.2 Additional requirements\n4.2.2.1 Requirements QTP for low value cases\n\nThe claimant(s) shall submit the transmission request form-cumundertaking as per format specified at Annexure-2 on a plain paper\nalong with a document establishing relationship between the\nclaimant(s) and the deceased security holder(s)."
+      ]
+    },
+    {
+      "id": "G008",
+      "configuration": "best",
+      "question": "For a low-value transmission claim involving dematerialised securities with no nomination, what is the QTP threshold, which relatives are eligible, and what documents must the claimant submit?",
+      "reference": "The dematerialised-securities QTP threshold is Rs 30,000 per beneficial owner. QTP concerns transmission following the death of the sole holder or all joint holders, without disputed or competing claims. QTP is permitted only for parents, spouse, children and parents-in-law of the deceased holder. The claimant must submit the Annexure-2 transmission request form-cum-undertaking on plain paper, a document establishing the relationship, the latest client master list of the claimant's demat account, a verifiable death certificate, and the original security certificate or copy of statement of account, as applicable.",
+      "gold_sources": [
+        {
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "page": 2
+        },
+        {
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "page": 5
+        },
+        {
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "page": 6
+        },
+        {
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "page": 7
+        },
+        {
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "page": 8
+        }
+      ],
+      "answer": "- **QTP threshold for dematerialised securities:** ₹ 30 thousand (₹ 30 × 1,000) [9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411 p.6]  \n\n- **Relatives eligible under QTP:** Immediate relatives of the deceased holder – parents, spouse, children and parents‑in‑law [9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411 p.14]  \n\n- **Documents the claimant must submit:** 1) The transmission request form‑cum‑undertaking (as per Annexure‑2) on plain paper; 2) A document establishing the relationship between the claimant and the deceased security holder [9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411 p.8]  ",
+      "status": "generated",
+      "contexts": [
+        "Annexure 1 - Simplified Grid for Documentation Requirement for Transmission of\n\nSecurities\nApplicability of Documentation Categories\nCategory\nApplicability\nQTP\nQuick Transmission Processing — very low-value claims\nby immediate relatives (parents, spouse, children,\nparents-in-law)\nSimplified\nSimplified documentation cases other than QTP, within\nthe prescribed threshold\nAbove Threshold\nClaims exceeding the simplified documentation threshold\nDocumentation Grid\nItem Document required from\nclaimant (duly signed / executed)\nQTP\nSimplified\nAbove\nThreshold\nA\nCommon documents (mandatory\nin all cases)\n\n1\nTransmission request form\n✔\n✔\n✔\n2\nLatest Client Master List (CML) of\nthe claimant's demat account\n✔\n✔\n✔\n3\nVerifiable death certificate of the\ndeceased security holder\n✔\n✔\n✔\n4\nOriginal\nsecurity\ncertificate/statement of SOA\n✔\n✔\n✔\n5\nCopy of Birth Certificate or School\nleaving\ncertificate/\nPassport\nor\nAadhaar attested by guardian (in\ncase\nthe\nnominee/claimant/legal\nheir is a minor)\n✔\n✔\n✔\n6\nKYC of the Guardian (in case of\nnominee /claimant being a minor / of\nunsound mind)\n✔\n✔\n✔",
+        "4. Documentation requirements for transmission\n\nNote: Transmission of securities under QTP shall be permitted only\nin favour of immediate relatives of the deceased security holder(s)\nviz. parents, spouse, children and parents-in-law.\n4.2.2.2 Requirements under simplified documentation category\nThe claimant(s) shall submit the following additional documents for\nprocessing of claim:\n(a) Notarized indemnity bond indemnifying the processing entity\n(format specified at Annexure-4); and\n(b) Notarised affidavit-cum-NOC from all legal heirs confirming\nidentification and claim of legal ownership to the securities and\nno objection (format specified at Annexure-5);\nOR\nCopy of family settlement deed executed by all legal heirs, duly\nattested by a Notary Public, Gazetted Officer, or accepted and\napproved by a Magistrate, Judge or Civil Court.",
+        "4. Documentation requirements for transmission\n\nPage 8 of 38\n\n4.2.2 Additional requirements\n4.2.2.1 Requirements QTP for low value cases\n\nThe claimant(s) shall submit the transmission request form-cumundertaking as per format specified at Annexure-2 on a plain paper\nalong with a document establishing relationship between the\nclaimant(s) and the deceased security holder(s).",
+        "2. Definitions\n\nPage 6 of 38\n\n(i) an original death certificate or copy of death certificate attested by\nthe nominee subject to verification with the original;\nor\n(ii) copy of death certificate duly attested by a notary public or a\nGazetted Officer or a Judicial Magistrate First Class (“JMFC”);\nor\n(iii) death certificate with Quick Response (QR) code\n3. Introduction of Quick Transmission Processing (“QTP”) for low value\nclaims and revision of thresholds for simplified documentation\n3.1 The threshold for QTP and simplified documentation shall be as follows:\nType of holding\nClaims\nthreshold\nunder\nQuick\nTransmission\nProcessing (QTP)\n(₹ in Thousands)\nClaims threshold\nunder\nsimplified\ndocumentation\n(₹ in Lakhs)\nSecurities in physical mode\n10\n10\nSecurities\nin\ndematerialised mode\n30\n30",
+        "3. Key features of the revised framework\n\nPage 2 of 38\n\n3.2. New category for low value claims, namely, Quick Transmission Processing\n(“QTP”) and revision of monetary threshold limits for transmission of securities\nunder the simplified documentation framework, as under:\nType of holding\nClaims threshold under\nQuick Transmission\nProcessing (QTP)1\n(₹ in Thousands)\nClaims threshold\nunder simplified\ndocumentation\n(₹ in Lakhs)\nSecurities in physical\nmode 2\n10\n103\nSecurities\nin\ndematerialised mode4\n30\n30"
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "chunk_index": 38,
+          "title": "Ease of Doing Investment and Ease of Doing Business – Simplification and standardisation of the framework for transmission of securities",
+          "source_file": "1784869499027.pdf",
+          "page": 14,
+          "circular_no": "HO/38/13/11(14)2026-MIRSD-POD/I/17111/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jul-2026/ease-of-doing-investment-and-ease-of-doing-business-simplification-and-standardisation-of-the-framework-for-transmission-of-securities_103030.html"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "chunk_index": 21,
+          "title": "Ease of Doing Investment and Ease of Doing Business – Simplification and standardisation of the framework for transmission of securities",
+          "source_file": "1784869499027.pdf",
+          "page": 8,
+          "circular_no": "HO/38/13/11(14)2026-MIRSD-POD/I/17111/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jul-2026/ease-of-doing-investment-and-ease-of-doing-business-simplification-and-standardisation-of-the-framework-for-transmission-of-securities_103030.html"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "chunk_index": 20,
+          "title": "Ease of Doing Investment and Ease of Doing Business – Simplification and standardisation of the framework for transmission of securities",
+          "source_file": "1784869499027.pdf",
+          "page": 8,
+          "circular_no": "HO/38/13/11(14)2026-MIRSD-POD/I/17111/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jul-2026/ease-of-doing-investment-and-ease-of-doing-business-simplification-and-standardisation-of-the-framework-for-transmission-of-securities_103030.html"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "chunk_index": 14,
+          "title": "Ease of Doing Investment and Ease of Doing Business – Simplification and standardisation of the framework for transmission of securities",
+          "source_file": "1784869499027.pdf",
+          "page": 6,
+          "circular_no": "HO/38/13/11(14)2026-MIRSD-POD/I/17111/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jul-2026/ease-of-doing-investment-and-ease-of-doing-business-simplification-and-standardisation-of-the-framework-for-transmission-of-securities_103030.html"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "9e9c336462c8431dc5744af201af0d9d5940581f762bee2041433d408f04c411",
+          "chunk_index": 4,
+          "title": "Ease of Doing Investment and Ease of Doing Business – Simplification and standardisation of the framework for transmission of securities",
+          "source_file": "1784869499027.pdf",
+          "page": 2,
+          "circular_no": "HO/38/13/11(14)2026-MIRSD-POD/I/17111/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/jul-2026/ease-of-doing-investment-and-ease-of-doing-business-simplification-and-standardisation-of-the-framework-for-transmission-of-securities_103030.html"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.8655868241650954,
+        "context_precision": 0.94999999997625,
+        "context_recall": 0.75
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "Annexure 1 - Simplified Grid for Documentation Requirement for Transmission of\n\nSecurities\nApplicability of Documentation Categories\nCategory\nApplicability\nQTP\nQuick Transmission Processing — very low-value claims\nby immediate relatives (parents, spouse, children,\nparents-in-law)\nSimplified\nSimplified documentation cases other than QTP, within\nthe prescribed threshold\nAbove Threshold\nClaims exceeding the simplified documentation threshold\nDocumentation Grid\nItem Document required from\nclaimant (duly signed / executed)\nQTP\nSimplified\nAbove\nThreshold\nA\nCommon documents (mandatory\nin all cases)\n\n1\nTransmission request form\n✔\n✔\n✔\n2\nLatest Client Master List (CML) of\nthe claimant's demat account\n✔\n✔\n✔\n3\nVerifiable death certificate of the\ndeceased security holder\n✔\n✔\n✔\n4\nOriginal\nsecurity\ncertificate/statement of SOA\n✔\n✔\n✔\n5\nCopy of Birth Certificate or School\nleaving\ncertificate/\nPassport\nor\nAadhaar attested by guardian (in\ncase\nthe\nnominee/claimant/legal\nheir is a minor)\n✔\n✔\n✔\n6\nKYC of the Guardian (in case of\nnominee /claimant being a minor / of\nunsound mind)\n✔\n✔\n✔",
+        "4. Documentation requirements for transmission\n\nNote: Transmission of securities under QTP shall be permitted only\nin favour of immediate relatives of the deceased security holder(s)\nviz. parents, spouse, children and parents-in-law.\n4.2.2.2 Requirements under simplified documentation category\nThe claimant(s) shall submit the following additional documents for\nprocessing of claim:\n(a) Notarized indemnity bond indemnifying the processing entity\n(format specified at Annexure-4); and\n(b) Notarised affidavit-cum-NOC from all legal heirs confirming\nidentification and claim of legal ownership to the securities and\nno objection (format specified at Annexure-5);\nOR\nCopy of family settlement deed executed by all legal heirs, duly\nattested by a Notary Public, Gazetted Officer, or accepted and\napproved by a Magistrate, Judge or Civil Court.",
+        "4. Documentation requirements for transmission\n\nPage 8 of 38\n\n4.2.2 Additional requirements\n4.2.2.1 Requirements QTP for low value cases\n\nThe claimant(s) shall submit the transmission request form-cumundertaking as per format specified at Annexure-2 on a plain paper\nalong with a document establishing relationship between the\nclaimant(s) and the deceased security holder(s).",
+        "2. Definitions\n\nPage 6 of 38\n\n(i) an original death certificate or copy of death certificate attested by\nthe nominee subject to verification with the original;\nor\n(ii) copy of death certificate duly attested by a notary public or a\nGazetted Officer or a Judicial Magistrate First Class (“JMFC”);\nor\n(iii) death certificate with Quick Response (QR) code\n3. Introduction of Quick Transmission Processing (“QTP”) for low value\nclaims and revision of thresholds for simplified documentation\n3.1 The threshold for QTP and simplified documentation shall be as follows:\nType of holding\nClaims\nthreshold\nunder\nQuick\nTransmission\nProcessing (QTP)\n(₹ in Thousands)\nClaims threshold\nunder\nsimplified\ndocumentation\n(₹ in Lakhs)\nSecurities in physical mode\n10\n10\nSecurities\nin\ndematerialised mode\n30\n30",
+        "3. Key features of the revised framework\n\nPage 2 of 38\n\n3.2. New category for low value claims, namely, Quick Transmission Processing\n(“QTP”) and revision of monetary threshold limits for transmission of securities\nunder the simplified documentation framework, as under:\nType of holding\nClaims threshold under\nQuick Transmission\nProcessing (QTP)1\n(₹ in Thousands)\nClaims threshold\nunder simplified\ndocumentation\n(₹ in Lakhs)\nSecurities in physical\nmode 2\n10\n103\nSecurities\nin\ndematerialised mode4\n30\n30"
+      ]
+    },
+    {
+      "id": "G009",
+      "configuration": "baseline",
+      "question": "Under RBI's SC/ST credit facilities Master Circular, what productive-activity and additional housing loan benefits does the DRI Scheme offer SC/ST borrowers, and what minimum share of total DRI advances must go to them?",
+      "reference": "The DRI Scheme provides finance to eligible borrowers from the weaker sections of the community up to Rs 15,000 for productive and gainful activities at 4% interest per annum. Eligible SC/ST borrowers must receive at least two-fifths (40%) of total DRI advances. The normal DRI landholding ceilings of 1 acre of irrigated land and 2.5 acres of unirrigated land do not apply to SC/ST borrowers. SC/ST members satisfying the scheme's income criteria may also obtain a housing loan up to Rs 20,000 per beneficiary, over and above the individual Rs 15,000 loan.",
+      "gold_sources": [
+        {
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "page": 4
+        },
+        {
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "page": 5
+        }
+      ],
+      "answer": "The DRI Scheme allows banks to lend SC/ST borrowers **up to ₹15,000 at a concessional 4 % per‑annum rate of interest for productive and gainful activities** and, if they meet the income criteria, **they may also obtain a housing loan (the maximum amount is not specified in the excerpt)**. Banks must ensure that **at least 2/5 (40 %) of the total DRI advances are granted to eligible SC/ST borrowers**【e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77 p.4】.",
+      "status": "generated",
+      "contexts": [
+        "4.2 Differential Rate of Interest (DRI) Scheme\n\nUnder the DRI Scheme, banks provide finance up to ₹15,000/- at a concessional rate\nof interest of 4 per cent per annum to the weaker sections of the community for\nengaging in productive and gainful activities. In order to ensure that persons belonging\nto SCs/STs also derive adequate benefit under the DRI Scheme, banks have been\nadvised to grant eligible borrowers belonging to SCs/STs such advances to the extent\nof not less than 2/5th (40 percent) of total DRI advances. Further, the eligibility criteria\nunder DRI, viz. size of land holding should not exceed 1 acre of irrigated land and 2.5\nacres of unirrigated land, are not applicable to SCs/STs. Members of SCs/STs\nsatisfying the income criteria of the scheme can also avail of housing loan up to",
+        "1\n\nभारतीय įरज़वर् बैंक\n_________________________ RESERVE BANK OF INDIA___________________________\nwww.rbi.org.in\n\nRBI/2026-27/272\nFIDD.CO.GSSD.BC.No.11/09.09.001/2026-27 October 01, 2026\n\nThe Chairman/ Managing Director / Chief Executive Officer\nAll Scheduled Commercial Banks (including Small Finance Banks)\n\nMadam/ Dear Sir,\n\nMaster Circular - Credit facilities to Scheduled Castes (SCs) & Scheduled Tribes\n(STs)\n\nThe Reserve Bank of India has, from time to time, issued a number of\nguidelines/instructions to banks on credit facilities to Scheduled Castes (SCs) & Scheduled\nTribes (STs). The enclosed Master Circular consolidates the circulars issued by Reserve\nBank on the subject till date, as listed in the Appendix.\n\nYours faithfully,\n\n(R. Giridharan)\nChief General Manager",
+        "2\n\nMaster Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes\n(STs)\n\nBanks should take the measures indicated below to step up their advances to\nSCs/STs.",
+        "5. Credit Enhancement Guarantee Scheme for Scheduled Castes (CEGSSC)\n\nThe CEGSSC was launched by Ministry of Social Justice & Empowerment on May 6,\n2015 with the objective of promoting entrepreneurship amongst the Scheduled Castes\n(SCs), by providing credit enhancement guarantee to Member Lending Institutions\n(MLIs), which extend financial assistance to these entrepreneurs. IFCI Ltd. has been\ndesignated as the Nodal Agency under the scheme, to issue the guarantee cover in\nfavour of MLIs for financing SC entrepreneurs.\n\nIndividual SC entrepreneurs/Registered Companies and Societies/Registered\nPartnership Firms/Sole Proprietorship firms having more than 51% shareholding and\nmanagement control for the previous 6 months by SC entrepreneurs/ promoters/\nmembers are eligible for guarantee from IFCI Ltd. against the loans extended by MLIs.\n\nThe amount of guarantee cover under CEGSSC ranges from a minimum of ₹0.15 cr\nto a maximum of ₹5.00 cr.\n\nThe tenure of guarantee is up to a maximum of 7 years or repayment period, whichever\nis earlier.",
+        "2. Role of Banks\n\n2.1 Bank staff may help the borrowers in filling up the forms and completing other\nformalities so that they are able to get credit facility within a stipulated period from the\ndate of receipt of applications.\n\n2.2 In order to encourage SC/ST borrowers to take advantage of credit facilities,\ngreater awareness among them about various schemes formulated by banks needs\nto be created through various means such as brochures, visits by field staff etc so that\nsalient features of the schemes, as also the advantages that will accrue to them are\nknown to such borrowers. Banks should advise their branches to organize meetings\nmore frequently exclusively for SC/ST beneficiaries to understand their credit needs\nand to incorporate the same in the credit plan.\n\n2.3 Circulars issued by RBI/NABARD should be circulated among the staff for\ncompliance."
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 12,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 4,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 1,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 3,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 2,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 14,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 5,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 6,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 3,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.7983181567151577,
+        "context_precision": 0.9999999999,
+        "context_recall": 0.75
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "4.2 Differential Rate of Interest (DRI) Scheme\n\nUnder the DRI Scheme, banks provide finance up to ₹15,000/- at a concessional rate\nof interest of 4 per cent per annum to the weaker sections of the community for\nengaging in productive and gainful activities. In order to ensure that persons belonging\nto SCs/STs also derive adequate benefit under the DRI Scheme, banks have been\nadvised to grant eligible borrowers belonging to SCs/STs such advances to the extent\nof not less than 2/5th (40 percent) of total DRI advances. Further, the eligibility criteria\nunder DRI, viz. size of land holding should not exceed 1 acre of irrigated land and 2.5\nacres of unirrigated land, are not applicable to SCs/STs. Members of SCs/STs\nsatisfying the income criteria of the scheme can also avail of housing loan up to",
+        "1\n\nभारतीय įरज़वर् बैंक\n_________________________ RESERVE BANK OF INDIA___________________________\nwww.rbi.org.in\n\nRBI/2026-27/272\nFIDD.CO.GSSD.BC.No.11/09.09.001/2026-27 October 01, 2026\n\nThe Chairman/ Managing Director / Chief Executive Officer\nAll Scheduled Commercial Banks (including Small Finance Banks)\n\nMadam/ Dear Sir,\n\nMaster Circular - Credit facilities to Scheduled Castes (SCs) & Scheduled Tribes\n(STs)\n\nThe Reserve Bank of India has, from time to time, issued a number of\nguidelines/instructions to banks on credit facilities to Scheduled Castes (SCs) & Scheduled\nTribes (STs). The enclosed Master Circular consolidates the circulars issued by Reserve\nBank on the subject till date, as listed in the Appendix.\n\nYours faithfully,\n\n(R. Giridharan)\nChief General Manager",
+        "2\n\nMaster Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes\n(STs)\n\nBanks should take the measures indicated below to step up their advances to\nSCs/STs.",
+        "5. Credit Enhancement Guarantee Scheme for Scheduled Castes (CEGSSC)\n\nThe CEGSSC was launched by Ministry of Social Justice & Empowerment on May 6,\n2015 with the objective of promoting entrepreneurship amongst the Scheduled Castes\n(SCs), by providing credit enhancement guarantee to Member Lending Institutions\n(MLIs), which extend financial assistance to these entrepreneurs. IFCI Ltd. has been\ndesignated as the Nodal Agency under the scheme, to issue the guarantee cover in\nfavour of MLIs for financing SC entrepreneurs.\n\nIndividual SC entrepreneurs/Registered Companies and Societies/Registered\nPartnership Firms/Sole Proprietorship firms having more than 51% shareholding and\nmanagement control for the previous 6 months by SC entrepreneurs/ promoters/\nmembers are eligible for guarantee from IFCI Ltd. against the loans extended by MLIs.\n\nThe amount of guarantee cover under CEGSSC ranges from a minimum of ₹0.15 cr\nto a maximum of ₹5.00 cr.\n\nThe tenure of guarantee is up to a maximum of 7 years or repayment period, whichever\nis earlier.",
+        "2. Role of Banks\n\n2.1 Bank staff may help the borrowers in filling up the forms and completing other\nformalities so that they are able to get credit facility within a stipulated period from the\ndate of receipt of applications.\n\n2.2 In order to encourage SC/ST borrowers to take advantage of credit facilities,\ngreater awareness among them about various schemes formulated by banks needs\nto be created through various means such as brochures, visits by field staff etc so that\nsalient features of the schemes, as also the advantages that will accrue to them are\nknown to such borrowers. Banks should advise their branches to organize meetings\nmore frequently exclusively for SC/ST beneficiaries to understand their credit needs\nand to incorporate the same in the credit plan.\n\n2.3 Circulars issued by RBI/NABARD should be circulated among the staff for\ncompliance."
+      ]
+    },
+    {
+      "id": "G009",
+      "configuration": "best",
+      "question": "Under RBI's SC/ST credit facilities Master Circular, what productive-activity and additional housing loan benefits does the DRI Scheme offer SC/ST borrowers, and what minimum share of total DRI advances must go to them?",
+      "reference": "The DRI Scheme provides finance to eligible borrowers from the weaker sections of the community up to Rs 15,000 for productive and gainful activities at 4% interest per annum. Eligible SC/ST borrowers must receive at least two-fifths (40%) of total DRI advances. The normal DRI landholding ceilings of 1 acre of irrigated land and 2.5 acres of unirrigated land do not apply to SC/ST borrowers. SC/ST members satisfying the scheme's income criteria may also obtain a housing loan up to Rs 20,000 per beneficiary, over and above the individual Rs 15,000 loan.",
+      "gold_sources": [
+        {
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "page": 4
+        },
+        {
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "page": 5
+        }
+      ],
+      "answer": "The DRI Scheme lets eligible SC/ST borrowers obtain a concessional‑interest loan of up to ₹15,000 (at 4 % p.a.) for productive‑gainful activities, and, in addition, a housing‑loan component of up to ₹20,000 per beneficiary over and above the ₹15,000 loan. Banks must ensure that at least 40 percent (2/5) of the total DRI advances are granted to SC/ST borrowers【e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77 p.4】【e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77 p.5】.",
+      "status": "generated",
+      "contexts": [
+        "4.2 Differential Rate of Interest (DRI) Scheme\n\nUnder the DRI Scheme, banks provide finance up to ₹15,000/- at a concessional rate\nof interest of 4 per cent per annum to the weaker sections of the community for\nengaging in productive and gainful activities. In order to ensure that persons belonging\nto SCs/STs also derive adequate benefit under the DRI Scheme, banks have been\nadvised to grant eligible borrowers belonging to SCs/STs such advances to the extent\nof not less than 2/5th (40 percent) of total DRI advances. Further, the eligibility criteria\nunder DRI, viz. size of land holding should not exceed 1 acre of irrigated land and 2.5\nacres of unirrigated land, are not applicable to SCs/STs. Members of SCs/STs\nsatisfying the income criteria of the scheme can also avail of housing loan up to",
+        "4. Reservations for SC/ST beneficiaries under major Centrally Sponsored\n\nSchemes.\nThere are several major centrally sponsored schemes under which credit is provided\nby banks and subsidy is received through Government Agencies. Credit flow under\nthese schemes is monitored by RBI. Under each of these, there is a significant\nreservation/relaxation for the members of the SC/ST communities.\n4.1 Deendayal Antyodaya Yojana - National Rural Livelihoods Mission (DAY-NRLM)\n\nDAY-NRLM (previously known as NRLM) was launched by the Ministry of Rural\nDevelopment, Government of India by restructuring the erstwhile Swarnajayanti Gram\nSwarozgar Yojana, effective from April 1, 2013. DAY-NRLM would ensure adequate\ncoverage of vulnerable sections of the society such that 50% of these beneficiaries\nare SCs/STs. Details of the scheme are available in the Master Circular on DAY-NRLM\nas updated from time to time.",
+        "7. Reporting Requirements\n\nNo.\nCircular No.\nDate\nSubject\n1.\nDBOD.No.BP.BC.172/C.464(R)-78\nDecember 12,\n1978\nRole\nof\nBanks\nin\nPromoting\nEmployment\n2.\nDBOD.No.BP.BC.8/C.453(K)-Gen\nJanuary 09, 1979 Agricultural\nCredit\nto\nSmall\nand\nMarginal Farmers\n3.\nDBOD.No.BP.BC.45/C.469(86)-81\nApril 14, 1981\nCredit Facilities to SC / ST\n4.\nDBOD.No.BP.BC.132/C.594-81\nOctober 22, 1981 Recommendations of the Working\nGroup\non\nthe\nDevelopment\nof\nScheduled Castes\n5.\nRPCD.No.PS.BC.2/C.594-82\nSeptember 10,\n1982\nCredit Facilities to SC / ST\n6.\nRPCD.No.PS.BC.9/C.594-82\nNovember 05,\n1982\nConcessional Bank Finance to SC / ST\nDevelopment Corporations\n7.\nRPCD.No.PS.BC.4/C. 594-83\nAugust 22, 1983\nCredit Facilities to SC / ST\n8.\nRPCD.No.PS.BC.20/C.568(A)-84\nJanuary 24, 1984 Credit Facilities to SC / ST - Rejection\nof Loan Applications\n9.\nRPCD.No. CONFS.62/PB-1-85/86\nJuly 24, 1985\nRole of Private Sector Banks in\nLending to SCs / STs\n10.\nRPCD.No.SP.BC.22/C.453(U)-85\nOctober 09, 1985 Credit Facilities to Scheduled Tribes\nunder DRI Scheme\n11.",
+        "1\n\nभारतीय įरज़वर् बैंक\n_________________________ RESERVE BANK OF INDIA___________________________\nwww.rbi.org.in\n\nRBI/2026-27/272\nFIDD.CO.GSSD.BC.No.11/09.09.001/2026-27 October 01, 2026\n\nThe Chairman/ Managing Director / Chief Executive Officer\nAll Scheduled Commercial Banks (including Small Finance Banks)\n\nMadam/ Dear Sir,\n\nMaster Circular - Credit facilities to Scheduled Castes (SCs) & Scheduled Tribes\n(STs)\n\nThe Reserve Bank of India has, from time to time, issued a number of\nguidelines/instructions to banks on credit facilities to Scheduled Castes (SCs) & Scheduled\nTribes (STs). The enclosed Master Circular consolidates the circulars issued by Reserve\nBank on the subject till date, as listed in the Appendix.\n\nYours faithfully,\n\n(R. Giridharan)\nChief General Manager",
+        "4.2 Differential Rate of Interest (DRI) Scheme\n\n5\n\n₹20,000/- per beneficiary over and above the individual loan of ₹15,000/- available\nunder the scheme."
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 12,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 4,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 11,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 4,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 19,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 7,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 1,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 1,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "e273a00d702fa73580dde9d561689a85b3429b0ea55a9f3e4fea218644087a77",
+          "chunk_index": 13,
+          "title": "Master Circular - Credit Facilities to Scheduled Castes (SCs) & Scheduled Tribes (STs)",
+          "source_file": "272MC011020266691348260DF4CF99ACE017F146409F1.PDF",
+          "page": 5,
+          "circular_no": "RBI/2026-27/272",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13716&Mode=0"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.7813687950495128,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "4.2 Differential Rate of Interest (DRI) Scheme\n\nUnder the DRI Scheme, banks provide finance up to ₹15,000/- at a concessional rate\nof interest of 4 per cent per annum to the weaker sections of the community for\nengaging in productive and gainful activities. In order to ensure that persons belonging\nto SCs/STs also derive adequate benefit under the DRI Scheme, banks have been\nadvised to grant eligible borrowers belonging to SCs/STs such advances to the extent\nof not less than 2/5th (40 percent) of total DRI advances. Further, the eligibility criteria\nunder DRI, viz. size of land holding should not exceed 1 acre of irrigated land and 2.5\nacres of unirrigated land, are not applicable to SCs/STs. Members of SCs/STs\nsatisfying the income criteria of the scheme can also avail of housing loan up to",
+        "4. Reservations for SC/ST beneficiaries under major Centrally Sponsored\n\nSchemes.\nThere are several major centrally sponsored schemes under which credit is provided\nby banks and subsidy is received through Government Agencies. Credit flow under\nthese schemes is monitored by RBI. Under each of these, there is a significant\nreservation/relaxation for the members of the SC/ST communities.\n4.1 Deendayal Antyodaya Yojana - National Rural Livelihoods Mission (DAY-NRLM)\n\nDAY-NRLM (previously known as NRLM) was launched by the Ministry of Rural\nDevelopment, Government of India by restructuring the erstwhile Swarnajayanti Gram\nSwarozgar Yojana, effective from April 1, 2013. DAY-NRLM would ensure adequate\ncoverage of vulnerable sections of the society such that 50% of these beneficiaries\nare SCs/STs. Details of the scheme are available in the Master Circular on DAY-NRLM\nas updated from time to time.",
+        "7. Reporting Requirements\n\nNo.\nCircular No.\nDate\nSubject\n1.\nDBOD.No.BP.BC.172/C.464(R)-78\nDecember 12,\n1978\nRole\nof\nBanks\nin\nPromoting\nEmployment\n2.\nDBOD.No.BP.BC.8/C.453(K)-Gen\nJanuary 09, 1979 Agricultural\nCredit\nto\nSmall\nand\nMarginal Farmers\n3.\nDBOD.No.BP.BC.45/C.469(86)-81\nApril 14, 1981\nCredit Facilities to SC / ST\n4.\nDBOD.No.BP.BC.132/C.594-81\nOctober 22, 1981 Recommendations of the Working\nGroup\non\nthe\nDevelopment\nof\nScheduled Castes\n5.\nRPCD.No.PS.BC.2/C.594-82\nSeptember 10,\n1982\nCredit Facilities to SC / ST\n6.\nRPCD.No.PS.BC.9/C.594-82\nNovember 05,\n1982\nConcessional Bank Finance to SC / ST\nDevelopment Corporations\n7.\nRPCD.No.PS.BC.4/C. 594-83\nAugust 22, 1983\nCredit Facilities to SC / ST\n8.\nRPCD.No.PS.BC.20/C.568(A)-84\nJanuary 24, 1984 Credit Facilities to SC / ST - Rejection\nof Loan Applications\n9.\nRPCD.No. CONFS.62/PB-1-85/86\nJuly 24, 1985\nRole of Private Sector Banks in\nLending to SCs / STs\n10.\nRPCD.No.SP.BC.22/C.453(U)-85\nOctober 09, 1985 Credit Facilities to Scheduled Tribes\nunder DRI Scheme\n11.",
+        "1\n\nभारतीय įरज़वर् बैंक\n_________________________ RESERVE BANK OF INDIA___________________________\nwww.rbi.org.in\n\nRBI/2026-27/272\nFIDD.CO.GSSD.BC.No.11/09.09.001/2026-27 October 01, 2026\n\nThe Chairman/ Managing Director / Chief Executive Officer\nAll Scheduled Commercial Banks (including Small Finance Banks)\n\nMadam/ Dear Sir,\n\nMaster Circular - Credit facilities to Scheduled Castes (SCs) & Scheduled Tribes\n(STs)\n\nThe Reserve Bank of India has, from time to time, issued a number of\nguidelines/instructions to banks on credit facilities to Scheduled Castes (SCs) & Scheduled\nTribes (STs). The enclosed Master Circular consolidates the circulars issued by Reserve\nBank on the subject till date, as listed in the Appendix.\n\nYours faithfully,\n\n(R. Giridharan)\nChief General Manager",
+        "4.2 Differential Rate of Interest (DRI) Scheme\n\n5\n\n₹20,000/- per beneficiary over and above the individual loan of ₹15,000/- available\nunder the scheme."
+      ]
+    },
+    {
+      "id": "G010",
+      "configuration": "baseline",
+      "question": "In Table 2 (Soiling Levels) of RBI's Note Sorting Machines Master Direction, what maximum density difference and minimum reflectance apply to Rs 100 and Rs 500 notes?",
+      "reference": "For Rs 100 notes: maximum density difference 0.05 and minimum reflectance 90%. For Rs 500 notes: maximum density difference 0.04 and minimum reflectance 93%.",
+      "gold_sources": [
+        {
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "page": 5
+        }
+      ],
+      "answer": "- ₹ 100 notes: maximum density difference 0.05 and minimum reflectance 90% [564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638 p.5]  \n- ₹ 500 notes: maximum density difference 0.04 and minimum reflectance 93% [564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638 p.5]",
+      "status": "generated",
+      "contexts": [
+        "5. Fitness Sorting\n\n(i) Soiling\n\nSoiling refers to the general distribution of dirt across the entire note or in some\npatterns. It is a measure of the loss of reflectivity from the unprinted areas due to\ndirt, ageing (yellowing), wear and extraneous markings and includes decolouration\ndue to ageing, excessive folding and other wearing. Soiling increases the optical\ndensity and decreases the reflectance of the notes. Notes exceeding the soiling\nlevels set out in Table 2 shall be sorted as unfit. Both the obverse and the reverse\nof the note shall be checked for soiling.\n\nTable 2: Soiling Levels\nSl.\nNo.\nDenomination\nMaximum Density\ndifference\nMinimum\nReflectance\n1\n₹5\n0.07\n85%\n2\n₹10\n0.07\n85%\n3\n₹20\n0.06\n87%\n4\n₹50\n0.06\n87%\n5\n₹100\n0.05\n90%\n6\n₹200\n0.05\n90%\n7\n₹500\n0.04\n93%\n\n(ii) Limpness\nLimpness relates to structural deterioration or wear resulting in a marked lack of",
+        "1. Introduction\n\nGuidelines on installation of Note Sorting Machines (NSMs) for sorting / processing\nof notes were issued vide circular DCM. No. Cir. NPD.3161/09.39.00 (Policy)/2009-\n2010 dated November 19, 2009, advising banks that these machines should conform\nto the standards / parameters prescribed by Reserve Bank of India from time to time.\nFurther, with reference to the draft guidelines on ''Note Authentication and Fitness\nSorting Parameters'' published during 2009 (December 23, 2009) and comments\nreceived from various stakeholders including banks, equipment manufacturers and\nmembers of public in this regard, the final guidelines on ''Note Authentication and\nFitness Sorting Parameters'' were issued vide circular DCM(R&D) No.G-\n26/18.00.14/2009-10 dated May 11, 2010. Subsequently, in the backdrop of\nintroduction of the new series banknotes, these parameters were reviewed, and a\nrevised set of guidelines were issued to banks vide circular DCM(NPD)No.\nS488/18.00.14/2022-23 dated July 01, 2022.",
+        "भारतीय ǐरज़वर् बैंक\nRESERVE BANK OF INDIA\nwww.rbi.org.in\nRBI/DCM/2026-27/473\nDCM(NPD) No.S2154/18.00.014/2026-27 October 02, 2026\n\nThe Chairman / Managing Director / Chief Executive Officer\nAll Banks\n\nMadam / Dear Sir,\n\nMaster Direction on Note Sorting Machines\n\nIn exercise of the powers conferred under Section 35A and Section 56 of the\nBanking Regulation Act, 1949, Reserve Bank of India (RBI), from time-to-time\nissues guidelines / circulars / directives to the banks on Note Sorting Machines.\n\n2. A Master Direction incorporating and updating the extant guidelines / circulars /\ndirectives on the subject has been prepared to enable banks to have all current\ninstructions on Note Sorting Machines at one place for reference and the same is\nenclosed.\n\n3. The previous circulars issued on the subject (Annexed) stand withdrawn from the\ndate of issuance of this Master Direction.\n\nYours faithfully,\n\n(Sanjeev Prakash)\nChief General Manager-in-Charge\n\nEncl: As above",
+        "7. Calibration and Periodic Testing of Machines\n\n10\n\nAnnex\n\nList of Circulars withdrawn\n\nSr.\nNo.\nCircular / Notification\nNo.\nDate\nSubject\n1\nDCM. No. Cir. NPD .\n3161/09.39.00\n(Policy)/2009-2010\n19.11.2009\nSorting / Processing of Notes -\nInstallation of Note Sorting Machines\n2\nDCM(R&D)No.G-\n26/18.00.14/2009-10\n11.05.2010\nInstallation of Note Sorting Machines\n- Note Authentication and Fitness\nSorting Parameters\n3\nDCM(NPD)No.S488/18.\n00.14/2022-23\n01.07.2022\nNote Sorting Machines -\nAuthentication and Fitness Sorting\nParameters\n4\nDCM (NPD)\nNo.S2193/09.45.000/20\n24-25\n30.10.2024\nNote Sorting Machines: Standards\nissued by the Bureau of Indian\nStandards\n5\nDCM (NPD)\nNo.S287/18.00.014/202\n5-26\n24.04.2025\nNote Sorting Machines: Standards\nissued by the Bureau of Indian\nStandards - Revised Timeline for\nImplementation",
+        "7. Calibration and Periodic Testing of Machines\n\nBanks shall ensure that the Note Sorting machines are tested for accuracy and\nconsistency on a quarterly basis and recalibrated, if required. A certificate (signed by\nBank Officials) to this effect shall be maintained for records. A periodicity of quarterly\ntesting as per the Format attached, may be followed.\n\n8. Standards issued by the Bureau of Indian Standards (BIS) for Note Sorting\nMachines (NSMs)\n\n8.1 The Bureau of Indian Standards (BIS) after due consultation with Reserve Bank\nof India and other stakeholders, published the standards for Note Sorting Machines\n(NSM) - ‘IS 18663: 2024’ in the ‘Gazette of India’ on March 19, 2024. The standards\nare available at BIS website (https://standards.bis.gov.in/website)\nThe list of BIS certified models of NSMs can be accessed at following links:\nFor domestic manufacturers:\nhttps://manakonline.in/MANAK/ApplicationLicenceRelatedrpt\nFor foreign manufacturers:\nhttps://www.bis.gov.in/fmcs/licensee/"
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 13,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 5,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 6,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 3,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 1,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 1,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 24,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 10,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 20,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 8,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.8887209460046727,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "5. Fitness Sorting\n\n(i) Soiling\n\nSoiling refers to the general distribution of dirt across the entire note or in some\npatterns. It is a measure of the loss of reflectivity from the unprinted areas due to\ndirt, ageing (yellowing), wear and extraneous markings and includes decolouration\ndue to ageing, excessive folding and other wearing. Soiling increases the optical\ndensity and decreases the reflectance of the notes. Notes exceeding the soiling\nlevels set out in Table 2 shall be sorted as unfit. Both the obverse and the reverse\nof the note shall be checked for soiling.\n\nTable 2: Soiling Levels\nSl.\nNo.\nDenomination\nMaximum Density\ndifference\nMinimum\nReflectance\n1\n₹5\n0.07\n85%\n2\n₹10\n0.07\n85%\n3\n₹20\n0.06\n87%\n4\n₹50\n0.06\n87%\n5\n₹100\n0.05\n90%\n6\n₹200\n0.05\n90%\n7\n₹500\n0.04\n93%\n\n(ii) Limpness\nLimpness relates to structural deterioration or wear resulting in a marked lack of",
+        "1. Introduction\n\nGuidelines on installation of Note Sorting Machines (NSMs) for sorting / processing\nof notes were issued vide circular DCM. No. Cir. NPD.3161/09.39.00 (Policy)/2009-\n2010 dated November 19, 2009, advising banks that these machines should conform\nto the standards / parameters prescribed by Reserve Bank of India from time to time.\nFurther, with reference to the draft guidelines on ''Note Authentication and Fitness\nSorting Parameters'' published during 2009 (December 23, 2009) and comments\nreceived from various stakeholders including banks, equipment manufacturers and\nmembers of public in this regard, the final guidelines on ''Note Authentication and\nFitness Sorting Parameters'' were issued vide circular DCM(R&D) No.G-\n26/18.00.14/2009-10 dated May 11, 2010. Subsequently, in the backdrop of\nintroduction of the new series banknotes, these parameters were reviewed, and a\nrevised set of guidelines were issued to banks vide circular DCM(NPD)No.\nS488/18.00.14/2022-23 dated July 01, 2022.",
+        "भारतीय ǐरज़वर् बैंक\nRESERVE BANK OF INDIA\nwww.rbi.org.in\nRBI/DCM/2026-27/473\nDCM(NPD) No.S2154/18.00.014/2026-27 October 02, 2026\n\nThe Chairman / Managing Director / Chief Executive Officer\nAll Banks\n\nMadam / Dear Sir,\n\nMaster Direction on Note Sorting Machines\n\nIn exercise of the powers conferred under Section 35A and Section 56 of the\nBanking Regulation Act, 1949, Reserve Bank of India (RBI), from time-to-time\nissues guidelines / circulars / directives to the banks on Note Sorting Machines.\n\n2. A Master Direction incorporating and updating the extant guidelines / circulars /\ndirectives on the subject has been prepared to enable banks to have all current\ninstructions on Note Sorting Machines at one place for reference and the same is\nenclosed.\n\n3. The previous circulars issued on the subject (Annexed) stand withdrawn from the\ndate of issuance of this Master Direction.\n\nYours faithfully,\n\n(Sanjeev Prakash)\nChief General Manager-in-Charge\n\nEncl: As above",
+        "7. Calibration and Periodic Testing of Machines\n\n10\n\nAnnex\n\nList of Circulars withdrawn\n\nSr.\nNo.\nCircular / Notification\nNo.\nDate\nSubject\n1\nDCM. No. Cir. NPD .\n3161/09.39.00\n(Policy)/2009-2010\n19.11.2009\nSorting / Processing of Notes -\nInstallation of Note Sorting Machines\n2\nDCM(R&D)No.G-\n26/18.00.14/2009-10\n11.05.2010\nInstallation of Note Sorting Machines\n- Note Authentication and Fitness\nSorting Parameters\n3\nDCM(NPD)No.S488/18.\n00.14/2022-23\n01.07.2022\nNote Sorting Machines -\nAuthentication and Fitness Sorting\nParameters\n4\nDCM (NPD)\nNo.S2193/09.45.000/20\n24-25\n30.10.2024\nNote Sorting Machines: Standards\nissued by the Bureau of Indian\nStandards\n5\nDCM (NPD)\nNo.S287/18.00.014/202\n5-26\n24.04.2025\nNote Sorting Machines: Standards\nissued by the Bureau of Indian\nStandards - Revised Timeline for\nImplementation",
+        "7. Calibration and Periodic Testing of Machines\n\nBanks shall ensure that the Note Sorting machines are tested for accuracy and\nconsistency on a quarterly basis and recalibrated, if required. A certificate (signed by\nBank Officials) to this effect shall be maintained for records. A periodicity of quarterly\ntesting as per the Format attached, may be followed.\n\n8. Standards issued by the Bureau of Indian Standards (BIS) for Note Sorting\nMachines (NSMs)\n\n8.1 The Bureau of Indian Standards (BIS) after due consultation with Reserve Bank\nof India and other stakeholders, published the standards for Note Sorting Machines\n(NSM) - ‘IS 18663: 2024’ in the ‘Gazette of India’ on March 19, 2024. The standards\nare available at BIS website (https://standards.bis.gov.in/website)\nThe list of BIS certified models of NSMs can be accessed at following links:\nFor domestic manufacturers:\nhttps://manakonline.in/MANAK/ApplicationLicenceRelatedrpt\nFor foreign manufacturers:\nhttps://www.bis.gov.in/fmcs/licensee/"
+      ]
+    },
+    {
+      "id": "G010",
+      "configuration": "best",
+      "question": "In Table 2 (Soiling Levels) of RBI's Note Sorting Machines Master Direction, what maximum density difference and minimum reflectance apply to Rs 100 and Rs 500 notes?",
+      "reference": "For Rs 100 notes: maximum density difference 0.05 and minimum reflectance 90%. For Rs 500 notes: maximum density difference 0.04 and minimum reflectance 93%.",
+      "gold_sources": [
+        {
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "page": 5
+        }
+      ],
+      "answer": "- ₹ 100 note – maximum density difference **0.05** and minimum reflectance **90 %**【564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638 p.5】  \n- ₹ 500 note – maximum density difference **0.04** and minimum reflectance **93 %**【564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638 p.5】",
+      "status": "generated",
+      "contexts": [
+        "5. Fitness Sorting\n\n(i) Soiling\n\nSoiling refers to the general distribution of dirt across the entire note or in some\npatterns. It is a measure of the loss of reflectivity from the unprinted areas due to\ndirt, ageing (yellowing), wear and extraneous markings and includes decolouration\ndue to ageing, excessive folding and other wearing. Soiling increases the optical\ndensity and decreases the reflectance of the notes. Notes exceeding the soiling\nlevels set out in Table 2 shall be sorted as unfit. Both the obverse and the reverse\nof the note shall be checked for soiling.\n\nTable 2: Soiling Levels\nSl.\nNo.\nDenomination\nMaximum Density\ndifference\nMinimum\nReflectance\n1\n₹5\n0.07\n85%\n2\n₹10\n0.07\n85%\n3\n₹20\n0.06\n87%\n4\n₹50\n0.06\n87%\n5\n₹100\n0.05\n90%\n6\n₹200\n0.05\n90%\n7\n₹500\n0.04\n93%\n\n(ii) Limpness\nLimpness relates to structural deterioration or wear resulting in a marked lack of",
+        "भारतीय ǐरज़वर् बैंक\nRESERVE BANK OF INDIA\nwww.rbi.org.in\nRBI/DCM/2026-27/473\nDCM(NPD) No.S2154/18.00.014/2026-27 October 02, 2026\n\nThe Chairman / Managing Director / Chief Executive Officer\nAll Banks\n\nMadam / Dear Sir,\n\nMaster Direction on Note Sorting Machines\n\nIn exercise of the powers conferred under Section 35A and Section 56 of the\nBanking Regulation Act, 1949, Reserve Bank of India (RBI), from time-to-time\nissues guidelines / circulars / directives to the banks on Note Sorting Machines.\n\n2. A Master Direction incorporating and updating the extant guidelines / circulars /\ndirectives on the subject has been prepared to enable banks to have all current\ninstructions on Note Sorting Machines at one place for reference and the same is\nenclosed.\n\n3. The previous circulars issued on the subject (Annexed) stand withdrawn from the\ndate of issuance of this Master Direction.\n\nYours faithfully,\n\n(Sanjeev Prakash)\nChief General Manager-in-Charge\n\nEncl: As above",
+        "3\n\nMaster Direction on Note Sorting Machines\n\nIn exercise of the powers conferred under Section 35A and Section 56 of the Banking\nRegulation Act, 1949, Reserve Bank of India (RBI) being satisfied that it is necessary\nand expedient in the public interest to do so, hereby, issues the Directions hereinafter\nspecified.",
+        "7. Calibration and Periodic Testing of Machines\n\n8.2 NSM models deployed at banks which have been discontinued from production,\nshall be phased out on or before June 30, 2027. The timeline may be strictly adhered\nto, failing which penalties would be levied for non-adherence in terms of Master\nDirection on “Incentives for Currency Distribution and Exchange and Penalties / Penal\nProvisions for Bank Branches and Currency Chests for Deficiency in Rendering\nCustomer Service and Reporting of Transactions / Balances” (Updated as on May\n27, 2026). Going forward, banks shall only procure the BIS certified Note Sorting\nMachines (NSMs).\n\n***************************",
+        "5. Fitness Sorting\n\n6\n\nstiffness in the note paper. Notes with very low stiffness of paper, i.e. with paper\nwhich is worn out in circulation or mechanically mutilated shall be sorted as unfit.\nDetectors for paper quality shall be adapted to the same level as for soiling.\n\n(iii) Dog-Ears\nBanknotes with dog-ears with an area of more than 100 mm2 and a minimum length\nof the smaller edge greater than 5 mm shall be sorted as unfit. Chipped notes shall\nalso be sorted as unfit.\n\n(iv) Tears\nNotes exhibiting at least one tear at the edge shall be classified as those having\ntears. Notes with tears larger than those indicated in Table 3 shall be sorted as unfit.\n\nTable 3: Tears\nSl. No.\nDirection\nWidth\nLength\n1\nVertical\n4 mm\n8 mm\n2\nHorizontal\n4 mm\n15 mm\n3\nDiagonal *\n4 mm\n18 mm\n\n* Measured by drawing a straight line from the peak of the tear to the edge of the\nnote where the tear begins (rectangular projection), rather than measuring the length\nof the tear itself.\n\n(v) Holes"
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 13,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 5,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 1,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 1,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 5,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 3,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 21,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 8,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "564170f3526bc009728bc6bddbb096e3e878950af2c009d15e1326fb42498638",
+          "chunk_index": 14,
+          "title": "Master Direction on Note Sorting Machines",
+          "source_file": "473MDD1229693F0604B6D996B1DF75C81E466.PDF",
+          "page": 6,
+          "circular_no": "RBI/DCM/2026-27/473",
+          "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13723&Mode=0"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.8888841144426651,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "5. Fitness Sorting\n\n(i) Soiling\n\nSoiling refers to the general distribution of dirt across the entire note or in some\npatterns. It is a measure of the loss of reflectivity from the unprinted areas due to\ndirt, ageing (yellowing), wear and extraneous markings and includes decolouration\ndue to ageing, excessive folding and other wearing. Soiling increases the optical\ndensity and decreases the reflectance of the notes. Notes exceeding the soiling\nlevels set out in Table 2 shall be sorted as unfit. Both the obverse and the reverse\nof the note shall be checked for soiling.\n\nTable 2: Soiling Levels\nSl.\nNo.\nDenomination\nMaximum Density\ndifference\nMinimum\nReflectance\n1\n₹5\n0.07\n85%\n2\n₹10\n0.07\n85%\n3\n₹20\n0.06\n87%\n4\n₹50\n0.06\n87%\n5\n₹100\n0.05\n90%\n6\n₹200\n0.05\n90%\n7\n₹500\n0.04\n93%\n\n(ii) Limpness\nLimpness relates to structural deterioration or wear resulting in a marked lack of",
+        "भारतीय ǐरज़वर् बैंक\nRESERVE BANK OF INDIA\nwww.rbi.org.in\nRBI/DCM/2026-27/473\nDCM(NPD) No.S2154/18.00.014/2026-27 October 02, 2026\n\nThe Chairman / Managing Director / Chief Executive Officer\nAll Banks\n\nMadam / Dear Sir,\n\nMaster Direction on Note Sorting Machines\n\nIn exercise of the powers conferred under Section 35A and Section 56 of the\nBanking Regulation Act, 1949, Reserve Bank of India (RBI), from time-to-time\nissues guidelines / circulars / directives to the banks on Note Sorting Machines.\n\n2. A Master Direction incorporating and updating the extant guidelines / circulars /\ndirectives on the subject has been prepared to enable banks to have all current\ninstructions on Note Sorting Machines at one place for reference and the same is\nenclosed.\n\n3. The previous circulars issued on the subject (Annexed) stand withdrawn from the\ndate of issuance of this Master Direction.\n\nYours faithfully,\n\n(Sanjeev Prakash)\nChief General Manager-in-Charge\n\nEncl: As above",
+        "3\n\nMaster Direction on Note Sorting Machines\n\nIn exercise of the powers conferred under Section 35A and Section 56 of the Banking\nRegulation Act, 1949, Reserve Bank of India (RBI) being satisfied that it is necessary\nand expedient in the public interest to do so, hereby, issues the Directions hereinafter\nspecified.",
+        "7. Calibration and Periodic Testing of Machines\n\n8.2 NSM models deployed at banks which have been discontinued from production,\nshall be phased out on or before June 30, 2027. The timeline may be strictly adhered\nto, failing which penalties would be levied for non-adherence in terms of Master\nDirection on “Incentives for Currency Distribution and Exchange and Penalties / Penal\nProvisions for Bank Branches and Currency Chests for Deficiency in Rendering\nCustomer Service and Reporting of Transactions / Balances” (Updated as on May\n27, 2026). Going forward, banks shall only procure the BIS certified Note Sorting\nMachines (NSMs).\n\n***************************",
+        "5. Fitness Sorting\n\n6\n\nstiffness in the note paper. Notes with very low stiffness of paper, i.e. with paper\nwhich is worn out in circulation or mechanically mutilated shall be sorted as unfit.\nDetectors for paper quality shall be adapted to the same level as for soiling.\n\n(iii) Dog-Ears\nBanknotes with dog-ears with an area of more than 100 mm2 and a minimum length\nof the smaller edge greater than 5 mm shall be sorted as unfit. Chipped notes shall\nalso be sorted as unfit.\n\n(iv) Tears\nNotes exhibiting at least one tear at the edge shall be classified as those having\ntears. Notes with tears larger than those indicated in Table 3 shall be sorted as unfit.\n\nTable 3: Tears\nSl. No.\nDirection\nWidth\nLength\n1\nVertical\n4 mm\n8 mm\n2\nHorizontal\n4 mm\n15 mm\n3\nDiagonal *\n4 mm\n18 mm\n\n* Measured by drawing a straight line from the peak of the tear to the edge of the\nnote where the tear begins (rectangular projection), rather than measuring the length\nof the tear itself.\n\n(v) Holes"
+      ]
+    },
+    {
+      "id": "G011",
+      "configuration": "baseline",
+      "question": "In SEBI's ITRI weightage table for MIIs, what weightages are assigned to Availability, Security and Scalability, and what is the total weightage?",
+      "reference": "Availability: 20; Security: 20; Scalability: 5. The total weightage is 100.",
+      "gold_sources": [
+        {
+          "doc_id": "ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea",
+          "page": 2
+        }
+      ],
+      "answer": "Availability: 20 [ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea p.2]  \nSecurity: 20 [ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea p.2]  \nScalability: 5 [ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea p.2]  \nTotal weightage: 100 [ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea p.2]",
+      "status": "generated",
+      "contexts": [
+        "Page 2 of 4\n\n5. Following system-driven framework for computation of ITRI is stipulated for MIIs:\n5.1. ITRI shall measure the robustness of Critical Systems of MIIs as defined at\nClause 9.1.2.3 of Master Circular dated December 30, 2024 for Stock\nExchanges and Clearing Corporations, Clause 4.31.2.3 of Master Circular\ndated December 03, 2024 for Depositories, and Clause 16.4.3(c) of Master\nCircular dated August 04, 2023 for Commodity Derivatives Segment. The\nscope shall also include other systems feeding / related to such Critical\nSystems.\n5.2. The parameters of computing ITRI and their weightages shall be as follows:\n\nSr. No.\nParameters\nWeightage\n1.\nAvailability\n20\n2.\nSecurity\n20\n3.\nIntegrity\n10\n4.\nGovernance\n10\n5.\nReliability and Monitoring\n10\n6.\nBusiness Continuity\n10\n7.\nModularity and Flexibility\n10\n8.\nScalability\n5\n9.\nOthers (such as Incident handling, etc.)\n5\n\nTOTAL\n100",
+        "TOTAL\n100\n\n5.3. The Industry Standards Forum (ISF) of MIIs constituted by SEBI shall finalize\nsub-parameters and detailed measurement criteria for each parameter of ITRI\n(mentioned at Para 5.2 above) by November 30, 2026.\n5.4. MIIs shall compute ITRI on a half-yearly basis within a period of 60 days from\nthe end of each half-year and submit the comparative analysis of two\nconsecutive half-years (on a rolling basis) and corrective actions taken (or",
+        "Dear Sir/ Madam,\nSubject: IT Resilience Index for Market Infrastructure Institutions (MIIs)\nA. Background\n1. IT systems of Market Infrastructure Institutions (MIIs) form backbone of smooth\nand uninterrupted functioning of Securities market and are fundamental to ensuring\nits orderly, efficient and uninterrupted functioning. Any disruption, degrading in\nperformance or compromise of these systems may adversely impact critical market\noperations and pose risks to the trust in the securities market.\n2. Accordingly, it is imperative that MIIs ensure the availability, reliability, performance\nand cyber resilience of their IT systems through robust governance, proactive\nmonitoring and timely corrective measures, so that the securities market continues\nto operate in a fair, transparent and efficient manner.\n3. In order to discharge their role of performance monitoring and ensure timely service\ndelivery to market participants, a framework covering oversight of resilience of IT",
+        "B. IT Resilience Index (ITRI) for MIIs\n4. Pursuant to discussion with SEBI’s Technical Advisory Committee (TAC) and\nConsultation paper dated March 25, 20261, it is decided to create an index that\nwould capture well-functioning and resilience of IT systems of the MII.\n\n1 Consultation Paper on Framework of IT Resilience Index for Market Infrastructure Institutions (MIIs).",
+        "proposed to be taken), to their Standing Committee on Technology (SCOT)\nand the Governing Board.\n5.5. The MIIs shall ensure that the computation of ITRI shall be system-driven, i.e.,\nITRI would be computed automatically from IT systems (or data extracted from\nsuch systems) without manual intervention. This is stipulated with the objective\nof ensuring that computation of ITRI remains non-discretionary and fool proof.\nIn case any of the parameters of ITRI could not be computed automatically\nfrom IT systems and necessitates manual intervention, MII shall carry out\nmanual data retrieval only after prior discussion of such exceptions with their\nSCOT.\n5.6. The ISF shall also formulate baseline parameters, acceptable threshold scores\nas well as the SOP for calculating ITRI along with an objective system-driven\nscoring methodology. This is with the intention of having comparability across\nMIIs.\n5.7. The aforesaid framework would function as a self-operating model requiring"
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea",
+          "chunk_index": 5,
+          "title": "IT Resilience Index for Market Infrastructure Institutions (MIIs)",
+          "source_file": "1787568759364.pdf",
+          "page": 2,
+          "circular_no": "HO/47/18/11(1)2026-MRD-TPD1/I/19509/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/it-resilience-index-for-market-infrastructure-institutions-miis-_103913.html"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea",
+          "chunk_index": 6,
+          "title": "IT Resilience Index for Market Infrastructure Institutions (MIIs)",
+          "source_file": "1787568759364.pdf",
+          "page": 2,
+          "circular_no": "HO/47/18/11(1)2026-MRD-TPD1/I/19509/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/it-resilience-index-for-market-infrastructure-institutions-miis-_103913.html"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea",
+          "chunk_index": 2,
+          "title": "IT Resilience Index for Market Infrastructure Institutions (MIIs)",
+          "source_file": "1787568759364.pdf",
+          "page": 1,
+          "circular_no": "HO/47/18/11(1)2026-MRD-TPD1/I/19509/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/it-resilience-index-for-market-infrastructure-institutions-miis-_103913.html"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea",
+          "chunk_index": 4,
+          "title": "IT Resilience Index for Market Infrastructure Institutions (MIIs)",
+          "source_file": "1787568759364.pdf",
+          "page": 1,
+          "circular_no": "HO/47/18/11(1)2026-MRD-TPD1/I/19509/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/it-resilience-index-for-market-infrastructure-institutions-miis-_103913.html"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea",
+          "chunk_index": 7,
+          "title": "IT Resilience Index for Market Infrastructure Institutions (MIIs)",
+          "source_file": "1787568759364.pdf",
+          "page": 3,
+          "circular_no": "HO/47/18/11(1)2026-MRD-TPD1/I/19509/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/it-resilience-index-for-market-infrastructure-institutions-miis-_103913.html"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.818175327653836,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "errors": {},
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "Page 2 of 4\n\n5. Following system-driven framework for computation of ITRI is stipulated for MIIs:\n5.1. ITRI shall measure the robustness of Critical Systems of MIIs as defined at\nClause 9.1.2.3 of Master Circular dated December 30, 2024 for Stock\nExchanges and Clearing Corporations, Clause 4.31.2.3 of Master Circular\ndated December 03, 2024 for Depositories, and Clause 16.4.3(c) of Master\nCircular dated August 04, 2023 for Commodity Derivatives Segment. The\nscope shall also include other systems feeding / related to such Critical\nSystems.\n5.2. The parameters of computing ITRI and their weightages shall be as follows:\n\nSr. No.\nParameters\nWeightage\n1.\nAvailability\n20\n2.\nSecurity\n20\n3.\nIntegrity\n10\n4.\nGovernance\n10\n5.\nReliability and Monitoring\n10\n6.\nBusiness Continuity\n10\n7.\nModularity and Flexibility\n10\n8.\nScalability\n5\n9.\nOthers (such as Incident handling, etc.)\n5\n\nTOTAL\n100",
+        "TOTAL\n100\n\n5.3. The Industry Standards Forum (ISF) of MIIs constituted by SEBI shall finalize\nsub-parameters and detailed measurement criteria for each parameter of ITRI\n(mentioned at Para 5.2 above) by November 30, 2026.\n5.4. MIIs shall compute ITRI on a half-yearly basis within a period of 60 days from\nthe end of each half-year and submit the comparative analysis of two\nconsecutive half-years (on a rolling basis) and corrective actions taken (or",
+        "Dear Sir/ Madam,\nSubject: IT Resilience Index for Market Infrastructure Institutions (MIIs)\nA. Background\n1. IT systems of Market Infrastructure Institutions (MIIs) form backbone of smooth\nand uninterrupted functioning of Securities market and are fundamental to ensuring\nits orderly, efficient and uninterrupted functioning. Any disruption, degrading in\nperformance or compromise of these systems may adversely impact critical market\noperations and pose risks to the trust in the securities market.\n2. Accordingly, it is imperative that MIIs ensure the availability, reliability, performance\nand cyber resilience of their IT systems through robust governance, proactive\nmonitoring and timely corrective measures, so that the securities market continues\nto operate in a fair, transparent and efficient manner.\n3. In order to discharge their role of performance monitoring and ensure timely service\ndelivery to market participants, a framework covering oversight of resilience of IT",
+        "B. IT Resilience Index (ITRI) for MIIs\n4. Pursuant to discussion with SEBI’s Technical Advisory Committee (TAC) and\nConsultation paper dated March 25, 20261, it is decided to create an index that\nwould capture well-functioning and resilience of IT systems of the MII.\n\n1 Consultation Paper on Framework of IT Resilience Index for Market Infrastructure Institutions (MIIs).",
+        "proposed to be taken), to their Standing Committee on Technology (SCOT)\nand the Governing Board.\n5.5. The MIIs shall ensure that the computation of ITRI shall be system-driven, i.e.,\nITRI would be computed automatically from IT systems (or data extracted from\nsuch systems) without manual intervention. This is stipulated with the objective\nof ensuring that computation of ITRI remains non-discretionary and fool proof.\nIn case any of the parameters of ITRI could not be computed automatically\nfrom IT systems and necessitates manual intervention, MII shall carry out\nmanual data retrieval only after prior discussion of such exceptions with their\nSCOT.\n5.6. The ISF shall also formulate baseline parameters, acceptable threshold scores\nas well as the SOP for calculating ITRI along with an objective system-driven\nscoring methodology. This is with the intention of having comparability across\nMIIs.\n5.7. The aforesaid framework would function as a self-operating model requiring"
+      ]
+    },
+    {
+      "id": "G011",
+      "configuration": "best",
+      "question": "In SEBI's ITRI weightage table for MIIs, what weightages are assigned to Availability, Security and Scalability, and what is the total weightage?",
+      "reference": "Availability: 20; Security: 20; Scalability: 5. The total weightage is 100.",
+      "gold_sources": [
+        {
+          "doc_id": "ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea",
+          "page": 2
+        }
+      ],
+      "answer": "Availability: 20 [ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea p.2]  \nSecurity: 20 [ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea p.2]  \nScalability: 5 [ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea p.2]  \nTotal weightage: 100 [ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea p.2]",
+      "status": "generated",
+      "contexts": [
+        "Page 2 of 4\n\n5. Following system-driven framework for computation of ITRI is stipulated for MIIs:\n5.1. ITRI shall measure the robustness of Critical Systems of MIIs as defined at\nClause 9.1.2.3 of Master Circular dated December 30, 2024 for Stock\nExchanges and Clearing Corporations, Clause 4.31.2.3 of Master Circular\ndated December 03, 2024 for Depositories, and Clause 16.4.3(c) of Master\nCircular dated August 04, 2023 for Commodity Derivatives Segment. The\nscope shall also include other systems feeding / related to such Critical\nSystems.\n5.2. The parameters of computing ITRI and their weightages shall be as follows:\n\nSr. No.\nParameters\nWeightage\n1.\nAvailability\n20\n2.\nSecurity\n20\n3.\nIntegrity\n10\n4.\nGovernance\n10\n5.\nReliability and Monitoring\n10\n6.\nBusiness Continuity\n10\n7.\nModularity and Flexibility\n10\n8.\nScalability\n5\n9.\nOthers (such as Incident handling, etc.)\n5\n\nTOTAL\n100",
+        "TOTAL\n100\n\n5.3. The Industry Standards Forum (ISF) of MIIs constituted by SEBI shall finalize\nsub-parameters and detailed measurement criteria for each parameter of ITRI\n(mentioned at Para 5.2 above) by November 30, 2026.\n5.4. MIIs shall compute ITRI on a half-yearly basis within a period of 60 days from\nthe end of each half-year and submit the comparative analysis of two\nconsecutive half-years (on a rolling basis) and corrective actions taken (or",
+        "B. IT Resilience Index (ITRI) for MIIs\n4. Pursuant to discussion with SEBI’s Technical Advisory Committee (TAC) and\nConsultation paper dated March 25, 20261, it is decided to create an index that\nwould capture well-functioning and resilience of IT systems of the MII.\n\n1 Consultation Paper on Framework of IT Resilience Index for Market Infrastructure Institutions (MIIs).",
+        "Dear Sir/ Madam,\nSubject: IT Resilience Index for Market Infrastructure Institutions (MIIs)\nA. Background\n1. IT systems of Market Infrastructure Institutions (MIIs) form backbone of smooth\nand uninterrupted functioning of Securities market and are fundamental to ensuring\nits orderly, efficient and uninterrupted functioning. Any disruption, degrading in\nperformance or compromise of these systems may adversely impact critical market\noperations and pose risks to the trust in the securities market.\n2. Accordingly, it is imperative that MIIs ensure the availability, reliability, performance\nand cyber resilience of their IT systems through robust governance, proactive\nmonitoring and timely corrective measures, so that the securities market continues\nto operate in a fair, transparent and efficient manner.\n3. In order to discharge their role of performance monitoring and ensure timely service\ndelivery to market participants, a framework covering oversight of resilience of IT",
+        "D. Continuous Monitoring of Service Delivery to Market Participants\n\nE. Implementation Time\n10. The implementation timeline for operationalization of the ITRI framework by MIIs\nshall be as follows-\n10.1. MIIs have already implemented the beta version of the ITRI framework. MIIs\nshall operationalize the aforesaid ITRI framework including Early Warning\nSystem and Real Time Monitoring of Service Delivery by February 28, 2027.\n10.2. The detailed Standard Operating Procedures (SOP) in this regard, after\nfinalization of sub-parameters by ISF (para 5.3 and 5.6) shall be submitted to\nSEBI after review by SCOT of MIIs by January 31, 2027.\n10.3. The first submission of ITRI computation under this framework shall be for the\nhalf-year ending March 31, 2027.\n\n11. MIIs are required to take necessary steps to put in place systems for\nimplementation of this Circular, including necessary amendments to the relevant\nbye-laws, rules and regulations, if any."
+      ],
+      "sources": [
+        {
+          "tag": "Source 1",
+          "doc_id": "ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea",
+          "chunk_index": 5,
+          "title": "IT Resilience Index for Market Infrastructure Institutions (MIIs)",
+          "source_file": "1787568759364.pdf",
+          "page": 2,
+          "circular_no": "HO/47/18/11(1)2026-MRD-TPD1/I/19509/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/it-resilience-index-for-market-infrastructure-institutions-miis-_103913.html"
+        },
+        {
+          "tag": "Source 2",
+          "doc_id": "ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea",
+          "chunk_index": 6,
+          "title": "IT Resilience Index for Market Infrastructure Institutions (MIIs)",
+          "source_file": "1787568759364.pdf",
+          "page": 2,
+          "circular_no": "HO/47/18/11(1)2026-MRD-TPD1/I/19509/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/it-resilience-index-for-market-infrastructure-institutions-miis-_103913.html"
+        },
+        {
+          "tag": "Source 3",
+          "doc_id": "ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea",
+          "chunk_index": 4,
+          "title": "IT Resilience Index for Market Infrastructure Institutions (MIIs)",
+          "source_file": "1787568759364.pdf",
+          "page": 1,
+          "circular_no": "HO/47/18/11(1)2026-MRD-TPD1/I/19509/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/it-resilience-index-for-market-infrastructure-institutions-miis-_103913.html"
+        },
+        {
+          "tag": "Source 4",
+          "doc_id": "ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea",
+          "chunk_index": 2,
+          "title": "IT Resilience Index for Market Infrastructure Institutions (MIIs)",
+          "source_file": "1787568759364.pdf",
+          "page": 1,
+          "circular_no": "HO/47/18/11(1)2026-MRD-TPD1/I/19509/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/it-resilience-index-for-market-infrastructure-institutions-miis-_103913.html"
+        },
+        {
+          "tag": "Source 5",
+          "doc_id": "ff4bac515b58a6f97510ab0bdac59e11e792ec0503dbf00ab6e41f6bb3b176ea",
+          "chunk_index": 12,
+          "title": "IT Resilience Index for Market Infrastructure Institutions (MIIs)",
+          "source_file": "1787568759364.pdf",
+          "page": 4,
+          "circular_no": "HO/47/18/11(1)2026-MRD-TPD1/I/19509/2026",
+          "source_url": "https://www.sebi.gov.in/legal/circulars/aug-2026/it-resilience-index-for-market-infrastructure-institutions-miis-_103913.html"
+        }
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": null,
+        "context_precision": null,
+        "context_recall": null
+      },
+      "errors": {
+        "answer_relevancy": "InstructorRetryException: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m0fq8m5tesft62a90b4kneq7` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198805, Requested 1494. Please try again in 2m9.168s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}",
+        "context_precision": "InstructorRetryException: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m0fq8m5tesft62a90b4kneq7` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198805, Requested 2051. Please try again in 6m9.792s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}",
+        "context_recall": "InstructorRetryException: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m0fq8m5tesft62a90b4kneq7` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198805, Requested 3408. Please try again in 15m56.016s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+      },
+      "judge_reasons": {},
+      "retrieved_contexts": [
+        "Page 2 of 4\n\n5. Following system-driven framework for computation of ITRI is stipulated for MIIs:\n5.1. ITRI shall measure the robustness of Critical Systems of MIIs as defined at\nClause 9.1.2.3 of Master Circular dated December 30, 2024 for Stock\nExchanges and Clearing Corporations, Clause 4.31.2.3 of Master Circular\ndated December 03, 2024 for Depositories, and Clause 16.4.3(c) of Master\nCircular dated August 04, 2023 for Commodity Derivatives Segment. The\nscope shall also include other systems feeding / related to such Critical\nSystems.\n5.2. The parameters of computing ITRI and their weightages shall be as follows:\n\nSr. No.\nParameters\nWeightage\n1.\nAvailability\n20\n2.\nSecurity\n20\n3.\nIntegrity\n10\n4.\nGovernance\n10\n5.\nReliability and Monitoring\n10\n6.\nBusiness Continuity\n10\n7.\nModularity and Flexibility\n10\n8.\nScalability\n5\n9.\nOthers (such as Incident handling, etc.)\n5\n\nTOTAL\n100",
+        "TOTAL\n100\n\n5.3. The Industry Standards Forum (ISF) of MIIs constituted by SEBI shall finalize\nsub-parameters and detailed measurement criteria for each parameter of ITRI\n(mentioned at Para 5.2 above) by November 30, 2026.\n5.4. MIIs shall compute ITRI on a half-yearly basis within a period of 60 days from\nthe end of each half-year and submit the comparative analysis of two\nconsecutive half-years (on a rolling basis) and corrective actions taken (or",
+        "B. IT Resilience Index (ITRI) for MIIs\n4. Pursuant to discussion with SEBI’s Technical Advisory Committee (TAC) and\nConsultation paper dated March 25, 20261, it is decided to create an index that\nwould capture well-functioning and resilience of IT systems of the MII.\n\n1 Consultation Paper on Framework of IT Resilience Index for Market Infrastructure Institutions (MIIs).",
+        "Dear Sir/ Madam,\nSubject: IT Resilience Index for Market Infrastructure Institutions (MIIs)\nA. Background\n1. IT systems of Market Infrastructure Institutions (MIIs) form backbone of smooth\nand uninterrupted functioning of Securities market and are fundamental to ensuring\nits orderly, efficient and uninterrupted functioning. Any disruption, degrading in\nperformance or compromise of these systems may adversely impact critical market\noperations and pose risks to the trust in the securities market.\n2. Accordingly, it is imperative that MIIs ensure the availability, reliability, performance\nand cyber resilience of their IT systems through robust governance, proactive\nmonitoring and timely corrective measures, so that the securities market continues\nto operate in a fair, transparent and efficient manner.\n3. In order to discharge their role of performance monitoring and ensure timely service\ndelivery to market participants, a framework covering oversight of resilience of IT",
+        "D. Continuous Monitoring of Service Delivery to Market Participants\n\nE. Implementation Time\n10. The implementation timeline for operationalization of the ITRI framework by MIIs\nshall be as follows-\n10.1. MIIs have already implemented the beta version of the ITRI framework. MIIs\nshall operationalize the aforesaid ITRI framework including Early Warning\nSystem and Real Time Monitoring of Service Delivery by February 28, 2027.\n10.2. The detailed Standard Operating Procedures (SOP) in this regard, after\nfinalization of sub-parameters by ISF (para 5.3 and 5.6) shall be submitted to\nSEBI after review by SCOT of MIIs by January 31, 2027.\n10.3. The first submission of ITRI computation under this framework shall be for the\nhalf-year ending March 31, 2027.\n\n11. MIIs are required to take necessary steps to put in place systems for\nimplementation of this Circular, including necessary amendments to the relevant\nbye-laws, rules and regulations, if any."
+      ]
+    }
+  ],
+  "review_note": "Review ten scored judgments using the saved question, answer, reference and context. Record a human verdict and evidence for any genuine judge error found. High faithfulness means context support, not a complete or correct answer: the context can be wrong or incomplete, and the judge can err. Reasons may be unavailable. Means exclude missing scores; compare coverage counts as well as averages."
+}
